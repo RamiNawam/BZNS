@@ -20,46 +20,50 @@ import Sidebar from '@/components/layout/sidebar'
 import TopBar from '@/components/layout/top-bar'
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
-  const supabase = createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  // Middleware already blocks unauthenticated users, but double-check here
-  if (!user) redirect('/login')
-
-  // Read the current pathname forwarded by middleware
   const pathname = headers().get('x-pathname') ?? ''
   const isIntakePath = pathname === '/intake'
 
-  // Check if this user has completed intake
-  const profile = await ProfileRepository.getByUserId(user.id)
-  const intakeIncomplete = !profile || !profile.intake_completed
+  // When Supabase is not yet configured (local dev without .env.local),
+  // skip all auth/profile checks and render the app shell directly.
+  const supabaseConfigured =
+    !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  if (intakeIncomplete && !isIntakePath) {
-    // First-time user or incomplete intake → force them through the wizard
-    redirect('/intake')
-  }
+  if (supabaseConfigured) {
+    const supabase = createServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
 
-  if (intakeIncomplete && isIntakePath) {
-    // User is on /intake and hasn't completed it yet — render the wizard
-    // full-screen (no sidebar/topbar chrome) for a clean onboarding UX
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-start justify-center py-12 px-4">
-        <div className="w-full max-w-2xl">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-teal-700">Welcome to BZNS</h1>
-            <p className="text-gray-500 mt-2">
-              Let&apos;s learn about your business idea so we can build your personalised roadmap.
-            </p>
+    // Middleware already blocks unauthenticated users, but double-check here
+    if (!user) redirect('/login')
+
+    // Check if this user has completed intake
+    const profile = await ProfileRepository.getByUserId(user.id)
+    const intakeIncomplete = !profile || !profile.intake_completed
+
+    if (intakeIncomplete && !isIntakePath) {
+      redirect('/intake')
+    }
+
+    if (intakeIncomplete && isIntakePath) {
+      return (
+        <div className="min-h-screen bg-slate-50 flex items-start justify-center py-12 px-4">
+          <div className="w-full max-w-2xl">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-brand-700">Welcome to BZNS</h1>
+              <p className="text-slate-500 mt-2">
+                Let&apos;s learn about your business idea so we can build your personalised roadmap.
+              </p>
+            </div>
+            {children}
           </div>
-          {children}
         </div>
-      </div>
-    )
+      )
+    }
   }
 
-  // Intake complete → render the full app shell
+  // Intake complete (or dev mode) → render the full app shell
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-slate-50">
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <TopBar />
