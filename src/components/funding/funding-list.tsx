@@ -45,7 +45,7 @@ export default function FundingList() {
   return (
     <div className="space-y-4">
       {matches.map((match) => (
-        <FundingCard key={match.programId} match={match} />
+        <FundingCard key={match.program_key} match={match} />
       ))}
     </div>
   );

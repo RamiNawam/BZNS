@@ -1,8 +1,17 @@
 import { create } from 'zustand';
-import type { ChatMessage } from '@/types/chat';
+import type { MessageRole } from '@/types/chat';
+
+// Lightweight client-side message shape (no DB-required fields)
+interface ClientMessage {
+  id: string;
+  role: MessageRole;
+  content: string;
+  created_at: string;
+  sources?: string[] | null;
+}
 
 interface ChatStore {
-  messages: ChatMessage[];
+  messages: ClientMessage[];
   isLoading: boolean;
   error: string | null;
 
@@ -21,11 +30,11 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   error: null,
 
   sendMessage: async (content) => {
-    const userMessage: ChatMessage = {
+    const userMessage: ClientMessage = {
       id: generateId(),
       role: 'user',
       content,
-      createdAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     };
 
     set((state) => ({
@@ -47,11 +56,11 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
       const data = await response.json();
 
-      const assistantMessage: ChatMessage = {
+      const assistantMessage: ClientMessage = {
         id: generateId(),
         role: 'assistant',
         content: data.reply ?? '(No response)',
-        createdAt: new Date().toISOString(),
+        created_at: new Date().toISOString(),
       };
 
       set((state) => ({

@@ -1,41 +1,57 @@
-export type FundingType =
-  | 'grant'
-  | 'loan'
-  | 'loan_guarantee'
-  | 'equity'
-  | 'loan_and_mentorship'
-  | 'wage_subsidy'
-  | 'advisory'
-  | 'other';
+// ============================================================
+// FUNDING TYPES — mirrors the `funding_matches` table in Supabase
+// ============================================================
 
-export interface FundingProgramEligibility {
-  age_min?: number;
-  age_max?: number;
-  location?: string;
-  business_stage?: string;
-  business_type?: string;
-  employees_max?: number;
-  residency?: string;
-  sectors_excluded_en?: string[];
-}
+export type ProgramType = 'loan' | 'grant' | 'tax_credit' | 'mentorship'
 
-export interface FundingProgram {
-  id: string;
-  name_en: string;
-  name_fr?: string;
-  website: string;
-  description_en: string;
-  description_fr?: string;
-  type?: FundingType;
-  eligibility?: FundingProgramEligibility;
-  funding_details?: Record<string, unknown>;
-}
-
+// Full DB row — 1:1 with funding_matches table
 export interface FundingMatch {
-  programId: string;
-  score: number;
-  rationale_en: string;
-  rationale_fr: string;
-  recommended: boolean;
-  program?: FundingProgram;
+  id: string
+  profile_id: string
+  created_at: string
+
+  program_key: string         // e.g. 'futurpreneur', 'pme_mtl_young'
+  program_name: string
+  program_type: ProgramType
+  amount_description: string | null   // e.g. 'Up to $75,000'
+  match_score: number                 // 0-100 from deterministic scorer
+  eligibility_details: Record<string, boolean> | null  // { age_eligible: true, ... }
+  summary: string | null
+  application_url: string | null
+  source_url: string | null
+
+  is_bookmarked: boolean
+  is_dismissed: boolean
 }
+
+// Shape of each program JSON in /data/funding/*.json
+export interface FundingProgramJSON {
+  key: string
+  name: string
+  type: ProgramType
+  amount_description: string
+  summary: string
+  application_url: string
+  source_url: string
+  eligibility: {
+    age_min?: number
+    age_max?: number
+    locations?: string[]
+    immigration_status?: string[]
+    business_types?: string[]
+    business_structures?: string[]
+    max_employees?: number
+    demographics?: string[]   // e.g. ['immigrant', 'woman', 'youth']
+  }
+  scoring_weights: {
+    age: number
+    location: number
+    immigration: number
+    business_type: number
+    demographics: number
+  }
+}
+
+// DTOs
+export type CreateFundingMatchDTO = Omit<FundingMatch, 'id' | 'created_at'>
+export type UpdateFundingMatchDTO = Pick<FundingMatch, 'is_bookmarked' | 'is_dismissed'>

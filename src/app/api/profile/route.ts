@@ -1,33 +1,59 @@
-import { NextRequest, NextResponse } from 'next/server';
-// import { createServerClient } from '@/lib/supabase/server';
+// ============================================================
+// CONTROLLER: POST /api/profile  — create profile from intake
+//             GET  /api/profile  — fetch current user's profile
+// Thin layer: validate input → call service → return JSON
+// ============================================================
 
-/**
- * GET /api/profile — Fetch the current user's business profile
- * POST /api/profile — Create or update the current user's business profile
- */
+import { NextRequest, NextResponse } from 'next/server'
+import { ProfileService } from '@/services/profile.service'
+import { createServerClient } from '@/lib/supabase/server'
 
 export async function GET(_req: NextRequest) {
-  // TODO: Authenticate the user via Supabase session
-  // const supabase = createServerClient();
-  // const { data: { user } } = await supabase.auth.getUser();
-  // if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  // const { data: profile } = await supabase.from('profiles').select('*').eq('user_id', user.id).single();
+  try {
+    const supabase = createServerClient()
+    const { data: { user }, error } = await supabase.auth.getUser()
+    if (error || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  return NextResponse.json({
-    message: 'Profile endpoint stub',
-    profile: null,
-  });
+    const profile = await ProfileService.getByUserId(user.id)
+    if (!profile) return NextResponse.json({ profile: null }, { status: 200 })
+
+    return NextResponse.json({ profile })
+  } catch (err) {
+    console.error('[GET /api/profile]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  try {
+    const supabase = createServerClient()
+    const { data: { user }, error } = await supabase.auth.getUser()
+    if (error || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  // TODO: Validate body with Zod schema
-  // TODO: Upsert profile in Supabase
-  // TODO: Trigger roadmap generation via Claude
+    const body = await req.json()
+    const { answers } = body
 
-  return NextResponse.json({
-    message: 'Profile saved (stub)',
-    received: body,
-  });
+    if (!answers) return NextResponse.json({ error: 'answers required' }, { status: 400 })
+
+    const profile = await ProfileService.createFromIntake(user.id, answers)
+    return NextResponse.json({ profile }, { status: 201 })
+  } catch (err) {
+    console.error('[POST /api/profile]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const body = await req.json()
+    const { profile_id, updates } = body
+
+    if (!profile_id) return NextResponse.json({ error: 'profile_id required' }, { status: 400 })
+
+    const profile = await ProfileService.update(profile_id, updates)
+    return NextResponse.json({ profile })
+  } catch (err) {
+    console.error('[PATCH /api/profile]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }

@@ -46,7 +46,7 @@ export default function RoadmapList() {
       <div className="space-y-3">
         {steps
           .slice()
-          .sort((a, b) => a.priority - b.priority)
+          .sort((a, b) => a.step_order - b.step_order)
           .map((step) => (
             <RoadmapStep key={step.id} step={step} />
           ))}

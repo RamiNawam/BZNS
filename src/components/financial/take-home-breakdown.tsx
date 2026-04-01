@@ -15,15 +15,16 @@ function formatPct(value: number | null | undefined): string {
 }
 
 export default function TakeHomeBreakdown({ snapshot }: TakeHomeBreakdownProps) {
+  const annualRevenue = snapshot.annual_revenue ?? snapshot.gross_monthly_revenue * 12;
   const rows = [
-    { label: 'Gross Income', value: snapshot.grossIncome, bold: false },
-    { label: 'Business Expenses', value: -snapshot.businessExpenses, bold: false },
-    { label: 'Net Business Income', value: snapshot.netBusinessIncome, bold: true },
-    { label: 'QPP Contributions', value: -snapshot.qpp, bold: false },
-    { label: 'QPIP Contributions', value: -snapshot.qpip, bold: false },
-    { label: 'Federal Income Tax', value: -snapshot.federalTax, bold: false },
-    { label: 'Quebec Income Tax', value: -snapshot.quebecTax, bold: false },
-    { label: 'Estimated Take-Home', value: snapshot.estimatedTakeHome, bold: true },
+    { label: 'Annual Revenue',       value: annualRevenue,                            bold: false },
+    { label: 'Business Expenses',    value: -(snapshot.monthly_expenses * 12),        bold: false },
+    { label: 'Net Revenue',          value: snapshot.net_revenue,                     bold: true  },
+    { label: 'QPP Contributions',    value: snapshot.qpp_contribution != null ? -snapshot.qpp_contribution : null, bold: false },
+    { label: 'QPIP Premium',         value: snapshot.qpip_premium    != null ? -snapshot.qpip_premium    : null, bold: false },
+    { label: 'Federal Income Tax',   value: snapshot.federal_income_tax   != null ? -snapshot.federal_income_tax   : null, bold: false },
+    { label: 'Québec Income Tax',    value: snapshot.provincial_income_tax != null ? -snapshot.provincial_income_tax : null, bold: false },
+    { label: 'Monthly Take-Home',    value: snapshot.monthly_take_home,               bold: true  },
   ];
 
   return (
@@ -39,7 +40,7 @@ export default function TakeHomeBreakdown({ snapshot }: TakeHomeBreakdownProps) 
                 className={`px-4 py-2 text-right tabular-nums ${
                   row.bold
                     ? 'font-semibold text-gray-900'
-                    : row.value < 0
+                    : (row.value ?? 0) < 0
                     ? 'text-red-600'
                     : 'text-gray-900'
                 }`}
@@ -49,9 +50,9 @@ export default function TakeHomeBreakdown({ snapshot }: TakeHomeBreakdownProps) 
             </tr>
           ))}
           <tr className="bg-gray-50">
-            <td className="px-4 py-2 text-xs text-gray-500">Effective Tax Rate</td>
+            <td className="px-4 py-2 text-xs text-gray-500">Effective Take-Home Rate</td>
             <td className="px-4 py-2 text-right text-xs text-gray-500 tabular-nums">
-              {formatPct(snapshot.effectiveTaxRate)}
+              {formatPct(snapshot.effective_take_home_rate)}
             </td>
           </tr>
         </tbody>

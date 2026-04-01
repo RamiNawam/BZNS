@@ -3,21 +3,18 @@
 import { useState } from 'react';
 import type { RoadmapStep as RoadmapStepType } from '@/types/roadmap';
 import { useRoadmapStore } from '@/stores/roadmap-store';
-import Badge from '@/components/ui/badge';
 import StepDetail from './step-detail';
 
 interface RoadmapStepProps {
   step: RoadmapStepType;
 }
 
-const categoryColors = {
-  registration: 'info',
-  permits: 'warning',
-  tax: 'danger',
-  banking: 'success',
-  insurance: 'default',
-  other: 'default',
-} as const;
+const STATUS_BADGE: Record<string, string> = {
+  pending:     'bg-gray-100 text-gray-600',
+  in_progress: 'bg-blue-100 text-blue-700',
+  completed:   'bg-green-100 text-green-700',
+  skipped:     'bg-gray-100 text-gray-400',
+};
 
 export default function RoadmapStep({ step }: RoadmapStepProps) {
   const [expanded, setExpanded] = useState(false);
@@ -26,7 +23,7 @@ export default function RoadmapStep({ step }: RoadmapStepProps) {
   const isCompleted = step.status === 'completed';
 
   return (
-    <div className={`card transition-all ${isCompleted ? 'opacity-60' : ''}`}>
+    <div className={`bg-white border border-gray-200 rounded-xl p-4 shadow-sm transition-all ${isCompleted ? 'opacity-60' : ''}`}>
       <div
         className="flex items-start gap-4 cursor-pointer"
         onClick={() => setExpanded((e) => !e)}
@@ -38,31 +35,35 @@ export default function RoadmapStep({ step }: RoadmapStepProps) {
           }}
           className={`mt-0.5 h-5 w-5 rounded border-2 flex-shrink-0 transition-colors ${
             isCompleted
-              ? 'border-brand-600 bg-brand-600 text-white'
-              : 'border-gray-300 hover:border-brand-400'
+              ? 'border-teal-600 bg-teal-600 text-white'
+              : 'border-gray-300 hover:border-teal-400'
           }`}
           aria-label={isCompleted ? 'Mark incomplete' : 'Mark complete'}
         >
-          {isCompleted && <span className="text-xs">✓</span>}
+          {isCompleted && <span className="text-xs leading-none">✓</span>}
         </button>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className={`font-medium ${isCompleted ? 'line-through text-gray-400' : 'text-gray-900'}`}>
-              {step.title_en}
+              {step.title}
             </span>
-            <Badge variant={categoryColors[step.category] ?? 'default'}>
-              {step.category}
-            </Badge>
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_BADGE[step.status] ?? STATUS_BADGE.pending}`}>
+              {step.status.replace('_', ' ')}
+            </span>
           </div>
-          {step.estimatedTimeHours && (
-            <span className="text-xs text-gray-400 mt-0.5">
-              ~{step.estimatedTimeHours}h
-            </span>
-          )}
+          <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">{step.description}</p>
+          <div className="flex gap-3 mt-1">
+            {step.estimated_timeline && (
+              <span className="text-xs text-gray-400">⏱ {step.estimated_timeline}</span>
+            )}
+            {step.estimated_cost && (
+              <span className="text-xs text-gray-400">💰 {step.estimated_cost}</span>
+            )}
+          </div>
         </div>
 
-        <span className="text-gray-400 text-sm">{expanded ? '▲' : '▼'}</span>
+        <span className="text-gray-400 text-sm flex-shrink-0">{expanded ? '▲' : '▼'}</span>
       </div>
 
       {expanded && <StepDetail step={step} />}

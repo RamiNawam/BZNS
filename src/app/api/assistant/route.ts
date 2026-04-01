@@ -1,41 +1,67 @@
-import { NextRequest, NextResponse } from 'next/server';
-// import Anthropic from '@anthropic-ai/sdk';
-// import { selectKnowledgeBase } from '@/lib/knowledge-base/selector';
-// import { buildSystemPrompt } from '@/lib/claude/prompts';
+// ============================================================
+// CONTROLLER: POST   /api/assistant — send a message, get Claude reply
+//             GET    /api/assistant — fetch conversation history
+//             DELETE /api/assistant — clear conversation history
+// Thin layer: validate input → call service → return JSON
+// ============================================================
 
-/**
- * POST /api/assistant — Stream a Claude AI response to a user message,
- * grounded in the BZNS knowledge base.
- */
+import { NextRequest, NextResponse } from 'next/server'
+import { AssistantService } from '@/services/assistant.service'
+import { randomUUID } from 'crypto'
+
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const profile_id = searchParams.get('profile_id')
+    const limit = parseInt(searchParams.get('limit') ?? '50', 10)
+
+    if (!profile_id) return NextResponse.json({ error: 'profile_id required' }, { status: 400 })
+
+    const messages = await AssistantService.getHistory(profile_id, limit)
+    return NextResponse.json({ messages })
+  } catch (err) {
+    console.error('[GET /api/assistant]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { messages, profileContext } = body;
+  try {
+    const body = await req.json()
+    const { profile_id, message, session_id, context_type } = body
 
-  if (!messages || !Array.isArray(messages)) {
-    return NextResponse.json(
-      { error: 'messages array is required' },
-      { status: 400 }
-    );
+    if (!profile_id) return NextResponse.json({ error: 'profile_id required' }, { status: 400 })
+    if (!message || typeof message !== 'string') {
+      return NextResponse.json({ error: 'message (string) required' }, { status: 400 })
+    }
+
+    const resolvedSessionId = session_id ?? randomUUID()
+
+    const reply = await AssistantService.chat(
+      profile_id,
+      message,
+      resolvedSessionId,
+      context_type
+    )
+
+    return NextResponse.json({ reply, session_id: resolvedSessionId })
+  } catch (err) {
+    console.error('[POST /api/assistant]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
+}
 
-  // TODO: Select relevant knowledge base files based on message intent
-  // const relevantContext = await selectKnowledgeBase(messages[messages.length - 1].content);
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const profile_id = searchParams.get('profile_id')
 
-  // TODO: Build grounded system prompt
-  // const systemPrompt = buildSystemPrompt({ profileContext, knowledgeBase: relevantContext });
+    if (!profile_id) return NextResponse.json({ error: 'profile_id required' }, { status: 400 })
 
-  // TODO: Call Claude API (streaming)
-  // const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  // const stream = await anthropic.messages.stream({ model: 'claude-opus-4-5', max_tokens: 1024, system: systemPrompt, messages });
-
-  // TODO: Return a streaming response
-  // return new Response(stream.toReadableStream(), { headers: { 'Content-Type': 'text/event-stream' } });
-
-  return NextResponse.json({
-    message: 'Assistant endpoint stub — implement streaming with Claude SDK',
-    userMessage: messages[messages.length - 1]?.content ?? '',
-    reply:
-      'Bonjour! I am the BZNS assistant. This is a stub response. Implement the Claude SDK integration in this route.',
-  });
+    await AssistantService.clearHistory(profile_id)
+    return NextResponse.json({ message: 'Conversation history cleared' })
+  } catch (err) {
+    console.error('[DELETE /api/assistant]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }

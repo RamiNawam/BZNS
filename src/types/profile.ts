@@ -1,45 +1,86 @@
-export type BusinessStage = 'idea' | 'pre_launch' | 'launched' | 'established';
+// ============================================================
+// PROFILE TYPES — mirrors the `profiles` table in Supabase
+// snake_case matches Supabase's default column naming
+// ============================================================
+
+export type BusinessType =
+  | 'food'
+  | 'freelance'
+  | 'daycare'
+  | 'retail'
+  | 'personal_care'
+  | 'other'
 
 export type BusinessStructure =
   | 'sole_proprietorship'
-  | 'general_partnership'
-  | 'incorporation'
-  | 'cooperative'
-  | 'undecided';
+  | 'corporation'
+  | 'partnership'
 
-export type Province = 'QC' | 'ON' | 'BC' | 'AB' | 'other';
+export type ImmigrationStatus =
+  | 'citizen'
+  | 'permanent_resident'
+  | 'work_permit'
+  | 'student'
 
-export interface UserProfile {
-  id: string;
-  userId: string;
-  businessName: string | null;
-  sector: string | null;
-  sectorCode: string | null; // NAICS code
-  city: string | null;
-  province: Province;
-  businessStage: BusinessStage;
-  businessStructure: BusinessStructure;
-  revenueProjection: number | null;
-  employeesCount: number;
-  hasEmployees: boolean;
+// Full DB row — 1:1 with the profiles table
+export interface Profile {
+  id: string
+  user_id: string
+  created_at: string
+  updated_at: string
 
-  // Demographics (for funding matching)
-  age: number | null;
-  gender: string | null;
-  isIndigenous: boolean;
-  isVisibleMinority: boolean;
-  isNewcomer: boolean;
-  isWoman: boolean;
+  // Business info (from intake)
+  business_name: string | null
+  business_type: BusinessType
+  business_description: string | null
+  industry_sector: string | null
+  municipality: string
+  borough: string | null
+  is_home_based: boolean
+  has_physical_location: boolean
 
-  // Sector-specific flags
-  sellsFood: boolean;
-  sellsAlcohol: boolean;
-  isRegulatedProfession: boolean;
-  operatesInMontreal: boolean;
+  // Personal info (from intake)
+  full_name: string | null
+  age: number | null
+  immigration_status: ImmigrationStatus | null
+  gender: string | null
+  languages_spoken: string[] | null
+  preferred_language: string
 
-  // Timestamps
-  createdAt: string;
-  updatedAt: string;
+  // Business setup (from intake)
+  business_structure: BusinessStructure | null
+  has_partners: boolean
+  num_employees: number
+  expected_monthly_revenue: number | null
+  startup_budget: number | null
+  has_neq: boolean
+  has_gst_qst: boolean
+
+  // Financial snapshot inputs (added on dashboard)
+  monthly_expenses: number | null
+  expense_categories: Record<string, number> | null
+  price_per_unit: number | null
+  units_per_month: number | null
+
+  // Intake tracking
+  intake_completed: boolean
+  intake_answers: Record<string, unknown> | null
 }
 
-export type ProfileFormData = Omit<UserProfile, 'id' | 'userId' | 'createdAt' | 'updatedAt'>;
+// Raw answers from the 8-question intake wizard (sent from the frontend)
+export interface IntakeAnswers {
+  business_idea: string
+  location: string
+  borough?: string
+  is_home_based: boolean
+  age: number
+  immigration_status: ImmigrationStatus
+  expected_monthly_revenue: number
+  has_partners: boolean
+  languages: string[]
+  preferred_language: string
+}
+
+// DTOs — what the service layer accepts
+export type CreateProfileDTO = Omit<Profile, 'id' | 'created_at' | 'updated_at'>
+export type UpdateProfileDTO = Partial<CreateProfileDTO>

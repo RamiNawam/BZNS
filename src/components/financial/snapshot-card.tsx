@@ -56,7 +56,7 @@ export default function SnapshotCard() {
         {snapshot && (
           <div className="space-y-4 pt-2">
             <TakeHomeBreakdown snapshot={snapshot} />
-            <WatchOutFlags warnings={snapshot.warnings ?? []} />
+            <WatchOutFlags warnings={snapshot.watch_out_flags ?? []} />
           </div>
         )}
       </CardContent>
