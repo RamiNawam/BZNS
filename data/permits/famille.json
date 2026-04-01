@@ -1,0 +1,42 @@
+{
+  "agency": "Ministère de la Famille",
+  "full_name_en": "Ministère de la Famille du Québec",
+  "full_name_fr": "Ministère de la Famille du Québec",
+  "website": "https://www.mfa.gouv.qc.ca",
+  "description_en": "The Ministère de la Famille oversees childcare services in Quebec, including subsidized daycares (CPE), family-type childcare providers, and private daycares.",
+  "description_fr": "Le Ministère de la Famille supervise les services de garde au Québec, notamment les CPE, les services de garde en milieu familial et les garderies privées.",
+  "permit_types": [
+    {
+      "id": "cpe_permit",
+      "name_en": "Childcare Centre (CPE) Permit",
+      "name_fr": "Permis de Centre de la petite enfance (CPE)",
+      "description_en": "Required to operate a non-profit childcare centre with subsidized spaces",
+      "capacity_limit": null,
+      "fee_cad": 0,
+      "note_en": "CPEs must operate as non-profit organisations and receive government subsidies per child"
+    },
+    {
+      "id": "home_childcare",
+      "name_en": "Home Childcare Provider Recognition",
+      "name_fr": "Reconnaissance à titre de responsable d'un service de garde en milieu familial",
+      "description_en": "Required to offer subsidized daycare in your own home through a coordinating office (bureau coordonnateur)",
+      "capacity_limit": 6,
+      "fee_cad": 0
+    },
+    {
+      "id": "private_daycare_permit",
+      "name_en": "Private Childcare Permit",
+      "name_fr": "Permis de garderie",
+      "description_en": "Required to operate a private for-profit or non-profit daycare",
+      "capacity_min": 7,
+      "fee_cad": 200,
+      "renewal": "Annual"
+    }
+  ],
+  "background_check_required": true,
+  "first_aid_required": true,
+  "contact": {
+    "phone": "1-855-336-8568",
+    "url": "https://www.mfa.gouv.qc.ca/fr/services-de-garde/Pages/index.aspx"
+  }
+}

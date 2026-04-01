@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "intake": "Profil d'entreprise",
+    "roadmap": "Feuille de route",
+    "funding": "Financement",
+    "starterKit": "Trousse de démarrage",
+    "assistant": "Assistant IA"
+  },
+  "home": {
+    "title": "BZNS — Tremplin pour micro-entreprises",
+    "subtitle": "Votre guide IA pour lancer une micro-entreprise au Québec.",
+    "cta": "Commencer",
+    "dashboard": "Tableau de bord"
+  },
+  "intake": {
+    "title": "Profil d'entreprise",
+    "subtitle": "Parlez-nous de votre idée d'entreprise pour obtenir une feuille de route personnalisée.",
+    "steps": {
+      "basics": "Informations de base",
+      "structure": "Structure juridique",
+      "finances": "Finances",
+      "demographics": "À votre sujet"
+    },
+    "fields": {
+      "businessName": "Nom de l'entreprise",
+      "sector": "Secteur d'activité",
+      "city": "Ville",
+      "province": "Province",
+      "revenueProjection": "Revenu annuel prévu (CAD)",
+      "stage": "Stade de l'entreprise",
+      "structure": "Structure juridique"
+    },
+    "stages": {
+      "idea": "Idée / concept",
+      "pre_launch": "Prélancement (planification)",
+      "launched": "Lancée (moins d'un an)",
+      "established": "Établie (1 an et plus)"
+    }
+  },
+  "roadmap": {
+    "title": "Votre feuille de route",
+    "empty": "Complétez votre profil d'entreprise pour générer une feuille de route personnalisée.",
+    "categories": {
+      "registration": "Immatriculation",
+      "permits": "Permis",
+      "tax": "Fiscalité",
+      "banking": "Services bancaires",
+      "insurance": "Assurances",
+      "other": "Autre"
+    }
+  },
+  "funding": {
+    "title": "Sources de financement",
+    "empty": "Complétez votre profil d'entreprise pour voir les correspondances de financement.",
+    "score": "Score de correspondance",
+    "recommended": "Recommandé",
+    "learnMore": "En savoir plus"
+  },
+  "assistant": {
+    "title": "Assistant IA",
+    "placeholder": "Posez-moi une question sur le démarrage de votre entreprise au Québec...",
+    "send": "Envoyer",
+    "thinking": "Réflexion en cours..."
+  },
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "next": "Suivant",
+    "back": "Retour",
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite. Veuillez réessayer."
+  }
+}

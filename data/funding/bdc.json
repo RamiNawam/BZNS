@@ -1,0 +1,46 @@
+{
+  "id": "bdc",
+  "name_en": "Business Development Bank of Canada (BDC)",
+  "name_fr": "Banque de développement du Canada (BDC)",
+  "website": "https://www.bdc.ca",
+  "description_en": "BDC is Canada's only bank devoted exclusively to entrepreneurs. It offers business loans, venture capital, and advisory services tailored to Canadian SMEs.",
+  "description_fr": "La BDC est la seule banque au Canada entièrement dédiée aux entrepreneurs. Elle offre des prêts aux entreprises, du capital de risque et des services-conseils.",
+  "products": [
+    {
+      "id": "small_business_loan",
+      "name_en": "Small Business Loan",
+      "description_en": "Flexible term loans for equipment purchase, working capital, leasehold improvements",
+      "amount_range_cad": "10,000–100,000",
+      "term_years": "Up to 10",
+      "collateral_required": false,
+      "note_en": "BDC uses a risk-based approach — weaker credit profiles can still qualify"
+    },
+    {
+      "id": "startup_financing",
+      "name_en": "Startup / Early-Stage Financing",
+      "description_en": "For businesses less than 2 years old",
+      "amount_range_cad": "Up to $100,000",
+      "co_lending_en": "Often co-lent with Futurpreneur for younger entrepreneurs"
+    },
+    {
+      "id": "venture_capital",
+      "name_en": "BDC Venture Capital",
+      "description_en": "Equity investments for high-growth technology companies",
+      "stage": "Seed to Series B",
+      "focus_sectors_en": ["AI / Deep Tech", "CleanTech", "Life Sciences", "Industrial Innovation"]
+    }
+  ],
+  "advisory_services": {
+    "available": true,
+    "description_en": "BDC advisors and consultants help with business planning, digital transformation, and management coaching",
+    "fee": "Paid — rates vary by engagement"
+  },
+  "eligibility": {
+    "residency": "Canadian-owned or controlled business",
+    "sectors_excluded_en": ["Weapons", "Gambling", "Real estate (passive investment)"]
+  },
+  "montreal_office": {
+    "address": "5 Place Ville Marie, Suite 300, Montreal, QC H3B 2G2",
+    "phone": "514-283-5904"
+  }
+}

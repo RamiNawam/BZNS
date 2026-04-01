@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "intake": "Business Profile",
+    "roadmap": "Roadmap",
+    "funding": "Funding",
+    "starterKit": "Starter Kit",
+    "assistant": "AI Assistant"
+  },
+  "home": {
+    "title": "BZNS — Micro-Business Launchpad",
+    "subtitle": "Your AI-powered guide to launching a micro-business in Quebec.",
+    "cta": "Get Started",
+    "dashboard": "Dashboard"
+  },
+  "intake": {
+    "title": "Business Profile",
+    "subtitle": "Tell us about your business idea to get a personalised roadmap.",
+    "steps": {
+      "basics": "Basics",
+      "structure": "Structure",
+      "finances": "Finances",
+      "demographics": "About You"
+    },
+    "fields": {
+      "businessName": "Business Name",
+      "sector": "Industry / Sector",
+      "city": "City",
+      "province": "Province",
+      "revenueProjection": "Expected Annual Revenue (CAD)",
+      "stage": "Business Stage",
+      "structure": "Business Structure"
+    },
+    "stages": {
+      "idea": "Idea / concept",
+      "pre_launch": "Pre-launch (planning)",
+      "launched": "Launched (under 1 year)",
+      "established": "Established (1+ years)"
+    }
+  },
+  "roadmap": {
+    "title": "Your Roadmap",
+    "empty": "Complete your business profile to generate a personalised roadmap.",
+    "categories": {
+      "registration": "Registration",
+      "permits": "Permits",
+      "tax": "Tax Setup",
+      "banking": "Banking",
+      "insurance": "Insurance",
+      "other": "Other"
+    }
+  },
+  "funding": {
+    "title": "Funding Matches",
+    "empty": "Complete your business profile to see funding matches.",
+    "score": "Match score",
+    "recommended": "Recommended",
+    "learnMore": "Learn more"
+  },
+  "assistant": {
+    "title": "AI Assistant",
+    "placeholder": "Ask me anything about starting your business in Quebec...",
+    "send": "Send",
+    "thinking": "Thinking..."
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "next": "Next",
+    "back": "Back",
+    "loading": "Loading...",
+    "error": "Something went wrong. Please try again."
+  }
+}

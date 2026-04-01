@@ -1,0 +1,45 @@
+{
+  "municipality": "Montreal",
+  "authority": "Ville de Montréal",
+  "website": "https://montreal.ca/en/topics/opening-business",
+  "description_en": "All businesses operating in Montreal must obtain a municipal business permit. Additional zoning, signage, and construction permits may also apply depending on business type and location.",
+  "description_fr": "Toutes les entreprises exploitées à Montréal doivent obtenir un permis d'exploitation municipal.",
+  "business_permit": {
+    "name_en": "Business Operating Permit (Permis d'exploitation)",
+    "fee_range_cad": "115–500",
+    "renewal": "Annual",
+    "how_to_apply": "https://montreal.ca/en/articles/applying-business-operating-permit",
+    "processing_time_en": "5–15 business days"
+  },
+  "zoning": {
+    "description_en": "Business use must comply with the borough's urban plan and zoning bylaws. Verify permitted uses before signing a lease.",
+    "tool": "https://montreal.ca/en/articles/using-urbanism-and-development-urban-plan",
+    "note_en": "Home-based businesses may have restrictions on signage, client visits, and noise"
+  },
+  "home_based_business": {
+    "permitted": true,
+    "restrictions_en": [
+      "Maximum 1 non-resident employee on premises",
+      "No exterior signage larger than 0.2m²",
+      "No retail sales to the general public from the home",
+      "Business use must remain secondary to residential use"
+    ]
+  },
+  "additional_permits": [
+    {
+      "name_en": "Terrasse (Outdoor Patio) Permit",
+      "applicable_to": "Restaurants, bars, cafes",
+      "fee_cad": 350,
+      "renewal": "Annual (May–October)"
+    },
+    {
+      "name_en": "Mobile Food Vendor Permit",
+      "applicable_to": "Food trucks, market stalls",
+      "fee_range_cad": "200–600"
+    }
+  ],
+  "contact": {
+    "phone": "311",
+    "email": "permis@montreal.ca"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "agency": "CRA",
+  "full_name_en": "Canada Revenue Agency",
+  "full_name_fr": "Agence du revenu du Canada",
+  "website": "https://www.canada.ca/en/revenue-agency.html",
+  "portal": "https://www.canada.ca/en/revenue-agency/services/e-services/e-services-businesses/business-account.html",
+  "description_en": "The CRA administers federal tax laws for the Government of Canada. Businesses need a Business Number (BN) to interact with CRA program accounts.",
+  "description_fr": "L'ARC administre les lois fiscales fédérales. Les entreprises ont besoin d'un numéro d'entreprise (NE) pour interagir avec les comptes de programme de l'ARC.",
+  "business_number": {
+    "description_en": "A 9-digit number that is the federal identifier for your business",
+    "format": "XXXXXXXXX",
+    "how_to_register_en": "Register online via Business Registration Online (BRO), by phone at 1-800-959-5525, or in person at a CRA tax services office."
+  },
+  "program_accounts": {
+    "GST_HST": {
+      "suffix": "RT",
+      "description_en": "Required when annual taxable supplies exceed $30,000",
+      "voluntary_registration": true
+    },
+    "payroll": {
+      "suffix": "RP",
+      "description_en": "Required when you hire employees and withhold deductions"
+    },
+    "corporate_income_tax": {
+      "suffix": "RC",
+      "description_en": "Required for incorporated businesses"
+    },
+    "import_export": {
+      "suffix": "RM",
+      "description_en": "Required if importing/exporting goods"
+    }
+  },
+  "my_business_account": {
+    "description_en": "Online portal to manage your CRA accounts, file returns, and make payments",
+    "url": "https://www.canada.ca/en/revenue-agency/services/e-services/e-services-businesses/business-account.html"
+  }
+}

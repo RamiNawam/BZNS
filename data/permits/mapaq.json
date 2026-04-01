@@ -1,0 +1,40 @@
+{
+  "agency": "MAPAQ",
+  "full_name_en": "Ministère de l'Agriculture, des Pêcheries et de l'Alimentation du Québec",
+  "full_name_fr": "Ministère de l'Agriculture, des Pêcheries et de l'Alimentation du Québec",
+  "website": "https://www.mapaq.gouv.qc.ca",
+  "description_en": "MAPAQ regulates food safety and inspects food businesses in Quebec. Any business that prepares, transforms, or sells food for human consumption may require a MAPAQ permit.",
+  "description_fr": "Le MAPAQ réglemente la salubrité alimentaire et inspecte les entreprises alimentaires au Québec.",
+  "applicable_sectors": [
+    "Restaurant / food service",
+    "Food processing and manufacturing",
+    "Grocery and specialty food retail",
+    "Catering",
+    "Bakery and pastry shop",
+    "Farm direct sales",
+    "Food truck / mobile food vendor"
+  ],
+  "permits": [
+    {
+      "id": "food_establishment_permit",
+      "name_en": "Food Establishment Permit",
+      "name_fr": "Permis d'exploitation d'un établissement alimentaire",
+      "required_for_en": "Any fixed or mobile location preparing or selling food to the public",
+      "fee_range_cad": "175–525",
+      "renewal": "Annual",
+      "processing_time_en": "2–4 weeks after inspection",
+      "url": "https://www.mapaq.gouv.qc.ca/en/Restauration/Pages/permis.aspx"
+    }
+  ],
+  "inspection_requirements_en": [
+    "Commercial-grade kitchen equipment",
+    "Adequate refrigeration and temperature controls",
+    "Proper food storage and labelling",
+    "Employee food handler training (MAPAQ recommends HACCP-based training)",
+    "Pest control measures"
+  ],
+  "contact": {
+    "phone": "1-888-222-6272",
+    "email": "info@mapaq.gouv.qc.ca"
+  }
+}

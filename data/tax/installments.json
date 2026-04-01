@@ -1,0 +1,47 @@
+{
+  "title_en": "Tax Instalments — Self-Employed in Quebec (2026)",
+  "description_en": "Self-employed individuals whose net tax owing exceeds $3,000 (federal) or $1,800 (Quebec) must pay quarterly tax instalments to avoid interest charges.",
+  "federal": {
+    "threshold_cad": 3000,
+    "administered_by": "CRA",
+    "payment_dates_2026": [
+      "March 15, 2026",
+      "June 15, 2026",
+      "September 15, 2026",
+      "December 15, 2026"
+    ],
+    "calculation_methods": [
+      {
+        "method": "Current Year Method",
+        "description_en": "Pay 25% of your estimated current year tax owing each quarter"
+      },
+      {
+        "method": "Prior Year Method",
+        "description_en": "Pay 25% of your prior year net tax owing each quarter"
+      },
+      {
+        "method": "No-Calculation Option",
+        "description_en": "Use CRA's pre-calculated amounts on your instalment reminder notices"
+      }
+    ],
+    "payment_url": "https://www.canada.ca/en/revenue-agency/services/payments-cra/individual-payments/income-tax-instalments.html"
+  },
+  "quebec": {
+    "threshold_cad": 1800,
+    "administered_by": "Revenu Québec",
+    "payment_dates_2026": [
+      "March 15, 2026",
+      "June 15, 2026",
+      "September 15, 2026",
+      "December 15, 2026"
+    ],
+    "payment_url": "https://www.revenuquebec.ca/en/individuals/income-tax/tax-instalments/",
+    "form": "TPZ-1026.A"
+  },
+  "tips_en": [
+    "Set aside 25–35% of each invoice as a tax reserve",
+    "Open a separate savings account for tax instalments",
+    "Interest on late instalments is charged at the prescribed rate (currently ~8%)",
+    "The instalment holiday rule: no penalties if you paid your prior year balance in full"
+  ]
+}

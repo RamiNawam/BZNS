@@ -1,0 +1,59 @@
+{
+  "description_en": "Quebec has 46 professional orders governed by the Professional Code. Members of regulated professions must belong to the relevant order and hold a valid permit to practise.",
+  "description_fr": "Le Québec compte 46 ordres professionnels régis par le Code des professions. Les membres des professions réglementées doivent appartenir à l'ordre concerné.",
+  "governing_body": {
+    "name_en": "Conseil interprofessionnel du Québec (CIQ)",
+    "website": "https://www.professions-quebec.org"
+  },
+  "selected_orders": [
+    {
+      "id": "oiq",
+      "name_en": "Ordre des ingénieurs du Québec (OIQ)",
+      "profession_en": "Engineers",
+      "website": "https://www.oiq.qc.ca",
+      "annual_fee_range_cad": "400–700",
+      "permit_to_practise_required": true
+    },
+    {
+      "id": "barreau",
+      "name_en": "Barreau du Québec",
+      "profession_en": "Lawyers (barristers & solicitors)",
+      "website": "https://www.barreau.qc.ca",
+      "annual_fee_range_cad": "700–1500",
+      "permit_to_practise_required": true
+    },
+    {
+      "id": "oaq",
+      "name_en": "Ordre des architectes du Québec (OAQ)",
+      "profession_en": "Architects",
+      "website": "https://www.oaq.com",
+      "annual_fee_range_cad": "600–900",
+      "permit_to_practise_required": true
+    },
+    {
+      "id": "opq",
+      "name_en": "Ordre des psychologues du Québec (OPQ)",
+      "profession_en": "Psychologists",
+      "website": "https://www.ordrepsy.qc.ca",
+      "annual_fee_range_cad": "500–800",
+      "permit_to_practise_required": true
+    },
+    {
+      "id": "cpa_quebec",
+      "name_en": "Ordre des CPA du Québec",
+      "profession_en": "Chartered Professional Accountants",
+      "website": "https://cpaquebec.ca",
+      "annual_fee_range_cad": "600–1100",
+      "permit_to_practise_required": true
+    },
+    {
+      "id": "oiiq",
+      "name_en": "Ordre des infirmières et infirmiers du Québec (OIIQ)",
+      "profession_en": "Nurses",
+      "website": "https://www.oiiq.org",
+      "annual_fee_range_cad": "300–500",
+      "permit_to_practise_required": true
+    }
+  ],
+  "note_en": "This is a representative selection. Verify with the CIQ directory for all 46 orders. Failure to hold a valid permit to practise is a professional offence."
+}
