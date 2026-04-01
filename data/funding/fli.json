@@ -1,34 +1,123 @@
 {
+  "_meta": {
+    "file": "funding/fli.json",
+    "description": "Fonds locaux d'investissement (FLI) — borough-level micro-loans for Montreal businesses. Each Montreal borough administers its own FLI through a CDEC or local development organization.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "main": "https://montreal.ca/en/articles/local-investment-fund",
+      "pmemtl_fli": "https://www.pmemtl.com/en/financing",
+      "cdec_cote_des_neiges": "https://www.cdeccdn.org"
+    }
+  },
+
   "id": "fli",
-  "name_en": "Fonds local d'investissement (FLI)",
-  "name_fr": "Fonds local d'investissement (FLI)",
-  "website": "https://www.pmemtl.com/financement/fli",
-  "administered_by": "PME MTL (on behalf of the City of Montreal)",
-  "description_en": "The FLI (Local Investment Fund) provides risk financing to SMEs and social economy enterprises in Montreal that cannot fully access traditional financing. It offers flexible loans to support business creation and growth.",
-  "description_fr": "Le FLI fournit du financement à risque aux PME et entreprises d'économie sociale de Montréal qui ne peuvent pas accéder pleinement aux sources traditionnelles.",
-  "funding_details": {
-    "loan_range_cad": "5,000–150,000",
-    "interest_rate_en": "Preferential — assessed case by case",
-    "term_years": "Up to 7",
-    "eligible_expenses_en": [
-      "Working capital",
-      "Equipment purchase",
-      "Leasehold improvements",
-      "Business acquisition"
-    ]
+  "program_name_en": "Fonds locaux d'investissement (FLI) — Local Investment Fund",
+  "program_name_fr": "Fonds locaux d'investissement (FLI)",
+  "program_key": "fli",
+  "type": "loan",
+
+  "plain_language_summary": "Every Montreal borough has a Fonds local d'investissement (FLI) — a pool of money specifically for local businesses. These are micro-loans typically ranging from $5,000 to $50,000, administered by local economic development organizations (CDECs, PME MTL centres). Because they're local and less publicized than national programs, they're often less competitive and faster to access.",
+
+  "amount": {
+    "typical_minimum": 5000,
+    "typical_maximum": 50000,
+    "note": "Varies by borough — some go up to $100,000 for the right project. Verify with your local administrator."
   },
+
+  "interest_rate": "Below market — typically 4-6% fixed (verify with your local FLI)",
+  "repayment": "Typically 2-5 years",
+
   "eligibility": {
-    "location": "Must be located in Montreal",
-    "employees_max": 50,
-    "business_type": "SMEs and social economy enterprises",
-    "note_en": "Priority given to innovative projects, social economy, and underrepresented entrepreneurs"
+    "scoring_weights": {
+      "location_montreal": 0.45,
+      "business_stage": 0.25,
+      "local_economic_impact": 0.20,
+      "immigration_status": 0.10
+    },
+    "criteria": {
+      "location": {
+        "required": true,
+        "detail": "Business must be located in the specific borough whose FLI you're applying to",
+        "note": "Each borough has its own FLI — you apply to your specific borough's fund"
+      },
+      "immigration_status": {
+        "eligible": ["canadian_citizen", "permanent_resident", "work_permit"],
+        "note": "FLIs are locally administered and often more flexible on immigration status than federal programs — verify with your local administrator"
+      },
+      "local_economic_impact": {
+        "detail": "Preference for businesses that create local jobs, serve the local community, or operate in priority sectors for that borough",
+        "examples": ["Home daycare creates local childcare (priority in many boroughs)", "Food business supplies local markets", "Service business hiring locally"]
+      },
+      "business_plan": "Required — PME MTL advisors can help prepare"
+    }
   },
-  "complementary_programs_en": [
-    "Fonds de développement des entreprises d'économie sociale (FDEÉS) — for co-ops and non-profits",
-    "Fonds Femmes Montréal — for women entrepreneurs"
+
+  "borough_administrators_montreal": [
+    {
+      "borough": "Villeray–Saint-Michel–Parc-Extension",
+      "administrator": "CDEC Rosemont–Petite-Patrie or local PME MTL Grand Nord",
+      "contact": "PME MTL Grand Nord — 514-858-1555"
+    },
+    {
+      "borough": "Plateau-Mont-Royal",
+      "administrator": "PME MTL Centre-Est",
+      "contact": "514-723-5823"
+    },
+    {
+      "borough": "Rosemont–La Petite-Patrie",
+      "administrator": "CDEC Rosemont–Petite-Patrie",
+      "contact": "https://www.cdec-rpp.org",
+      "phone": "514-723-0030"
+    },
+    {
+      "borough": "Côte-des-Neiges–Notre-Dame-de-Grâce",
+      "administrator": "CDEC CDN-NDG",
+      "contact": "https://www.cdeccdn.org",
+      "phone": "514-737-2880"
+    },
+    {
+      "borough": "Sud-Ouest",
+      "administrator": "RESO (Regroupement économique et social du Sud-Ouest)",
+      "contact": "https://www.resosudouest.com"
+    },
+    {
+      "borough": "Ahuntsic-Cartierville",
+      "administrator": "CDEC Ahuntsic-Cartierville or PME MTL Grand Nord",
+      "contact": "PME MTL Grand Nord — 514-858-1555"
+    }
   ],
-  "contact": {
-    "phone": "514-328-4200",
-    "url": "https://www.pmemtl.com/financement/fli"
-  }
+
+  "what_you_need": [
+    "Business plan",
+    "Financial projections (2-3 years)",
+    "Proof of Montreal address (personal and business)",
+    "NEQ registration",
+    "Personal financial statements"
+  ],
+
+  "timeline": {
+    "application_to_decision": "3-6 weeks typically",
+    "note": "Local funds often move faster than national programs"
+  },
+
+  "why_this_is_a_hidden_gem": [
+    "Less known than Futurpreneur or PME MTL — less competition",
+    "Locally administered means more personal relationship with your advisor",
+    "More flexible on immigration status in many boroughs",
+    "Can be stacked with other programs (Futurpreneur + FLI + PME MTL)",
+    "Local administrators understand your specific neighbourhood's business environment"
+  ],
+
+  "stacking_note": "FLI loans can often be combined with PME MTL financing and other programs. A business in Rosemont could potentially access: FLI (up to $50K) + PME MTL Young Entrepreneurs Fund ($20K) + Futurpreneur ($75K if 18-39) for substantial startup capital.",
+
+  "common_mistakes": [
+    "Not knowing your borough's FLI exists — most entrepreneurs don't",
+    "Going to the wrong administrator — each borough has a different organization running its FLI",
+    "Not asking PME MTL advisors about the FLI — they know which borough funds have money available",
+    "Applying too late in the fiscal year — some FLIs run out of funds before year end"
+  ],
+
+  "application_url": "Contact your borough's PME MTL office or CDEC — see borough administrators above",
+  "source_url": "https://montreal.ca/en/articles/local-investment-fund",
+  "government_body": "Administered locally through CDECs and PME MTL, funded by Ville de Montréal"
 }

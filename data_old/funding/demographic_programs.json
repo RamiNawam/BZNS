@@ -1,0 +1,52 @@
+{
+  "title_en": "Funding Programs for Underrepresented Entrepreneurs",
+  "description_en": "These programs provide targeted financial support and advisory services to entrepreneurs from underrepresented communities in Canada and Quebec.",
+  "programs": [
+    {
+      "id": "women_entrepreneurs",
+      "name_en": "Women Entrepreneurship Strategy (WES) Ecosystem Fund",
+      "administered_by": "ISED Canada",
+      "website": "https://ised-isde.canada.ca/site/women-entrepreneurship-strategy",
+      "description_en": "Federal initiative providing grants and resources to women-owned businesses and organizations that support women entrepreneurs",
+      "target_group": "Women entrepreneurs",
+      "type": "Grant and ecosystem support"
+    },
+    {
+      "id": "fonds_femmes_mtl",
+      "name_en": "Fonds Femmes Montréal",
+      "administered_by": "PME MTL",
+      "website": "https://www.pmemtl.com",
+      "description_en": "Loan fund for women entrepreneurs based in Montreal",
+      "target_group": "Women entrepreneurs (Montreal)",
+      "loan_range_cad": "5,000–50,000",
+      "type": "Loan"
+    },
+    {
+      "id": "black_entrepreneurship",
+      "name_en": "Black Entrepreneurship Program (BEP)",
+      "administered_by": "ISED Canada",
+      "website": "https://ised-isde.canada.ca/site/black-entrepreneurship-program",
+      "description_en": "Federal program providing loans (up to $250,000) and training to Black business owners in Canada",
+      "target_group": "Black entrepreneurs",
+      "loan_max_cad": 250000,
+      "type": "Loan and coaching"
+    },
+    {
+      "id": "indigenous_entrepreneurs",
+      "name_en": "Aboriginal Business and Entrepreneurship Development (ABED)",
+      "administered_by": "CIRNAC",
+      "website": "https://www.sac-isc.gc.ca/eng/1375201178602/1610797286236",
+      "description_en": "Funding for Indigenous entrepreneurs and communities to start or expand a business",
+      "target_group": "First Nations, Métis, and Inuit entrepreneurs",
+      "type": "Grant and loan"
+    },
+    {
+      "id": "newcomer_entrepreneurs",
+      "name_en": "Newcomer Entrepreneur Support",
+      "administered_by": "Various (MIDI, PAENQ, local CDECs)",
+      "description_en": "Quebec and Montreal offer targeted advisory support and micro-loans for immigrant and newcomer entrepreneurs through organizations like MIDI and Femmessor",
+      "target_group": "Immigrant and newcomer entrepreneurs",
+      "type": "Advisory and micro-loan"
+    }
+  ]
+}

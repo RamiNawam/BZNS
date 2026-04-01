@@ -1,33 +1,88 @@
 {
+  "_meta": {
+    "file": "funding/irap.json",
+    "description": "NRC IRAP (Industrial Research Assistance Program) — federal R&D funding for innovative small businesses. Most relevant for tech, software, and product development businesses.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "main": "https://nrc.canada.ca/en/support-technology-innovation/about-nrc-irap",
+      "eligibility": "https://nrc.canada.ca/en/support-technology-innovation/nrc-irap-eligibility-requirements",
+      "apply": "https://nrc.canada.ca/en/support-technology-innovation/apply-nrc-irap-funding"
+    }
+  },
+
   "id": "irap",
-  "name_en": "Industrial Research Assistance Program (IRAP)",
-  "name_fr": "Programme d'aide à la recherche industrielle (PARI)",
-  "website": "https://nrc.canada.ca/en/support-technology-innovation",
-  "administered_by": "National Research Council of Canada (NRC)",
-  "description_en": "IRAP provides financial support and advisory services to Canadian small and medium-sized businesses engaged in technology innovation. Funding helps cover R&D labour and contractor costs.",
-  "description_fr": "Le PARI offre un soutien financier et des services-conseils aux PME canadiennes engagées dans l'innovation technologique.",
-  "funding_details": {
-    "type": "Contribution (non-repayable grant)",
-    "typical_amount_range_cad": "10,000–500,000",
-    "eligible_costs_en": [
-      "Salaries and wages for R&D staff",
-      "Eligible subcontractor costs",
-      "Equipment directly tied to the R&D project"
-    ],
-    "note_en": "Funding amounts vary widely based on project scope. Large technology firms may receive multi-million dollar contributions."
+  "program_name_en": "NRC IRAP — Industrial Research Assistance Program",
+  "program_name_fr": "PARI-CNRC — Programme d'aide à la recherche industrielle",
+  "program_key": "irap",
+  "type": "grant",
+
+  "plain_language_summary": "IRAP provides funding and advisory services for Canadian small businesses doing technological innovation or R&D. If you're building a software product, developing a new technology, or creating an innovative process — not just providing a service — IRAP may cover up to 80% of eligible project costs. Very underused by small tech businesses.",
+
+  "amount": {
+    "advisory_services": "Free — Industrial Technology Advisors (ITAs) provide free technical and business advice",
+    "financial_contributions": "Project-based — typically $50,000 to $500,000 for SMEs; micro-projects can be smaller",
+    "youth_employment": "Separate stream: up to $25,000 to hire a post-secondary student for an R&D project",
+    "note": "IRAP doesn't have a fixed maximum — it depends on your project scope and eligible costs"
   },
+
   "eligibility": {
-    "business_type": "Incorporated Canadian SME",
-    "employees_max": 500,
-    "focus": "Technology development or adaptation with commercial potential",
-    "sectors_en": ["Software", "Hardware", "Biotech", "CleanTech", "Advanced Manufacturing", "Agri-tech"]
+    "scoring_weights": {
+      "business_type_tech": 0.45,
+      "business_stage": 0.25,
+      "immigration_status": 0.20,
+      "innovation_component": 0.10
+    },
+    "criteria": {
+      "business_type": {
+        "strong_fit": ["Software development", "App/platform development", "Tech consulting with proprietary tool development", "Food tech / food science innovation", "Any business developing a new product or process"],
+        "weak_fit": ["Service businesses with no R&D component", "Standard retail", "Home daycare", "Standard food preparation (unless innovating a process or product)"],
+        "key_question": "Are you developing something technically new, or just providing an existing service?"
+      },
+      "company_size": {
+        "employees_max": 500,
+        "note": "IRAP is specifically for small and medium enterprises — no minimum size"
+      },
+      "immigration_status": {
+        "eligible": ["canadian_citizen", "permanent_resident"],
+        "note": "Company must be incorporated in Canada or be a Canadian sole proprietor"
+      },
+      "business_stage": {
+        "eligible": ["Early stage with a defined R&D project", "Growth stage with new product/process development"],
+        "not_eligible": "Pure service delivery with no innovation component"
+      }
+    }
   },
-  "irap_advisors": {
-    "description_en": "IRAP Industrial Technology Advisors (ITAs) are assigned to businesses and provide both financial support and strategic advisory services at no cost",
-    "how_to_find": "https://nrc.canada.ca/en/support-technology-innovation/find-industrial-technology-advisor"
+
+  "how_it_works": {
+    "step_1": "Contact an NRC Industrial Technology Advisor (ITA) — they're assigned by region and provide free advisory services first",
+    "step_2": "ITA helps you identify if you have an eligible project and guides your application",
+    "step_3": "Apply with a defined project: technical objectives, timeline, budget, expected outcomes",
+    "step_4": "If approved, funding covers a portion of eligible costs (salaries, contractor fees, some materials)",
+    "note": "The ITA relationship is valuable beyond funding — they provide free technical mentorship"
   },
-  "contact": {
-    "phone": "1-877-994-4727",
-    "email": "irap-pari@nrc-cnrc.gc.ca"
-  }
+
+  "sred_comparison": {
+    "sred_note": "SR&ED (Scientific Research & Experimental Development) is a related federal tax credit that many small tech businesses also qualify for. IRAP and SR&ED can sometimes be combined — ask your ITA about this.",
+    "sred_url": "https://www.canada.ca/en/revenue-agency/services/scientific-research-experimental-development-tax-incentive-program.html"
+  },
+
+  "persona_fit": {
+    "Marcus_freelance_dev": "Potentially strong fit if Marcus is building proprietary tools or platforms — not just hourly consulting. If he's developing a software product, IRAP + SR&ED could be very valuable.",
+    "Yara_bakery": "Weak fit unless she's developing a novel food product or automated process",
+    "Fatima_daycare": "Not a fit"
+  },
+
+  "timeline": "ITA assignment: 1-2 weeks. Application to decision: 6-12 weeks.",
+
+  "common_mistakes": [
+    "Thinking IRAP is only for large tech companies — it actively targets small businesses",
+    "Not contacting an ITA first — the ITA guides you through eligibility, don't apply cold",
+    "Describing your work as 'services' when it has genuine R&D elements — reframe around the innovation",
+    "Missing SR&ED which is complementary — always ask your ITA and accountant about combining both"
+  ],
+
+  "application_url": "https://nrc.canada.ca/en/support-technology-innovation/apply-nrc-irap-funding",
+  "source_url": "https://nrc.canada.ca/en/support-technology-innovation/about-nrc-irap",
+  "government_body": "National Research Council of Canada (NRC)",
+  "phone": "1-877-994-4727"
 }

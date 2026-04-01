@@ -1,40 +1,174 @@
 {
-  "agency": "MAPAQ",
-  "full_name_en": "Ministère de l'Agriculture, des Pêcheries et de l'Alimentation du Québec",
-  "full_name_fr": "Ministère de l'Agriculture, des Pêcheries et de l'Alimentation du Québec",
-  "website": "https://www.mapaq.gouv.qc.ca",
-  "description_en": "MAPAQ regulates food safety and inspects food businesses in Quebec. Any business that prepares, transforms, or sells food for human consumption may require a MAPAQ permit.",
-  "description_fr": "Le MAPAQ réglemente la salubrité alimentaire et inspecte les entreprises alimentaires au Québec.",
-  "applicable_sectors": [
-    "Restaurant / food service",
-    "Food processing and manufacturing",
-    "Grocery and specialty food retail",
-    "Catering",
-    "Bakery and pastry shop",
-    "Farm direct sales",
-    "Food truck / mobile food vendor"
-  ],
-  "permits": [
+  "_meta": {
+    "file": "permits/mapaq.json",
+    "description": "Food business permits and regulations from MAPAQ (Ministère de l'Agriculture, des Pêcheries et de l'Alimentation du Québec). Covers home kitchen businesses, market vendors, cottage food operations.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "main": "https://www.mapaq.gouv.qc.ca/en/md/permis/Pages/permis.aspx",
+      "home_kitchen": "https://www.mapaq.gouv.qc.ca/en/Restauration/md/permis/Pages/cuisine-maison.aspx",
+      "food_safety_training": "https://www.mapaq.gouv.qc.ca/en/Restauration/FormationHygiene/Pages/FormationHygiene.aspx",
+      "market_vendors": "https://www.mapaq.gouv.qc.ca/en/Productions/md/permis/Pages/marchePublic.aspx"
+    }
+  },
+
+  "id": "mapaq_permits",
+  "title_en": "MAPAQ Food Business Permit",
+  "title_fr": "Permis d'exploitation alimentaire MAPAQ",
+  "applies_to_business_types": ["food"],
+
+  "plain_language_summary": "If you prepare or sell food in Quebec — whether from your home kitchen, at a farmers' market, or in a commercial space — you need authorization from MAPAQ (the provincial food safety ministry). The type of authorization depends on what you make, where you make it, and how much you sell. Home bakers, pastry chefs, jam makers, and market food vendors all fall under this.",
+
+  "permit_types": [
+    {
+      "id": "home_kitchen_exemption",
+      "name_en": "Home Kitchen Exemption (Cottage Food)",
+      "name_fr": "Exemption — cuisine résidentielle",
+      "plain_language": "Quebec allows home kitchen food businesses under specific conditions without a full MAPAQ permit. This is the most common starting point for home bakers.",
+
+      "eligibility": {
+        "who_qualifies": [
+          "Selling baked goods (bread, pastries, cakes, cookies) made in your home kitchen",
+          "Selling jams, jellies, preserves (high-acid or high-sugar products)",
+          "Selling certain dried goods and confectionery",
+          "Annual revenue under a certain threshold (verify current limit with MAPAQ)",
+          "Selling directly to end consumers (markets, online, from home) — NOT to retailers or restaurants"
+        ],
+        "who_does_not_qualify": [
+          "Selling meat, poultry, or seafood products",
+          "Selling dairy products or anything requiring refrigeration for safety",
+          "Selling to grocery stores, restaurants, or other businesses (requires commercial kitchen)",
+          "Annual revenue exceeding MAPAQ threshold (verify current amount)",
+          "Products requiring special handling (low-acid canned goods, sprouts)"
+        ],
+        "automatic_disqualifiers": ["meat_products", "dairy_products", "low_acid_canned"],
+        "future_eligibility": "If you're currently selling to retailers and don't qualify for the exemption, you can qualify by renting a certified commercial kitchen for production."
+      },
+
+      "requirements": [
+        "Complete MAPAQ's free online food safety training (Formation en hygiène et salubrité alimentaires)",
+        "Keep your home kitchen clean and separate from non-food preparation areas",
+        "Label products with: your name, address, ingredient list, allergen declarations, production date",
+        "Do not make products that require refrigeration for food safety"
+      ],
+
+      "cost": { "permit_fee": 0, "training_fee": 0, "note": "Free — no permit fee, free training" },
+      "timeline": "Training takes approximately 3 hours online. No waiting period after completing training.",
+      "url": "https://www.mapaq.gouv.qc.ca/en/Restauration/md/permis/Pages/cuisine-maison.aspx"
+    },
+
     {
       "id": "food_establishment_permit",
       "name_en": "Food Establishment Permit",
       "name_fr": "Permis d'exploitation d'un établissement alimentaire",
-      "required_for_en": "Any fixed or mobile location preparing or selling food to the public",
-      "fee_range_cad": "175–525",
-      "renewal": "Annual",
-      "processing_time_en": "2–4 weeks after inspection",
-      "url": "https://www.mapaq.gouv.qc.ca/en/Restauration/Pages/permis.aspx"
+      "plain_language": "Required if you're operating a commercial kitchen, food truck, catering business, or selling products that don't qualify for the home kitchen exemption.",
+
+      "eligibility": {
+        "who_qualifies": [
+          "Any food business not covered by the home kitchen exemption",
+          "Caterers",
+          "Food trucks",
+          "Commercial kitchen operators",
+          "Businesses selling to retailers or restaurants"
+        ]
+      },
+
+      "requirements": [
+        "Complete MAPAQ food safety training (mandatory for permit holder)",
+        "Commercial kitchen meeting MAPAQ standards (inspected before permit issued)",
+        "Submit permit application to MAPAQ with business details",
+        "Pay annual permit fee",
+        "NEQ number"
+      ],
+
+      "cost": {
+        "permit_fee_annual": "Varies by establishment type — typically $200–$600/year",
+        "note": "Verify exact fee for your establishment type at MAPAQ website",
+        "training_fee": 0
+      },
+      "timeline": "4-8 weeks from application to permit issuance. Inspection must happen before permit is granted.",
+      "url": "https://www.mapaq.gouv.qc.ca/en/md/permis/Pages/permis.aspx"
     }
   ],
-  "inspection_requirements_en": [
-    "Commercial-grade kitchen equipment",
-    "Adequate refrigeration and temperature controls",
-    "Proper food storage and labelling",
-    "Employee food handler training (MAPAQ recommends HACCP-based training)",
-    "Pest control measures"
+
+  "food_safety_training": {
+    "name": "Formation en hygiène et salubrité alimentaires",
+    "mandatory_for": "Anyone who handles food commercially in Quebec (required for permit holder, strongly recommended for all staff)",
+    "format": "Online, self-paced",
+    "duration": "Approximately 3 hours",
+    "cost": 0,
+    "certificate_validity": "5 years",
+    "url": "https://www.mapaq.gouv.qc.ca/en/Restauration/FormationHygiene/Pages/FormationHygiene.aspx",
+    "available_in": ["French", "English", "Spanish", "Arabic", "Chinese"]
+  },
+
+  "labelling_requirements": {
+    "mandatory_on_all_food_products": [
+      "Product name",
+      "Your name and address (for home kitchen products)",
+      "Complete ingredient list (in descending order by weight)",
+      "Allergen declarations (the 14 priority allergens must be declared)",
+      "Net quantity",
+      "Best before date (if applicable)",
+      "Storage instructions (if applicable)"
+    ],
+    "allergens_to_declare": ["peanuts", "tree nuts", "sesame seeds", "milk", "eggs", "fish", "shellfish", "soy", "wheat/gluten", "mustard", "sulphites"],
+    "language_requirement": "Labels must be in French (Bill 96). English may be added but French must be at least as prominent.",
+    "url": "https://www.mapaq.gouv.qc.ca/en/Transformation/etiquetage/Pages/etiquetage.aspx"
+  },
+
+  "market_vendor_rules": {
+    "plain_language": "If you sell at farmers' markets in Quebec, each market may have its own rules, but you must still comply with MAPAQ regulations.",
+    "requirements": [
+      "MAPAQ authorization (home kitchen exemption or full permit)",
+      "Completed food safety training",
+      "Proper labelling on all products",
+      "Some markets require proof of insurance — check with specific market",
+      "Marché Jean-Talon, Marché Atwater: contact market administration for vendor requirements"
+    ],
+    "montreal_markets": [
+      {
+        "name": "Marché Jean-Talon",
+        "url": "https://www.marchespublics-mtl.com/marches/jean-talon/",
+        "note": "Contact market for vendor application — waitlists may apply"
+      },
+      {
+        "name": "Marché Atwater",
+        "url": "https://www.marchespublics-mtl.com/marches/atwater/",
+        "note": "Contact market for vendor application"
+      }
+    ]
+  },
+
+  "prerequisites": [
+    {
+      "step": "Complete MAPAQ food safety training",
+      "ref": "food_safety_training",
+      "required_before": "Applying for any permit or starting food sales"
+    },
+    {
+      "step": "Get your NEQ number",
+      "ref": "req_registration",
+      "required_before": "Applying for food establishment permit (not required for home kitchen exemption)"
+    }
   ],
-  "contact": {
-    "phone": "1-888-222-6272",
-    "email": "info@mapaq.gouv.qc.ca"
-  }
+
+  "common_mistakes": [
+    "Selling at markets without any MAPAQ authorization — inspectors do visit markets",
+    "Making products that require refrigeration (cream-filled pastries, cheesecakes) under the home kitchen exemption — these require a full permit",
+    "Not declaring allergens on labels — can result in product recall and fines",
+    "Labelling in English only — French labelling is mandatory under Bill 96",
+    "Thinking the home kitchen exemption covers selling to restaurants or cafés — it doesn't",
+    "Not renewing the food safety training certificate every 5 years"
+  ],
+
+  "enforcement": {
+    "who_enforces": "MAPAQ inspectors, sometimes in conjunction with municipal inspectors",
+    "inspections": "Unannounced for commercial kitchens. Market inspections happen during market season.",
+    "penalties": "Fines ranging from $500 to $62,500 for violations under the Food Products Act"
+  },
+
+  "source_url": "https://www.mapaq.gouv.qc.ca/en/md/permis/Pages/permis.aspx",
+  "government_body": "Ministère de l'Agriculture, des Pêcheries et de l'Alimentation du Québec (MAPAQ)",
+  "phone": "1-800-463-5023",
+  "email_contact": "https://www.mapaq.gouv.qc.ca/en/nous-joindre/Pages/nous-joindre.aspx"
 }

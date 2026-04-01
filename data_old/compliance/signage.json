@@ -1,0 +1,50 @@
+{
+  "title_en": "Business Signage Requirements in Quebec",
+  "description_en": "Business signage in Quebec is governed by the Charter of the French Language (as amended by Bill 96), municipal bylaws, and in some cases federal trademark law.",
+  "french_language_requirements": {
+    "administered_by": "Office québécois de la langue française (OQLF)",
+    "rules": [
+      {
+        "id": "exterior_signage",
+        "name_en": "Exterior Signs and Posters",
+        "rule_en": "French must be markedly predominant — meaning French text must be at least twice the visual size of any other language text.",
+        "applies_to": "All exterior commercial signs visible to the public"
+      },
+      {
+        "id": "trade_name",
+        "name_en": "Trade Name (Business Name)",
+        "rule_en": "Trade names must include a French generic term or description if the name is not already French. A French-language version must be displayed.",
+        "example_en": "e.g., 'Joe's Bakery' → 'Boulangerie Joe's'"
+      },
+      {
+        "id": "interior_signage",
+        "name_en": "Interior Signs and Menus",
+        "rule_en": "French must appear, but other languages can appear alongside French in equal size for interior signage and menus."
+      }
+    ]
+  },
+  "municipal_requirements_montreal": {
+    "authority": "Ville de Montréal — Direction de l'urbanisme",
+    "sign_permit_required": true,
+    "when_required_en": "Any new exterior sign or change to an existing sign typically requires a municipal sign permit.",
+    "fee_range_cad": "50–300",
+    "restrictions_en": [
+      "Maximum sign dimensions vary by zoning (commercial, residential, industrial)",
+      "Illuminated signs may require additional permits",
+      "Heritage buildings have strict signage rules",
+      "No roof-top signage in many zones"
+    ],
+    "url": "https://montreal.ca/en/articles/applying-sign-permit"
+  },
+  "federal_trademark_note_en": "Registered Canadian trademarks may be displayed on signs without French translation, but must still comply with the markedly predominant rule for accompanying descriptive text.",
+  "resources": [
+    {
+      "name_en": "OQLF Signage Guide",
+      "url": "https://www.oqlf.gouv.qc.ca/english/affichage/index.html"
+    },
+    {
+      "name_en": "Montreal Sign Permit Application",
+      "url": "https://montreal.ca/en/articles/applying-sign-permit"
+    }
+  ]
+}

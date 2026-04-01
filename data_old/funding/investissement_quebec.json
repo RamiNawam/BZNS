@@ -1,0 +1,45 @@
+{
+  "id": "investissement_quebec",
+  "name_en": "Investissement Québec",
+  "name_fr": "Investissement Québec",
+  "website": "https://www.investissement-quebec.com",
+  "description_en": "Investissement Québec is the Quebec government's economic development agency. It offers loans, loan guarantees, and equity investments to support business creation, expansion, and innovation in Quebec.",
+  "description_fr": "Investissement Québec est l'agence de développement économique du gouvernement du Québec. Elle offre des prêts, des garanties de prêt et des prises de participation.",
+  "products": [
+    {
+      "id": "startup_loan",
+      "name_en": "Startup Financing",
+      "description_en": "Subordinated loans and loan guarantees for early-stage businesses",
+      "amount_range_cad": "50,000–5,000,000",
+      "type": "Subordinated loan or guarantee",
+      "note_en": "IQ often takes a subordinated position to allow traditional bank financing to proceed"
+    },
+    {
+      "id": "innovation_financing",
+      "name_en": "Innovation Financing",
+      "description_en": "Support for R&D projects and technology commercialisation",
+      "amount_range_cad": "100,000+",
+      "refundable_tax_credit_link": true
+    },
+    {
+      "id": "export_financing",
+      "name_en": "Export Development Financing",
+      "description_en": "Financing to support Quebec businesses expanding into international markets"
+    }
+  ],
+  "eligibility": {
+    "location": "Must operate in Quebec",
+    "business_type": "For-profit companies (most sectors)",
+    "sectors_prioritized_en": [
+      "Aerospace",
+      "Artificial Intelligence",
+      "Agri-food",
+      "Life sciences",
+      "Clean tech"
+    ]
+  },
+  "contact": {
+    "phone": "1-844-474-6367",
+    "montreal_office": "1200 avenue McGill College, Bureau 1500, Montréal, QC H3B 4G7"
+  }
+}

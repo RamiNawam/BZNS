@@ -1,52 +1,198 @@
 {
-  "title_en": "Funding Programs for Underrepresented Entrepreneurs",
-  "description_en": "These programs provide targeted financial support and advisory services to entrepreneurs from underrepresented communities in Canada and Quebec.",
+  "_meta": {
+    "file": "funding/demographic_programs.json",
+    "description": "Funding and support programs specifically targeting underrepresented entrepreneurs: immigrants and newcomers, women, Black entrepreneurs, Indigenous entrepreneurs, and youth. These are often the least-known but most impactful programs for the target personas.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "paco": "https://www.pacoinc.ca/en/",
+      "women_entrepreneurship": "https://ised-isde.canada.ca/site/women-entrepreneurship-strategy/en",
+      "black_entrepreneurship": "https://ised-isde.canada.ca/site/national-black-canadians-entrepreneurship-program/en",
+      "mifi_entrepreneurs": "https://www.immigration-quebec.gouv.qc.ca/en/economic-immigration/investing-quebec/entrepreneurs/",
+      "yes_montreal": "https://www.yesmontreal.ca",
+      "ceed": "https://ceed.ca/en/",
+      "irap": "https://nrc.canada.ca/en/support-technology-innovation/about-nrc-irap"
+    }
+  },
+
+  "id": "demographic_programs",
+  "title_en": "Programs for Underrepresented Entrepreneurs",
+  "title_fr": "Programmes pour entrepreneurs sous-représentés",
+  "program_key": "demographic_programs",
+
+  "plain_language_summary": "Several funding programs and support organizations specifically target entrepreneurs from underrepresented groups — immigrants, women, Black Canadians, Indigenous peoples, and youth. These are often less competitive than general programs because fewer people apply, making them high-value opportunities.",
+
   "programs": [
     {
-      "id": "women_entrepreneurs",
+      "id": "paco",
+      "name_en": "PACO — Programme d'accompagnement des communautés ethnoculturelles",
+      "name_fr": "PACO — Programme d'accompagnement des communautés ethnoculturelles",
+      "type": "mentorship_and_financing",
+      "target": "immigrants",
+      "plain_language": "PACO provides business support, mentorship, and micro-financing specifically for immigrant entrepreneurs in Montreal. One of the best-kept secrets for newcomers.",
+      "amount": { "micro_loan": "Up to $15,000", "note": "Verify current amounts at pacoinc.ca" },
+      "eligibility": {
+        "immigration_status": { "eligible": ["permanent_resident", "canadian_citizen", "protected_person"], "note": "Some programs open to work permit holders — verify" },
+        "location": "Montreal",
+        "target_group": "Immigrant and ethnocultural community entrepreneurs"
+      },
+      "scoring_weights": { "immigration_status_immigrant": 0.40, "location_montreal": 0.35, "business_stage": 0.25 },
+      "services": ["Business plan development", "Financial literacy training", "Networking with immigrant entrepreneur community", "Micro-loan access", "Mentorship matching"],
+      "languages": "French, English, Spanish, Arabic, Creole, and others",
+      "url": "https://www.pacoinc.ca/en/",
+      "phone": "514-272-5533"
+    },
+
+    {
+      "id": "women_entrepreneurship_strategy",
       "name_en": "Women Entrepreneurship Strategy (WES) Ecosystem Fund",
-      "administered_by": "ISED Canada",
-      "website": "https://ised-isde.canada.ca/site/women-entrepreneurship-strategy",
-      "description_en": "Federal initiative providing grants and resources to women-owned businesses and organizations that support women entrepreneurs",
-      "target_group": "Women entrepreneurs",
-      "type": "Grant and ecosystem support"
+      "name_fr": "Stratégie pour les femmes en entrepreneuriat",
+      "type": "grant_and_support",
+      "target": "women",
+      "plain_language": "Federal program providing grants and ecosystem support for women entrepreneurs. Delivered through partner organizations across Canada including in Quebec.",
+      "amount": { "note": "Varies by partner organization and program stream — from $5,000 to $100,000+" },
+      "eligibility": {
+        "gender": "Women and non-binary entrepreneurs",
+        "immigration_status": { "eligible": ["canadian_citizen", "permanent_resident"] },
+        "business_stage": "Startup to growth stage"
+      },
+      "scoring_weights": { "gender_woman": 0.50, "immigration_status": 0.25, "business_stage": 0.25 },
+      "how_to_access": "Through local partner organizations — in Montreal: CEED Centre, Women in Biz Network, etc.",
+      "montreal_partners": [
+        { "name": "CEED Centre", "url": "https://ceed.ca/en/", "note": "Free business support and financing for women entrepreneurs in Montreal" },
+        { "name": "Réseau des Femmes d'affaires du Québec", "url": "https://rfaq.ca/" }
+      ],
+      "url": "https://ised-isde.canada.ca/site/women-entrepreneurship-strategy/en"
     },
+
     {
-      "id": "fonds_femmes_mtl",
-      "name_en": "Fonds Femmes Montréal",
-      "administered_by": "PME MTL",
-      "website": "https://www.pmemtl.com",
-      "description_en": "Loan fund for women entrepreneurs based in Montreal",
-      "target_group": "Women entrepreneurs (Montreal)",
-      "loan_range_cad": "5,000–50,000",
-      "type": "Loan"
+      "id": "ceed_centre",
+      "name_en": "CEED Centre — Centre for Entrepreneurship Education and Development",
+      "name_fr": "Centre CEED",
+      "type": "financing_and_mentorship",
+      "target": "women",
+      "plain_language": "CEED provides micro-loans and free business coaching specifically for women entrepreneurs in Montreal. One of the most accessible programs for women starting a micro-business.",
+      "amount": {
+        "micro_loan_min": 1000,
+        "micro_loan_max": 15000,
+        "note": "Flexible micro-loans with low interest rates for women who may not qualify for bank financing"
+      },
+      "eligibility": {
+        "gender": "Women (trans women included)",
+        "location": "Montreal and surrounding area",
+        "immigration_status": { "eligible": ["canadian_citizen", "permanent_resident", "work_permit"], "note": "More flexible than some federal programs — verify with CEED" },
+        "credit": "Works with women who have limited or imperfect credit"
+      },
+      "scoring_weights": { "gender_woman": 0.45, "location_montreal": 0.30, "immigration_status": 0.25 },
+      "free_services": ["One-on-one business coaching", "Financial literacy", "Networking events", "Business plan support"],
+      "url": "https://ceed.ca/en/",
+      "phone": "514-933-5517"
     },
+
     {
-      "id": "black_entrepreneurship",
-      "name_en": "Black Entrepreneurship Program (BEP)",
-      "administered_by": "ISED Canada",
-      "website": "https://ised-isde.canada.ca/site/black-entrepreneurship-program",
-      "description_en": "Federal program providing loans (up to $250,000) and training to Black business owners in Canada",
-      "target_group": "Black entrepreneurs",
-      "loan_max_cad": 250000,
-      "type": "Loan and coaching"
+      "id": "black_entrepreneurship_program",
+      "name_en": "National Black Canadians Entrepreneurship Program (NBCEP)",
+      "name_fr": "Programme national pour l'entrepreneuriat des Canadiens noirs",
+      "type": "loan_and_support",
+      "target": "black_entrepreneurs",
+      "plain_language": "Federal program providing loans, mentorship, and capacity building for Black Canadian entrepreneurs. Delivered through Black-led community organizations.",
+      "amount": {
+        "loan_range": "Up to $250,000 through lending partners",
+        "note": "Amount varies by stream and partner organization"
+      },
+      "eligibility": {
+        "target_group": "Black Canadian entrepreneurs",
+        "immigration_status": { "eligible": ["canadian_citizen", "permanent_resident"] },
+        "business_stage": "Startup to established"
+      },
+      "scoring_weights": { "black_entrepreneur": 0.55, "immigration_status": 0.25, "business_stage": 0.20 },
+      "montreal_delivery_partners": [
+        { "name": "Groupe 3737", "url": "https://groupe3737.com", "note": "Major Black entrepreneurship hub in Montreal" },
+        { "name": "BFAN (Black Founder Accelerator Network)", "note": "Verify current Montreal presence" }
+      ],
+      "url": "https://ised-isde.canada.ca/site/national-black-canadians-entrepreneurship-program/en"
     },
+
     {
-      "id": "indigenous_entrepreneurs",
-      "name_en": "Aboriginal Business and Entrepreneurship Development (ABED)",
-      "administered_by": "CIRNAC",
-      "website": "https://www.sac-isc.gc.ca/eng/1375201178602/1610797286236",
-      "description_en": "Funding for Indigenous entrepreneurs and communities to start or expand a business",
-      "target_group": "First Nations, Métis, and Inuit entrepreneurs",
-      "type": "Grant and loan"
+      "id": "groupe_3737",
+      "name_en": "Groupe 3737 — Black Entrepreneurship Hub",
+      "name_fr": "Groupe 3737 — Hub d'entrepreneuriat noir",
+      "type": "mentorship_and_financing",
+      "target": "black_entrepreneurs",
+      "plain_language": "Montreal's major Black entrepreneurship hub — offers workspace, mentorship, funding access, and a strong community network. Located in Saint-Michel.",
+      "amount": { "note": "Various programs — contact directly for current offerings" },
+      "eligibility": {
+        "target_group": "Black entrepreneurs",
+        "location": "Montreal"
+      },
+      "scoring_weights": { "black_entrepreneur": 0.60, "location_montreal": 0.40 },
+      "url": "https://groupe3737.com",
+      "address": "3737 Rue Jarry Est, Montréal"
     },
+
     {
-      "id": "newcomer_entrepreneurs",
-      "name_en": "Newcomer Entrepreneur Support",
-      "administered_by": "Various (MIDI, PAENQ, local CDECs)",
-      "description_en": "Quebec and Montreal offer targeted advisory support and micro-loans for immigrant and newcomer entrepreneurs through organizations like MIDI and Femmessor",
-      "target_group": "Immigrant and newcomer entrepreneurs",
-      "type": "Advisory and micro-loan"
+      "id": "mifi_immigrant_investors",
+      "name_en": "MIFI — Support for Immigrant Entrepreneurs",
+      "name_fr": "MIFI — Soutien aux entrepreneurs immigrants",
+      "type": "support_and_referral",
+      "target": "immigrants",
+      "plain_language": "Quebec's immigration ministry (MIFI) provides support and referrals for immigrant entrepreneurs. Not direct funding, but connects you with the right programs and francization support.",
+      "eligibility": {
+        "immigration_status": { "eligible": ["permanent_resident", "canadian_citizen"], "note": "Some services for recent arrivals regardless of status" }
+      },
+      "scoring_weights": { "immigration_status_immigrant": 0.70, "location_quebec": 0.30 },
+      "services": ["Referral to funding programs", "French language training for business", "Networking with immigrant entrepreneur networks", "Credential recognition guidance"],
+      "url": "https://www.immigration-quebec.gouv.qc.ca/en/",
+      "phone": "1-877-644-4545"
+    },
+
+    {
+      "id": "carrefour_jeunesse_emploi",
+      "name_en": "Carrefour Jeunesse-Emploi (CJE) — Youth Self-Employment",
+      "name_fr": "Carrefour Jeunesse-Emploi — Entrepreneuriat jeunesse",
+      "type": "support_and_mentorship",
+      "target": "youth",
+      "plain_language": "Local youth employment centres across Quebec offer free entrepreneurship support for young people aged 16-35. Each borough in Montreal has its own CJE. Free business coaching, referrals, and sometimes small startup grants.",
+      "amount": { "note": "Varies by CJE — some offer small startup grants or interest-free loans of $1,000-$5,000" },
+      "eligibility": {
+        "age": { "min": 16, "max": 35 },
+        "immigration_status": { "eligible": "All — including work permit holders and new arrivals", "note": "Very inclusive — one of few programs open to most immigration statuses" },
+        "location": "Quebec — find your local CJE"
+      },
+      "scoring_weights": { "age_under_35": 0.40, "location_montreal": 0.35, "immigration_status": 0.25 },
+      "montreal_offices": "Each borough has a CJE — find yours at https://www.cjereseau.org",
+      "url": "https://www.cjereseau.org",
+      "why_underused": "Many young immigrants and newcomers don't know CJEs serve them regardless of immigration status"
+    },
+
+    {
+      "id": "yes_montreal",
+      "name_en": "YES Montréal — Youth Employment Services",
+      "name_fr": "YES Montréal",
+      "type": "free_support",
+      "target": "all_but_especially_youth_immigrants",
+      "plain_language": "YES Montréal is arguably the most valuable free resource for any entrepreneur in Montreal. Free one-on-one business coaching, workshops, job search help, and connections to funding. Serves everyone but especially strong for youth and newcomers.",
+      "amount": { "value": 0, "note": "All services free" },
+      "eligibility": {
+        "age": "Primarily 18-40, but services for all ages",
+        "immigration_status": { "eligible": "All statuses", "note": "Serves newcomers, refugees, work permit holders, everyone" },
+        "location": "Montreal"
+      },
+      "scoring_weights": { "location_montreal": 0.50, "age_under_40": 0.30, "immigration_status": 0.20 },
+      "services": [
+        "Free one-on-one business coaching (multiple sessions)",
+        "Business plan review",
+        "Financial literacy workshops",
+        "Networking events",
+        "Referrals to funding programs",
+        "Employment support"
+      ],
+      "languages": "English, French, Spanish, and others through referral",
+      "url": "https://www.yesmontreal.ca",
+      "phone": "514-878-9788",
+      "address": "666 Sherbrooke St W, Suite 700, Montreal"
     }
-  ]
+  ],
+
+  "source_url": "https://www.yesmontreal.ca",
+  "note": "Verify program availability and amounts directly — demographic-targeted programs update frequently"
 }

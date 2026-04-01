@@ -1,0 +1,65 @@
+{
+  "year": 2026,
+  "province": "QC",
+  "federal_tax_brackets": [
+    { "min": 0, "max": 57375, "rate": 0.15 },
+    { "min": 57375, "max": 114750, "rate": 0.205 },
+    { "min": 114750, "max": 158519, "rate": 0.26 },
+    { "min": 158519, "max": 220000, "rate": 0.29 },
+    { "min": 220000, "max": null, "rate": 0.33 }
+  ],
+  "federal_basic_personal_amount": 16129,
+  "quebec_tax_brackets": [
+    { "min": 0, "max": 53255, "rate": 0.14 },
+    { "min": 53255, "max": 106495, "rate": 0.19 },
+    { "min": 106495, "max": 129590, "rate": 0.24 },
+    { "min": 129590, "max": null, "rate": 0.2575 }
+  ],
+  "quebec_basic_personal_amount": 17183,
+  "federal_abatement_qc": 0.165,
+  "sales_taxes": {
+    "GST": {
+      "rate": 0.05,
+      "registration_threshold_cad": 30000,
+      "administered_by": "CRA"
+    },
+    "QST": {
+      "rate": 0.09975,
+      "registration_threshold_cad": 30000,
+      "administered_by": "Revenu Québec"
+    },
+    "combined_rate": 0.14975
+  },
+  "QPP": {
+    "year": 2026,
+    "basic_exemption": 3500,
+    "maximum_pensionable_earnings": 73200,
+    "employee_rate": 0.054,
+    "employer_rate": 0.054,
+    "self_employed_rate": 0.108,
+    "QPP2_rate_employee": 0.04,
+    "QPP2_rate_employer": 0.04,
+    "QPP2_rate_self_employed": 0.08,
+    "QPP2_upper_earnings": 81200
+  },
+  "EI": {
+    "year": 2026,
+    "employee_rate": 0.0166,
+    "employer_rate_multiplier": 1.4,
+    "maximum_insurable_earnings": 65700,
+    "note": "Self-employed workers in Quebec do not pay regular EI premiums but may opt into special benefits"
+  },
+  "QPIP": {
+    "year": 2026,
+    "employee_premium_rate": 0.00494,
+    "employer_premium_rate": 0.00692,
+    "self_employed_rate": 0.01186,
+    "maximum_insurable_earnings": 98000,
+    "basic_exemption": 2000
+  },
+  "small_business_deduction": {
+    "federal_rate": 0.09,
+    "quebec_rate": 0.03,
+    "threshold": 500000
+  }
+}

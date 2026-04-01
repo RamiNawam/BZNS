@@ -1,36 +1,130 @@
 {
-  "agency": "Revenu Québec",
-  "full_name_en": "Revenu Québec",
-  "full_name_fr": "Revenu Québec",
-  "website": "https://www.revenuquebec.ca",
-  "portal": "https://clic.revenuquebec.ca",
-  "description_en": "Revenu Québec administers provincial tax laws for Quebec, including QST, QPP, and QPIP. Businesses must register here for QST collection and employer accounts.",
-  "description_fr": "Revenu Québec administre les lois fiscales provinciales du Québec, notamment la TVQ, le RRQ et le RQAP.",
-  "QST_registration": {
-    "threshold_cad": 30000,
-    "description_en": "Register for QST when your annual taxable supplies exceed $30,000 CAD",
-    "voluntary_registration": true,
-    "how_to_register_en": "Register online via clicSÉQUR – Entreprises portal or by phone at 1-800-567-4692",
-    "account_number_format": "XXXXXXXXXX TQ XXXX"
+  "_meta": {
+    "file": "registration/revenu_quebec.json",
+    "description": "Registration with Revenu Québec for provincial taxes, including GST/QST collection, QPP contributions, and income tax filing obligations for self-employed workers.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "main": "https://www.revenuquebec.ca/en/businesses/starting-a-business/",
+      "gst_qst_registration": "https://www.revenuquebec.ca/en/businesses/consumption-taxes/gsthst-and-qst/registering-for-the-gst-and-qst/",
+      "my_account": "https://www.revenuquebec.ca/en/online-services/access-to-my-account-for-businesses/"
+    }
   },
-  "employer_account": {
-    "description_en": "Required when you hire employees — used for provincial income tax withholding, QPP, and QPIP remittances",
-    "suffix": "RS"
-  },
-  "clicsequr": {
-    "description_en": "Quebec's secure online portal for businesses to manage tax accounts, file returns, and make payments",
-    "url": "https://clic.revenuquebec.ca"
-  },
-  "important_forms": [
+
+  "id": "revenu_quebec_registration",
+  "title_en": "Register with Revenu Québec",
+  "title_fr": "S'inscrire à Revenu Québec",
+
+  "plain_language_summary": "Revenu Québec is the provincial equivalent of the CRA. As a self-employed person in Quebec, you have specific obligations with Revenu Québec: filing your Quebec income tax return (TP1), contributing to QPP and QPIP, and registering for QST (Quebec's sales tax) if your revenue exceeds $30,000. This is separate from your federal CRA registration.",
+
+  "registrations_required": [
     {
-      "code": "LM-1",
-      "name_en": "Application for Registration — QST",
-      "url": "https://www.revenuquebec.ca/en/businesses/consumption-taxes/gsthst-and-qst/registering-for-the-qst/"
+      "id": "qst_registration",
+      "name": "QST (Quebec Sales Tax) Registration",
+      "mandatory_when": "Revenue exceeds $30,000 in any 12-month period",
+      "optional_when": "Revenue under $30,000 — you can register voluntarily to claim input tax refunds",
+      "what_it_means": "You collect 9.975% QST from customers and remit it to Revenu Québec. You can also claim refunds on QST you paid on business purchases.",
+      "how_to_register": "Online at My Account for Businesses (clicSÉQUR access required), by phone at 1-800-567-4692, or in person at a Revenu Québec office",
+      "timeline_to_register": "Within 30 days of crossing the $30,000 threshold",
+      "url": "https://www.revenuquebec.ca/en/businesses/consumption-taxes/gsthst-and-qst/registering-for-the-gst-and-qst/"
     },
     {
-      "code": "TP-1015.3",
-      "name_en": "Source Deductions Return",
-      "url": "https://www.revenuquebec.ca/en/businesses/source-deductions-and-employer-contributions/"
+      "id": "qpp_registration",
+      "name": "QPP (Quebec Pension Plan) Contributions",
+      "mandatory_when": "Always — if you earn self-employment income in Quebec",
+      "what_it_means": "You contribute 12.8% of net business income (between $3,500 and $71,300) to QPP. This is paid annually when you file your return — not registered separately.",
+      "how_it_works": "Calculated on Schedule Q of your Quebec income tax return (TP1). No separate registration needed.",
+      "url": "https://www.revenuquebec.ca/en/citizens/income-tax-return/completing-your-income-tax-return/how-to-complete-your-income-tax-return/line-by-line-help/line-98-contributions-to-the-qpp-on-income-from-self-employment/"
+    },
+    {
+      "id": "qpip_registration",
+      "name": "QPIP (Quebec Parental Insurance Plan) Premiums",
+      "mandatory_when": "Always — if you earn self-employment income in Quebec",
+      "what_it_means": "You pay 0.878% of net business income (up to $98,000) as QPIP premiums. In return, you're eligible for maternity/paternity/adoption benefits.",
+      "how_it_works": "Calculated on Schedule Q of your Quebec income tax return (TP1). No separate registration needed.",
+      "benefit": "Unlike federal EI, QPIP actually provides meaningful parental leave benefits to self-employed workers",
+      "url": "https://www.rqap.gouv.qc.ca/en/about-the-plan/general-information/premium-rates"
+    },
+    {
+      "id": "income_tax_filing",
+      "name": "Quebec Income Tax Return (TP1)",
+      "mandatory_when": "Always — if you have business income in Quebec",
+      "deadline": "April 30 for income tax payment; June 15 for return filing if self-employed (but interest accrues from April 30 if you owe)",
+      "forms_needed": [
+        "TP-1 (Quebec personal income tax return)",
+        "TP-80-V (Business or Professional Income and Expenses)"
+      ],
+      "url": "https://www.revenuquebec.ca/en/citizens/income-tax-return/"
     }
-  ]
+  ],
+
+  "eligibility": {
+    "who_must_register": [
+      "All self-employed individuals earning income in Quebec",
+      "Anyone crossing the $30,000 revenue threshold for QST"
+    ],
+    "voluntary_registration": "You can register for QST voluntarily before crossing $30,000 — beneficial if you have significant business purchases with QST (you can claim refunds)"
+  },
+
+  "prerequisites": [
+    {
+      "step": "Obtain your NEQ number from the REQ",
+      "ref": "req_registration",
+      "note": "Required for QST registration"
+    },
+    {
+      "step": "Have your SIN (Social Insurance Number) ready",
+      "note": "Required for all Revenu Québec registrations"
+    }
+  ],
+
+  "clicsequr_access": {
+    "what_is_it": "clicSÉQUR is Revenu Québec's secure online portal (like CRA My Account but for Quebec)",
+    "how_to_get": "Register at https://www.revenuquebec.ca/en/online-services/access-to-my-account-for-businesses/",
+    "what_you_can_do": [
+      "Register for QST online",
+      "File QST returns",
+      "View your account balance",
+      "Send secure messages to Revenu Québec",
+      "File income tax returns"
+    ]
+  },
+
+  "cost": {
+    "registration_fee": 0,
+    "note": "Registration with Revenu Québec is free. You only pay taxes/contributions once they are owed."
+  },
+
+  "timeline": {
+    "qst_registration": "1-2 weeks after applying online; you receive your QST number by mail",
+    "qst_registration_note": "You can start collecting QST before receiving your number if you've applied"
+  },
+
+  "what_you_need": [
+    "NEQ number (from REQ)",
+    "Social Insurance Number (SIN)",
+    "Business address",
+    "Description of business activities",
+    "Expected revenue for the next 12 months",
+    "clicSÉQUR access (set up before registering online)"
+  ],
+
+  "common_mistakes": [
+    "Not registering for QST within 30 days of crossing $30,000 — penalties apply",
+    "Collecting QST without being registered — must refund customers or face penalties",
+    "Forgetting that QPP and QPIP are paid when you file your return — not separately — so you must budget for them throughout the year",
+    "Confusing QST (Revenu Québec) with GST (CRA) — you register and remit them separately, though often at the same time",
+    "Missing the April 30 payment deadline (even if return is due June 15) — interest charges begin May 1"
+  ],
+
+  "quarterly_installments": {
+    "required_when": "Expected Quebec tax owing exceeds $1,800",
+    "due_dates": ["March 15", "June 15", "September 15", "December 15"],
+    "how_to_pay": "Online via clicSÉQUR or pre-authorized debit",
+    "note": "First-year self-employed often don't pay installments and then face a surprise tax bill in April — budget 25-30% of net income for taxes throughout the year"
+  },
+
+  "source_url": "https://www.revenuquebec.ca/en/businesses/starting-a-business/",
+  "government_body": "Revenu Québec",
+  "phone": "1-800-567-4692",
+  "hours": "Monday–Friday 8:30 AM–4:30 PM"
 }

@@ -1,0 +1,42 @@
+{
+  "id": "pme_mtl",
+  "name_en": "PME MTL",
+  "name_fr": "PME MTL",
+  "website": "https://www.pmemtl.com",
+  "description_en": "PME MTL is the Montreal business support network funded by the City of Montreal. It offers free advisory services, financing, and funding to SMEs operating in Montreal.",
+  "description_fr": "PME MTL est le réseau de soutien aux entreprises de Montréal, financé par la Ville. Il offre des services-conseils gratuits, du financement et des subventions.",
+  "services": [
+    {
+      "id": "advisory",
+      "name_en": "Free Business Advisory Services",
+      "description_en": "Access to business advisors for strategic planning, financial analysis, and market development — free of charge",
+      "fee": "Free"
+    },
+    {
+      "id": "startup_loan",
+      "name_en": "PME MTL Startup Loan",
+      "description_en": "Loans for Montreal-based startups in early stages",
+      "amount_range_cad": "5,000–250,000",
+      "interest_rate_en": "Preferential rate",
+      "eligibility_en": "Registered business in Montreal, viable project, unable to obtain full financing from traditional sources"
+    },
+    {
+      "id": "growth_loan",
+      "name_en": "Growth Loan",
+      "description_en": "Loans for established SMEs looking to scale",
+      "amount_range_cad": "25,000–500,000"
+    }
+  ],
+  "eligibility": {
+    "location": "Must operate or plan to operate in Montreal",
+    "business_type": "For-profit and social economy enterprises",
+    "stage": "Startup to growth"
+  },
+  "offices": [
+    { "borough": "Centre-Ville", "phone": "514-328-4200" },
+    { "borough": "Est", "phone": "514-493-4000" },
+    { "borough": "Nord", "phone": "514-858-2222" },
+    { "borough": "Ouest-de-l'Île", "phone": "514-426-2888" },
+    { "borough": "Grand Sud-Ouest", "phone": "514-765-7060" }
+  ]
+}

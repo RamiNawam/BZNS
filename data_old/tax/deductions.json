@@ -1,0 +1,82 @@
+{
+  "title_en": "Common Business Deductions — Self-Employed in Quebec (2026)",
+  "description_en": "Allowable business expenses reduce your net income for tax purposes. Expenses must be incurred to earn business income and be reasonable in the circumstances.",
+  "categories": [
+    {
+      "id": "home_office",
+      "name_en": "Home Office Expenses",
+      "description_en": "If you work from home, you can deduct a proportional share of household expenses",
+      "deductible_expenses_en": [
+        "Rent or mortgage interest",
+        "Property taxes",
+        "Home insurance",
+        "Utilities (heat, electricity, water)",
+        "Internet (business portion)",
+        "Maintenance and repairs"
+      ],
+      "calculation_en": "Calculate the percentage of your home used exclusively for work (e.g., home office square footage / total home square footage)",
+      "form_federal": "T2125",
+      "form_quebec": "TP-80"
+    },
+    {
+      "id": "vehicle",
+      "name_en": "Vehicle Expenses",
+      "description_en": "You can deduct the business-use portion of vehicle expenses",
+      "deductible_expenses_en": [
+        "Fuel and oil",
+        "Insurance",
+        "Maintenance and repairs",
+        "Licence and registration",
+        "Lease payments (up to CCA limit)",
+        "Interest on auto loan (up to $300/month)"
+      ],
+      "log_required": true,
+      "note_en": "Must keep a mileage logbook to support business vs personal use"
+    },
+    {
+      "id": "professional_development",
+      "name_en": "Professional Development & Training",
+      "deductible_expenses_en": [
+        "Courses and workshops",
+        "Books and subscriptions related to your business",
+        "Professional conferences"
+      ]
+    },
+    {
+      "id": "marketing",
+      "name_en": "Advertising & Marketing",
+      "deductible_expenses_en": [
+        "Website design and hosting",
+        "Social media advertising",
+        "Business cards and printed materials",
+        "Google / Meta ad spend"
+      ]
+    },
+    {
+      "id": "professional_fees",
+      "name_en": "Professional & Legal Fees",
+      "deductible_expenses_en": [
+        "Accountant and bookkeeper fees",
+        "Legal fees for business contracts",
+        "Business consulting"
+      ]
+    },
+    {
+      "id": "equipment",
+      "name_en": "Equipment & Technology (CCA)",
+      "description_en": "Capital assets are depreciated over time using Capital Cost Allowance (CCA) classes",
+      "cca_classes": [
+        { "class": 10, "rate": 0.30, "description_en": "Passenger vehicles and computer equipment" },
+        { "class": 8, "rate": 0.20, "description_en": "Furniture, appliances, tools > $500" },
+        { "class": 50, "rate": 0.55, "description_en": "Computer hardware" },
+        { "class": 12, "rate": 1.00, "description_en": "Small tools < $500, software" }
+      ]
+    }
+  ],
+  "non_deductible_en": [
+    "Personal clothing (unless a uniform or protective gear)",
+    "Fines and penalties",
+    "Personal meals (50% rule applies to business meals)",
+    "Club memberships (golf, fitness) unless core to business"
+  ]
+}

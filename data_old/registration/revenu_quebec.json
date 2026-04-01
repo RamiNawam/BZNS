@@ -1,0 +1,36 @@
+{
+  "agency": "Revenu Québec",
+  "full_name_en": "Revenu Québec",
+  "full_name_fr": "Revenu Québec",
+  "website": "https://www.revenuquebec.ca",
+  "portal": "https://clic.revenuquebec.ca",
+  "description_en": "Revenu Québec administers provincial tax laws for Quebec, including QST, QPP, and QPIP. Businesses must register here for QST collection and employer accounts.",
+  "description_fr": "Revenu Québec administre les lois fiscales provinciales du Québec, notamment la TVQ, le RRQ et le RQAP.",
+  "QST_registration": {
+    "threshold_cad": 30000,
+    "description_en": "Register for QST when your annual taxable supplies exceed $30,000 CAD",
+    "voluntary_registration": true,
+    "how_to_register_en": "Register online via clicSÉQUR – Entreprises portal or by phone at 1-800-567-4692",
+    "account_number_format": "XXXXXXXXXX TQ XXXX"
+  },
+  "employer_account": {
+    "description_en": "Required when you hire employees — used for provincial income tax withholding, QPP, and QPIP remittances",
+    "suffix": "RS"
+  },
+  "clicsequr": {
+    "description_en": "Quebec's secure online portal for businesses to manage tax accounts, file returns, and make payments",
+    "url": "https://clic.revenuquebec.ca"
+  },
+  "important_forms": [
+    {
+      "code": "LM-1",
+      "name_en": "Application for Registration — QST",
+      "url": "https://www.revenuquebec.ca/en/businesses/consumption-taxes/gsthst-and-qst/registering-for-the-qst/"
+    },
+    {
+      "code": "TP-1015.3",
+      "name_en": "Source Deductions Return",
+      "url": "https://www.revenuquebec.ca/en/businesses/source-deductions-and-employer-contributions/"
+    }
+  ]
+}

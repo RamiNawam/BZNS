@@ -1,42 +1,185 @@
 {
-  "agency": "Ministère de la Famille",
-  "full_name_en": "Ministère de la Famille du Québec",
-  "full_name_fr": "Ministère de la Famille du Québec",
-  "website": "https://www.mfa.gouv.qc.ca",
-  "description_en": "The Ministère de la Famille oversees childcare services in Quebec, including subsidized daycares (CPE), family-type childcare providers, and private daycares.",
-  "description_fr": "Le Ministère de la Famille supervise les services de garde au Québec, notamment les CPE, les services de garde en milieu familial et les garderies privées.",
-  "permit_types": [
+  "_meta": {
+    "file": "permits/famille.json",
+    "description": "Home daycare (garde en milieu familial) regulations, permit requirements, and the STA income support program. Covers RSG (responsable de service de garde) recognition, CPE affiliation, and independent operation.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "main": "https://www.mfa.gouv.qc.ca/fr/services-de-garde/rsg/pages/index.aspx",
+      "become_rsg": "https://www.mfa.gouv.qc.ca/fr/services-de-garde/rsg/devenir-rsg/pages/index.aspx",
+      "recognition_process": "https://www.mfa.gouv.qc.ca/fr/services-de-garde/rsg/devenir-rsg/pages/reconnaissance.aspx",
+      "independent_daycare": "https://www.mfa.gouv.qc.ca/fr/services-de-garde/garderies/pages/index.aspx"
+    }
+  },
+
+  "id": "home_daycare_permit",
+  "title_en": "Home Daycare — Recognition as RSG (Responsable de service de garde)",
+  "title_fr": "Garde en milieu familial — Reconnaissance comme RSG",
+  "applies_to_business_types": ["daycare"],
+
+  "plain_language_summary": "Running a home daycare in Quebec is one of the most regulated micro-businesses. You need to be officially recognized as an RSG (responsable de service de garde) by a coordinating office (bureau coordonnateur). This takes 2-6 months and involves training, a home inspection, and a criminal record check. BUT — once recognized, you benefit from government subsidized rates, access to the $10/day system, and potentially the STA income support program during your startup period.",
+
+  "two_pathways": [
     {
-      "id": "cpe_permit",
-      "name_en": "Childcare Centre (CPE) Permit",
-      "name_fr": "Permis de Centre de la petite enfance (CPE)",
-      "description_en": "Required to operate a non-profit childcare centre with subsidized spaces",
-      "capacity_limit": null,
-      "fee_cad": 0,
-      "note_en": "CPEs must operate as non-profit organisations and receive government subsidies per child"
+      "id": "affiliated_rsg",
+      "name_en": "Affiliated Home Daycare (RSG affiliated with a Bureau Coordonnateur)",
+      "name_fr": "RSG affiliée à un bureau coordonnateur (BC)",
+      "plain_language": "The most common path. You operate your home daycare through a coordinating office (like a CPE) that handles administration, subsidized rates, and support. Parents pay the reduced $10-$12/day rate and the government pays you the rest.",
+      "recommended": true,
+
+      "eligibility": {
+        "who_qualifies": [
+          "Quebec residents (citizen, permanent resident, or valid work permit)",
+          "Age 18 or older",
+          "Physically and mentally fit to care for children",
+          "Home meets safety and space requirements",
+          "No serious criminal record (certain convictions are automatic disqualifiers)"
+        ],
+        "who_does_not_qualify": [
+          "Certain criminal convictions (assault, child endangerment, sexual offences — permanent disqualifiers)",
+          "Homes that cannot meet childproofing and space requirements",
+          "People on certain immigration status types (verify with specific bureau coordonnateur)"
+        ],
+        "future_eligibility": "If you're currently on a work permit, you may qualify depending on your specific permit type. Permanent residents qualify fully. If your criminal record contains minor convictions, review with the bureau coordonnateur — not all convictions disqualify."
+      },
+
+      "capacity": {
+        "max_children": 6,
+        "max_children_under_18_months": 2,
+        "with_assistant": "Up to 9 children if you hire a qualified assistant",
+        "note": "Your own children under 9 years old count toward the 6-child maximum"
+      },
+
+      "steps": [
+        {
+          "order": 1,
+          "title": "Contact your local Bureau Coordonnateur (BC)",
+          "detail": "Find the BC in your borough and express interest. They will explain their specific requirements and current capacity for new RSGs in your area. Some BCs have waiting lists.",
+          "url": "https://www.mfa.gouv.qc.ca/fr/services-de-garde/rsg/trouver-un-rsg/pages/index.aspx"
+        },
+        {
+          "order": 2,
+          "title": "Complete required training",
+          "detail": "Complete the Attestation d'études collégiales (AEC) in Early Childhood Education OR equivalent recognized training. Some BCs accept equivalent experience. Check with your BC.",
+          "duration": "Varies — AEC is several months; prior ECE training may be recognized",
+          "cost": "Varies — may be subsidized or free through Emploi-Québec"
+        },
+        {
+          "order": 3,
+          "title": "Home inspection",
+          "detail": "A BC representative visits your home to ensure it meets the safety, space, and sanitation requirements of the Educational Childcare Act regulations.",
+          "checklist": [
+            "Smoke detectors and carbon monoxide detectors on every floor",
+            "Child safety gates on stairs",
+            "Secure outdoor play area (or access to one)",
+            "First aid kit",
+            "Safe sleeping environment for infants",
+            "Adequate space per child (at least 2.8 m² per child in play area)",
+            "Functioning bathroom with child-accessible sink"
+          ]
+        },
+        {
+          "order": 4,
+          "title": "Criminal record check",
+          "detail": "All adults living in or regularly present in the home must submit a criminal record check (Vérification des antécédents judiciaires). Some positions also require a child protection registry check.",
+          "cost": "Varies by municipality — typically $25-$75 for criminal record check",
+          "note": "Contact your local police service for a criminal record check"
+        },
+        {
+          "order": 5,
+          "title": "First aid certification",
+          "detail": "RSG must hold valid pediatric first aid certification.",
+          "cost": "Typically $50-$150 for a certified course",
+          "duration": "1-2 days"
+        },
+        {
+          "order": 6,
+          "title": "Receive recognition and sign agreement with BC",
+          "detail": "Once all requirements are met, the BC issues your recognition and you sign a service agreement. You can begin accepting children.",
+          "timeline_from_start": "Typically 2-6 months from first contact"
+        }
+      ],
+
+      "compensation": {
+        "how_paid": "The BC collects parent contributions and government subsidies and pays you a daily rate per child",
+        "approximate_daily_rate_per_child": "Approximately $45-$60/day per child (government subsidy + parent contribution)",
+        "annual_estimate_6_children": "Approximately $65,000-$80,000 gross/year at full capacity",
+        "note": "Verify current rates with your BC — rates are set by the government and updated periodically"
+      },
+
+      "sta_program": {
+        "name": "Soutien au travail autonome (STA) — Income Support During Startup",
+        "status": "suspended",
+        "suspension_note": "⚠️ The STA program has been suspended since May 1, 2024 for an indefinite period. It is not currently available. Monitor Emploi-Québec for updates: https://www.emploiquebec.gouv.qc.ca",
+        "ref": "funding/sta.json",
+        "plain_language": "When active, this program provided income replacement while setting up your business — valuable for new RSGs building their client base. Currently suspended as of May 1, 2024."
+      }
     },
+
     {
-      "id": "home_childcare",
-      "name_en": "Home Childcare Provider Recognition",
-      "name_fr": "Reconnaissance à titre de responsable d'un service de garde en milieu familial",
-      "description_en": "Required to offer subsidized daycare in your own home through a coordinating office (bureau coordonnateur)",
-      "capacity_limit": 6,
-      "fee_cad": 0
-    },
-    {
-      "id": "private_daycare_permit",
-      "name_en": "Private Childcare Permit",
-      "name_fr": "Permis de garderie",
-      "description_en": "Required to operate a private for-profit or non-profit daycare",
-      "capacity_min": 7,
-      "fee_cad": 200,
-      "renewal": "Annual"
+      "id": "independent_daycare",
+      "name_en": "Independent Home Childcare (Non-subsidized)",
+      "name_fr": "Garde en milieu familial non subventionnée",
+      "plain_language": "You can also operate independently without a BC affiliation. Parents pay your full rate directly (typically $30-$60/day). You're not part of the $10/day system but have more flexibility in rates and operations. Still requires recognition from the MFA.",
+
+      "eligibility": {
+        "note": "Similar requirements to affiliated RSG — recognition is still required for more than 6 visits/year by the same children"
+      },
+
+      "tradeoff": "Higher potential daily rate but no guaranteed government income, no BC administrative support, must find your own clients"
     }
   ],
-  "background_check_required": true,
-  "first_aid_required": true,
-  "contact": {
-    "phone": "1-855-336-8568",
-    "url": "https://www.mfa.gouv.qc.ca/fr/services-de-garde/Pages/index.aspx"
-  }
+
+  "sta_program_detail": {
+    "name": "Soutien au travail autonome (STA)",
+    "status": "suspended",
+    "suspended_since": "2024-05-01",
+    "managed_by": "Emploi-Québec",
+    "plain_language": "⚠️ SUSPENDED as of May 1, 2024 — indefinitely. When active, this program provided weekly income support while starting a self-employed business, and was highly relevant for new RSGs building their daycare client base. Not currently available.",
+    "monitor_for_resumption": "https://www.emploiquebec.gouv.qc.ca/en/citizens/find-a-job/self-employment/",
+    "url": "https://www.emploiquebec.gouv.qc.ca/en/citizens/find-a-job/self-employment/"
+  },
+
+  "cost_summary": {
+    "training": "Free to $2,000 depending on prior education and subsidies available",
+    "criminal_record_check": "25–75 per adult in household",
+    "first_aid_certification": "50–150",
+    "home_modifications": "Varies — budget $200-$1,000 for safety equipment (gates, detectors, etc.)",
+    "total_estimated_startup": "300–3,300",
+    "note": "Many costs may be subsidized through Emploi-Québec if you qualify for STA"
+  },
+
+  "timeline": {
+    "total": "2-6 months from first contact to first child",
+    "by_step": {
+      "training": "Varies — may be recognized immediately if you have ECE background",
+      "home_inspection": "1-4 weeks after training complete",
+      "criminal_checks": "1-3 weeks",
+      "recognition_issued": "2-4 weeks after all documents submitted"
+    }
+  },
+
+  "common_mistakes": [
+    "Starting to care for children before receiving official recognition — illegal and can result in permanent disqualification",
+    "Not knowing about the STA program — many new RSGs lose income during the startup period unnecessarily",
+    "Not budgeting for the cost of home modifications required by the inspector",
+    "Not contacting the BC early enough — some areas have waiting lists for new RSG spots",
+    "Forgetting that your own children under 9 count toward the 6-child maximum"
+  ],
+
+  "support_resources": [
+    {
+      "name": "Ministère de la Famille — RSG Information",
+      "url": "https://www.mfa.gouv.qc.ca/fr/services-de-garde/rsg/pages/index.aspx",
+      "phone": "1-855-336-8568"
+    },
+    {
+      "name": "Emploi-Québec — STA Program",
+      "url": "https://www.emploiquebec.gouv.qc.ca/en/citizens/find-a-job/self-employment/",
+      "note": "Entry point for STA application"
+    }
+  ],
+
+  "source_url": "https://www.mfa.gouv.qc.ca/fr/services-de-garde/rsg/devenir-rsg/pages/index.aspx",
+  "government_body": "Ministère de la Famille du Québec",
+  "phone": "1-855-336-8568"
 }

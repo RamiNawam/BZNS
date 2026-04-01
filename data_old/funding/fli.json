@@ -1,0 +1,34 @@
+{
+  "id": "fli",
+  "name_en": "Fonds local d'investissement (FLI)",
+  "name_fr": "Fonds local d'investissement (FLI)",
+  "website": "https://www.pmemtl.com/financement/fli",
+  "administered_by": "PME MTL (on behalf of the City of Montreal)",
+  "description_en": "The FLI (Local Investment Fund) provides risk financing to SMEs and social economy enterprises in Montreal that cannot fully access traditional financing. It offers flexible loans to support business creation and growth.",
+  "description_fr": "Le FLI fournit du financement à risque aux PME et entreprises d'économie sociale de Montréal qui ne peuvent pas accéder pleinement aux sources traditionnelles.",
+  "funding_details": {
+    "loan_range_cad": "5,000–150,000",
+    "interest_rate_en": "Preferential — assessed case by case",
+    "term_years": "Up to 7",
+    "eligible_expenses_en": [
+      "Working capital",
+      "Equipment purchase",
+      "Leasehold improvements",
+      "Business acquisition"
+    ]
+  },
+  "eligibility": {
+    "location": "Must be located in Montreal",
+    "employees_max": 50,
+    "business_type": "SMEs and social economy enterprises",
+    "note_en": "Priority given to innovative projects, social economy, and underrepresented entrepreneurs"
+  },
+  "complementary_programs_en": [
+    "Fonds de développement des entreprises d'économie sociale (FDEÉS) — for co-ops and non-profits",
+    "Fonds Femmes Montréal — for women entrepreneurs"
+  ],
+  "contact": {
+    "phone": "514-328-4200",
+    "url": "https://www.pmemtl.com/financement/fli"
+  }
+}

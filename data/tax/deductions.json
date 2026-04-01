@@ -1,82 +1,296 @@
 {
-  "title_en": "Common Business Deductions — Self-Employed in Quebec (2026)",
-  "description_en": "Allowable business expenses reduce your net income for tax purposes. Expenses must be incurred to earn business income and be reasonable in the circumstances.",
-  "categories": [
-    {
-      "id": "home_office",
-      "name_en": "Home Office Expenses",
-      "description_en": "If you work from home, you can deduct a proportional share of household expenses",
-      "deductible_expenses_en": [
-        "Rent or mortgage interest",
-        "Property taxes",
-        "Home insurance",
-        "Utilities (heat, electricity, water)",
-        "Internet (business portion)",
-        "Maintenance and repairs"
+  "_meta": {
+    "file": "tax/deductions.json",
+    "description": "Common business expense deductions for self-employed workers in Quebec, organized by business type. Helps Claude suggest missing expense categories in the Financial Snapshot.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "cra_expenses": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/business-expenses.html",
+      "revenu_quebec_expenses": "https://www.revenuquebec.ca/en/citizens/income-tax-return/completing-your-income-tax-return/how-to-complete-your-income-tax-return/line-by-line-help/line-164-business-or-professional-income/",
+      "home_office": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/business-expenses/business-use-home-expenses.html",
+      "vehicle": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/business-expenses/motor-vehicle-expenses.html"
+    }
+  },
+
+  "id": "deductions",
+  "title_en": "Business Expense Deductions for Self-Employed Workers",
+  "title_fr": "Déductions pour dépenses d'entreprise — Travailleurs autonomes",
+
+  "plain_language_summary": "As a self-employed person, you can deduct legitimate business expenses from your income before calculating tax. This directly reduces what you owe. Most new self-employed workers miss deductions — especially home office, vehicle, phone, and professional development. Track everything from day one.",
+
+  "universal_deductions": {
+    "note": "These apply to almost all self-employed business types",
+    "categories": [
+      {
+        "name": "Home Office Expenses",
+        "plain_language": "If you use part of your home exclusively and regularly for business, you can deduct a proportional amount of your housing costs.",
+        "what_qualifies": [
+          "Rent (proportional % of your space used for work)",
+          "Hydro/electricity (same proportion)",
+          "Internet (business use portion — typically 50-80% for most self-employed)",
+          "Phone (business use portion)",
+          "Home insurance (if you've notified insurer of business use)",
+          "Property tax (proportional — for homeowners)",
+          "Mortgage interest (proportional — for homeowners, not principal)"
+        ],
+        "how_to_calculate": "Measure your dedicated work area in square feet. Divide by total home square footage. That % applies to shared housing costs. Example: 200 sq ft office / 1,000 sq ft home = 20% deductible.",
+        "important_limitation": "Home office deductions cannot create a business loss — they can only reduce income to zero, not below. Carry forward any excess.",
+        "form": "CRA Form T2125 (Statement of Business Activities), Revenu Québec TP-80-V"
+      },
+      {
+        "name": "Phone and Internet",
+        "plain_language": "The business-use portion of your phone and internet bills is deductible.",
+        "what_qualifies": "Monthly bills, data plans, apps used for business",
+        "how_to_calculate": "Estimate business vs personal use %. Common approach: 50-80% for most self-employed who use phone primarily for work.",
+        "tip": "Having a separate business phone line makes this 100% deductible with no calculation needed"
+      },
+      {
+        "name": "Professional Development",
+        "what_qualifies": [
+          "Online courses and subscriptions (Udemy, Coursera, LinkedIn Learning)",
+          "Books and publications related to your field",
+          "Industry association memberships",
+          "Conference registrations",
+          "Coaching and mentoring fees"
+        ],
+        "montreal_specific": "YES Montréal workshops, PME MTL training — may be deductible if business-related"
+      },
+      {
+        "name": "Bank Fees and Financial Costs",
+        "what_qualifies": [
+          "Business bank account monthly fees",
+          "Transaction fees",
+          "Credit card annual fees (business card)",
+          "Bookkeeping software (QuickBooks, Wave, etc.)",
+          "Accounting and tax preparation fees"
+        ]
+      },
+      {
+        "name": "Marketing and Advertising",
+        "what_qualifies": [
+          "Website domain and hosting fees",
+          "Social media advertising (Meta Ads, Google Ads)",
+          "Business cards and printed materials",
+          "Photography for business (product photos, headshots)",
+          "Graphic design services",
+          "Promotional items"
+        ]
+      },
+      {
+        "name": "Legal and Professional Fees",
+        "what_qualifies": [
+          "Legal advice related to the business",
+          "Accounting fees for business returns",
+          "Contract review fees",
+          "REQ registration fee ($41 initial, $36 annual)"
+        ]
+      },
+      {
+        "name": "Business Insurance",
+        "what_qualifies": [
+          "General liability insurance",
+          "Professional liability (errors and omissions) insurance",
+          "Contents insurance for business equipment"
+        ],
+        "important": "Personal life insurance is NOT deductible"
+      },
+      {
+        "name": "Office Supplies and Equipment",
+        "what_qualifies": [
+          "Pens, paper, notebooks",
+          "Printer ink and paper",
+          "Postage and shipping",
+          "Software subscriptions (Microsoft 365, Adobe, etc.)"
+        ],
+        "cca_note": "Equipment over $500 (computers, cameras, furniture) is typically deducted over multiple years via CCA (Capital Cost Allowance), not all at once"
+      },
+      {
+        "name": "Meals and Entertainment",
+        "what_qualifies": "Meals or entertainment with clients or business associates",
+        "deductible_portion": "50% only — both federal and Quebec limit this to 50%",
+        "record_keeping": "Keep receipt AND note: who attended, business purpose"
+      }
+    ]
+  },
+
+  "by_business_type": {
+    "food": {
+      "label": "Food Business (Bakery, Catering, Food Prep)",
+      "specific_deductions": [
+        {
+          "name": "Ingredients and Food Supplies",
+          "plain_language": "The cost of ingredients used to make your products is a direct business expense.",
+          "examples": ["Flour, sugar, butter, eggs, chocolate", "Packaging materials (boxes, bags, stickers)", "Food coloring and decorating supplies"]
+        },
+        {
+          "name": "Commercial Kitchen Rental",
+          "plain_language": "If you rent a commercial kitchen for production, the rental fee is fully deductible.",
+          "montreal_options": ["Espace Cuisine MTL", "La Cuisine Collective", "Various church/community kitchens available for hourly rental"]
+        },
+        {
+          "name": "Food Safety Training",
+          "plain_language": "MAPAQ food safety training and any food safety certifications are deductible."
+        },
+        {
+          "name": "Market and Vendor Fees",
+          "plain_language": "Farmers' market stall fees, event vendor fees, and market membership fees are deductible."
+        },
+        {
+          "name": "Specialized Equipment",
+          "examples": ["Stand mixer, food processor, baking pans", "Display cases, serving equipment", "Coolers for transport"],
+          "note": "Items over $500 typically use CCA (Capital Cost Allowance)"
+        },
+        {
+          "name": "Delivery and Transportation",
+          "plain_language": "Gas and vehicle use for delivering orders or going to markets. Track mileage for each business trip.",
+          "how_to_track": "Keep a mileage log: date, destination, business purpose, km driven"
+        }
       ],
-      "calculation_en": "Calculate the percentage of your home used exclusively for work (e.g., home office square footage / total home square footage)",
-      "form_federal": "T2125",
-      "form_quebec": "TP-80"
+      "commonly_missed": ["Packaging and presentation materials", "Market stall fees", "Food safety certification renewal", "Mileage to markets and delivery"]
     },
-    {
-      "id": "vehicle",
-      "name_en": "Vehicle Expenses",
-      "description_en": "You can deduct the business-use portion of vehicle expenses",
-      "deductible_expenses_en": [
-        "Fuel and oil",
-        "Insurance",
-        "Maintenance and repairs",
-        "Licence and registration",
-        "Lease payments (up to CCA limit)",
-        "Interest on auto loan (up to $300/month)"
+
+    "freelance": {
+      "label": "Freelancer / Consultant (Software, Design, Writing, etc.)",
+      "specific_deductions": [
+        {
+          "name": "Software and Subscriptions",
+          "examples": ["Development tools (GitHub Pro, JetBrains, etc.)", "Design tools (Figma, Adobe Creative Cloud)", "Project management (Notion, Linear, Jira)", "Communication tools (Slack, Zoom)"]
+        },
+        {
+          "name": "Computer and Hardware",
+          "plain_language": "Your laptop, monitor, keyboard, and other equipment used for work.",
+          "cca_note": "Computers qualify for 55% CCA rate (Class 10) — meaning you deduct 55% of the cost in year 1, then 55% of the remaining balance in subsequent years",
+          "immediate_expensing": "As of 2023+, self-employed individuals may be eligible for immediate full expensing of eligible depreciable property in the year of acquisition — verify with accountant"
+        },
+        {
+          "name": "Subcontractor Costs",
+          "plain_language": "If you hire other freelancers to help with a project, their fees are deductible. You must issue a T4A slip if you pay more than $500 to a single person in a year."
+        },
+        {
+          "name": "Home Office",
+          "plain_language": "Most freelancers work primarily from home — home office deduction is significant and commonly missed."
+        },
+        {
+          "name": "Professional Memberships",
+          "examples": ["IEEE, ACM, design associations", "Industry-specific certifications", "LinkedIn Premium for business development"]
+        }
       ],
-      "log_required": true,
-      "note_en": "Must keep a mileage logbook to support business vs personal use"
+      "commonly_missed": ["Home office (biggest one)", "Internet at full business-use percentage", "Professional development courses", "Software subscriptions", "Subcontractor T4A slips (not a deduction but a compliance requirement)"]
     },
-    {
-      "id": "professional_development",
-      "name_en": "Professional Development & Training",
-      "deductible_expenses_en": [
-        "Courses and workshops",
-        "Books and subscriptions related to your business",
-        "Professional conferences"
+
+    "daycare": {
+      "label": "Home Daycare (RSG)",
+      "specific_deductions": [
+        {
+          "name": "Toys and Educational Materials",
+          "plain_language": "Toys, books, art supplies, learning materials purchased for the children in your care are deductible."
+        },
+        {
+          "name": "Food and Snacks for Children",
+          "plain_language": "Food you provide to children in your care is a business expense.",
+          "how_to_calculate": "Keep grocery receipts and estimate the portion used for daycare children vs your family"
+        },
+        {
+          "name": "Home Modifications for Safety",
+          "examples": ["Safety gates, outlet covers, cabinet locks", "First aid supplies"],
+          "note": "Major modifications (structural changes) use CCA; small safety items are current expenses"
+        },
+        {
+          "name": "Training and Professional Development",
+          "examples": ["Early childhood education training", "First aid certification (renewal)", "Professional development workshops"]
+        },
+        {
+          "name": "Home Insurance — Business Rider",
+          "plain_language": "If you've added a home daycare rider to your home insurance (you should), that premium is deductible."
+        },
+        {
+          "name": "Home Office and Space Used for Daycare",
+          "plain_language": "The area of your home used for daycare (play area, nap area, etc.) can be deducted proportionally from housing costs.",
+          "special_rule": "For home daycares, CRA allows a more generous calculation — verify with an accountant specializing in RSG tax returns"
+        }
+      ],
+      "commonly_missed": ["Food costs for children", "Toy and supply replacement costs", "Business portion of home insurance", "CPR/First aid training renewal"]
+    },
+
+    "retail": {
+      "label": "Retail / Product Sales",
+      "specific_deductions": [
+        {
+          "name": "Cost of Goods Sold (COGS)",
+          "plain_language": "The cost of products you purchase for resale is deductible.",
+          "formula": "Opening inventory + Purchases during year - Closing inventory = Cost of Goods Sold"
+        },
+        {
+          "name": "Shipping and Postage",
+          "plain_language": "Costs to ship products to customers or receive inventory."
+        },
+        {
+          "name": "Packaging Materials",
+          "plain_language": "Boxes, bags, tissue paper, tape — everything used to package products for sale or shipping."
+        },
+        {
+          "name": "Marketplace Fees",
+          "examples": ["Etsy seller fees", "Amazon fees", "Shopify monthly fees", "Payment processing fees (Stripe, Square)"]
+        }
       ]
     },
-    {
-      "id": "marketing",
-      "name_en": "Advertising & Marketing",
-      "deductible_expenses_en": [
-        "Website design and hosting",
-        "Social media advertising",
-        "Business cards and printed materials",
-        "Google / Meta ad spend"
-      ]
-    },
-    {
-      "id": "professional_fees",
-      "name_en": "Professional & Legal Fees",
-      "deductible_expenses_en": [
-        "Accountant and bookkeeper fees",
-        "Legal fees for business contracts",
-        "Business consulting"
-      ]
-    },
-    {
-      "id": "equipment",
-      "name_en": "Equipment & Technology (CCA)",
-      "description_en": "Capital assets are depreciated over time using Capital Cost Allowance (CCA) classes",
-      "cca_classes": [
-        { "class": 10, "rate": 0.30, "description_en": "Passenger vehicles and computer equipment" },
-        { "class": 8, "rate": 0.20, "description_en": "Furniture, appliances, tools > $500" },
-        { "class": 50, "rate": 0.55, "description_en": "Computer hardware" },
-        { "class": 12, "rate": 1.00, "description_en": "Small tools < $500, software" }
+
+    "personal_care": {
+      "label": "Personal Care (Hair, Nails, Massage, Esthetics)",
+      "specific_deductions": [
+        {
+          "name": "Supplies and Products",
+          "examples": ["Hair color, styling products", "Nail supplies, gels, acrylics", "Massage oils, linens", "Disposables (gloves, masks, applicators)"]
+        },
+        {
+          "name": "Equipment",
+          "examples": ["Styling chair, hairdryer, scissors", "Massage table", "UV lamp, nail drill"]
+        },
+        {
+          "name": "Booth Rental or Studio Rental",
+          "plain_language": "If you rent a booth at a salon or a studio space, that's fully deductible.",
+          "montreal_context": "Many stylists and estheticians rent booths — this is a significant deduction"
+        },
+        {
+          "name": "Professional Certifications",
+          "plain_language": "Renewal fees for professional permits and certifications are deductible."
+        },
+        {
+          "name": "Liability Insurance",
+          "plain_language": "Professional liability insurance is essential and deductible for personal care services."
+        }
       ]
     }
+  },
+
+  "record_keeping_requirements": {
+    "how_long_to_keep": "6 years from the end of the tax year they relate to",
+    "what_to_keep": [
+      "All receipts for business expenses",
+      "Bank statements (business account)",
+      "Credit card statements (business card)",
+      "Mileage log for vehicle use",
+      "Invoices you issued to clients",
+      "Contracts and agreements"
+    ],
+    "digital_tools": [
+      "Wave Accounting (free — popular with Quebec micro-entrepreneurs)",
+      "QuickBooks Self-Employed",
+      "Freshbooks",
+      "A simple Excel/Google Sheets log is acceptable for small operations"
+    ],
+    "tip": "Take a photo of every receipt immediately — paper fades. Apps like Wave let you scan receipts with your phone."
+  },
+
+  "what_is_NOT_deductible": [
+    "Personal expenses (groceries, personal clothing, personal trips)",
+    "Fines and penalties (parking tickets, CRA penalties)",
+    "Life insurance premiums",
+    "Loan principal payments (interest is deductible, principal is not)",
+    "Personal portion of mixed-use expenses",
+    "Club memberships (unless exclusively for business client entertainment — rare)"
   ],
-  "non_deductible_en": [
-    "Personal clothing (unless a uniform or protective gear)",
-    "Fines and penalties",
-    "Personal meals (50% rule applies to business meals)",
-    "Club memberships (golf, fitness) unless core to business"
-  ]
+
+  "source_url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/business-expenses.html",
+  "government_body": "Canada Revenue Agency (CRA) / Revenu Québec",
+  "professional_advice": "For complex deductions or large purchases, consult a CPA. Many offer free initial consultations. Community tax clinics (CVITP) serve low-income self-employed individuals for free."
 }

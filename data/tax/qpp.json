@@ -1,36 +1,102 @@
 {
-  "title_en": "Quebec Pension Plan (QPP) — Self-Employed Contributions",
-  "year": 2026,
-  "description_en": "Self-employed workers in Quebec must contribute both the employee and employer portions of QPP. QPP contributions are calculated on net self-employment income between the basic exemption and maximum pensionable earnings.",
-  "QPP_base": {
-    "basic_exemption_cad": 3500,
-    "maximum_pensionable_earnings_cad": 73200,
-    "maximum_contributory_earnings_cad": 69700,
-    "employee_rate": 0.054,
-    "employer_rate": 0.054,
-    "self_employed_combined_rate": 0.108,
-    "maximum_self_employed_contribution_cad": 7527.60
+  "_meta": {
+    "file": "tax/qpp.json",
+    "description": "Quebec Pension Plan (QPP) contributions for self-employed workers. The single biggest financial surprise for first-time self-employed people in Quebec — they pay both the employee and employer share.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "main": "https://www.revenuquebec.ca/en/businesses/source-deductions-and-employer-contributions/calculating-source-deductions-and-employer-contributions/quebec-pension-plan-contributions/",
+      "self_employed": "https://www.revenuquebec.ca/en/citizens/income-tax-return/completing-your-income-tax-return/how-to-complete-your-income-tax-return/line-by-line-help/line-98-contributions-to-the-qpp-on-income-from-self-employment/",
+      "rates_2026": "https://www.revenuquebec.ca/en/citizens/income-tax-return/completing-your-income-tax-return/how-to-complete-your-income-tax-return/line-by-line-help/"
+    }
   },
-  "QPP2": {
-    "description_en": "QPP2 is an additional layer that applies to earnings between the Year's Maximum Pensionable Earnings (YMPE) and the Year's Additional Maximum Pensionable Earnings (YAMPE).",
-    "YMPE_cad": 73200,
-    "YAMPE_cad": 81200,
-    "employee_rate": 0.04,
-    "employer_rate": 0.04,
-    "self_employed_rate": 0.08,
-    "maximum_self_employed_contribution_cad": 640
+
+  "id": "qpp_self_employed",
+  "title_en": "QPP (Quebec Pension Plan) — Self-Employed Contributions",
+  "title_fr": "RRQ (Régime de rentes du Québec) — Cotisations des travailleurs autonomes",
+
+  "plain_language_summary": "The QPP is Quebec's equivalent of CPP — a mandatory pension contribution that funds your retirement. When you're employed, your employer pays half and you pay half. When you're self-employed, you pay BOTH halves. This is often the biggest financial shock for new self-employed workers: the QPP alone can cost $5,000–$8,000/year at moderate income levels.",
+
+  "the_big_surprise": {
+    "title": "Why this shocks first-time self-employed workers",
+    "explanation": "An employee earning $60,000 pays $3,600 in QPP (6%). Their employer pays another $3,600. As a self-employed person earning $60,000, YOU pay the full $7,200 (12.8% — both sides). This is in addition to income tax. Many people don't budget for this and face a massive surprise tax bill.",
+    "action": "Budget 12.8% of your expected net income for QPP from day one."
   },
-  "tax_deduction": {
-    "description_en": "Self-employed individuals can deduct the employer-equivalent portion (50%) of QPP contributions on their federal and Quebec income tax returns.",
-    "deductible_portion": 0.5
+
+  "rates_2026": {
+    "employee_rate": 0.064,
+    "employer_rate": 0.064,
+    "self_employed_rate": 0.128,
+    "basic_exemption": 3500,
+    "max_pensionable_earnings": 71300,
+    "max_contribution_self_employed": 8677.60,
+    "note": "Verify exact rates for 2026 at Revenu Québec — rates are indexed annually"
   },
-  "QPIP": {
-    "title_en": "Quebec Parental Insurance Plan (QPIP)",
-    "year": 2026,
-    "self_employed_rate": 0.01186,
-    "maximum_insurable_earnings_cad": 98000,
-    "basic_exemption_cad": 2000,
-    "maximum_contribution_cad": 1139.63,
-    "description_en": "Self-employed workers in Quebec are required to pay QPIP premiums, unlike in other provinces where EI parental benefits apply. QPIP premiums entitle self-employed workers to maternity, paternity, and adoption benefits."
-  }
+
+  "calculation": {
+    "formula": "(Net self-employment income - $3,500 basic exemption) × 12.8%",
+    "cap": "Maximum pensionable earnings of $71,300 — contributions on income above this are not required",
+    "examples": [
+      {
+        "net_income": 20000,
+        "calculation": "($20,000 - $3,500) × 12.8% = $2,112",
+        "monthly_impact": "$176/month"
+      },
+      {
+        "net_income": 40000,
+        "calculation": "($40,000 - $3,500) × 12.8% = $4,672",
+        "monthly_impact": "$389/month"
+      },
+      {
+        "net_income": 60000,
+        "calculation": "($60,000 - $3,500) × 12.8% = $7,232",
+        "monthly_impact": "$603/month"
+      },
+      {
+        "net_income": 71300,
+        "calculation": "($71,300 - $3,500) × 12.8% = $8,678 (maximum)",
+        "monthly_impact": "$723/month"
+      }
+    ]
+  },
+
+  "how_and_when_to_pay": {
+    "method": "Calculated on your Quebec income tax return (Schedule Q of TP-1) and paid with your annual return",
+    "deadline": "April 30 for payment (June 15 for return filing if self-employed, but interest starts May 1)",
+    "installments": "If you expect to owe more than $1,800 in Quebec taxes including QPP, you must make quarterly installments: March 15, June 15, September 15, December 15",
+    "practical_tip": "Set aside 12.8% of every payment you receive for QPP. Add this to your income tax savings — total self-employment tax burden is roughly 30-40% of net income depending on your income level."
+  },
+
+  "deductions_from_qpp": {
+    "federal_deduction": "You can deduct HALF of your QPP contribution on your federal return (line 22200). This reduces your federal taxable income.",
+    "quebec_tax_credit": "Quebec provides a tax credit (not a deduction) for the employee portion of QPP contributions"
+  },
+
+  "benefit_of_contributing": {
+    "retirement_pension": "Your contributions build toward a QPP retirement pension, payable as early as age 60 (at reduced rate) or 65 (full rate)",
+    "disability_benefit": "QPP also provides disability benefits if you become unable to work",
+    "survivor_benefit": "Death/survivor benefits for your family",
+    "note": "The benefits accumulate based on your contributions and years of contribution — self-employed contributions count fully toward your pension"
+  },
+
+  "new_qpp2_enhancement": {
+    "plain_language": "Starting 2024-2026, QPP has an enhanced component (QPP2) that increases the maximum pension. Higher earners pay slightly more but get better benefits.",
+    "rate_enhancement": "An additional contribution rate applies on earnings between $71,300 and approximately $81,900 (verify current figures)",
+    "url": "https://www.revenuquebec.ca/en/citizens/pension-plan/"
+  },
+
+  "common_mistakes": [
+    "Not budgeting for QPP throughout the year and being hit with a $4,000–$8,000 bill in April",
+    "Not making quarterly installments when required — penalty is interest charges from the due date",
+    "Forgetting to deduct the employer half of QPP on your federal return — you leave money on the table",
+    "Confusing QPP (Quebec) with CPP (federal) — Quebec residents with QPP do NOT also pay CPP. They are separate pension plans."
+  ],
+
+  "qpp_vs_cpp": {
+    "important": "Quebec has its OWN pension plan (QPP/RRQ). If you work in Quebec, you contribute to QPP, NOT to the federal CPP. Your QPP contributions are administered by Revenu Québec.",
+    "if_you_worked_in_other_provinces": "If you worked in other provinces before Quebec, your CPP contributions transfer and count toward your total pension entitlement"
+  },
+
+  "source_url": "https://www.revenuquebec.ca/en/businesses/source-deductions-and-employer-contributions/calculating-source-deductions-and-employer-contributions/quebec-pension-plan-contributions/",
+  "government_body": "Revenu Québec / Retraite Québec",
+  "phone": "1-800-567-4692"
 }

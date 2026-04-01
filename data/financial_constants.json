@@ -1,65 +1,126 @@
 {
+  "_meta": {
+    "file": "financial_constants.json",
+    "description": "All 2026 tax rates, brackets, and thresholds used by the deterministic tax calculator. No AI needed — pure math inputs.",
+    "last_verified": "2026-03-31",
+    "verify_by": "2027-01-15",
+    "verify_urls": {
+      "federal_brackets": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/frequently-asked-questions-individuals/canadian-income-tax-rates-individuals-current-previous-years.html",
+      "quebec_brackets": "https://www.revenuquebec.ca/en/citizens/income-tax-return/completing-your-income-tax-return/how-to-complete-your-income-tax-return/line-by-line-help/",
+      "qpp": "https://www.revenuquebec.ca/en/businesses/source-deductions-and-employer-contributions/calculating-source-deductions-and-employer-contributions/quebec-pension-plan-contributions/",
+      "qpip": "https://www.rqap.gouv.qc.ca/en/about-the-plan/general-information/premium-rates",
+      "gst_qst": "https://www.revenuquebec.ca/en/businesses/consumption-taxes/gsthst-and-qst/"
+    }
+  },
+
   "year": 2026,
-  "province": "QC",
-  "federal_tax_brackets": [
-    { "min": 0, "max": 57375, "rate": 0.15 },
-    { "min": 57375, "max": 114750, "rate": 0.205 },
-    { "min": 114750, "max": 158519, "rate": 0.26 },
-    { "min": 158519, "max": 220000, "rate": 0.29 },
-    { "min": 220000, "max": null, "rate": 0.33 }
+
+  "gst_rate": 0.05,
+  "qst_rate": 0.09975,
+  "gst_qst_registration_threshold": 30000,
+  "gst_qst_notes": [
+    "Threshold is $30,000 in taxable worldwide supplies over any 4 consecutive calendar quarters",
+    "Once threshold is crossed, registration is mandatory within 30 days",
+    "Some supplies are zero-rated (basic groceries) or exempt — home bakers selling at markets must verify with Revenu Québec"
+  ],
+
+  "qpp": {
+    "rate_self_employed": 0.128,
+    "rate_employee": 0.064,
+    "rate_employer": 0.064,
+    "max_pensionable_earnings": 71300,
+    "basic_exemption": 3500,
+    "max_annual_contribution_self_employed": 8677.6,
+    "note": "Self-employed pay BOTH the employee (6.4%) and employer (6.4%) shares = 12.8% total. This surprises most first-time self-employed people.",
+    "plain_language": "If you earn $50,000 self-employed, you pay QPP on ($50,000 - $3,500) = $46,500 × 12.8% = $5,952. An employee earning the same would only pay $2,976."
+  },
+
+  "qpip": {
+    "rate_self_employed": 0.00878,
+    "max_insurable_earnings": 98000,
+    "max_annual_premium_self_employed": 860.44,
+    "note": "Quebec Parental Insurance Plan — provides maternity/paternity benefits. Self-employed pay a single combined rate.",
+    "benefit": "Unlike CPP, QPIP actually provides parental leave benefits to self-employed workers who pay in"
+  },
+
+  "federal_tax_brackets_2026": [
+    { "min": 0, "max": 57375, "rate": 0.15, "label": "15% on first $57,375" },
+    {
+      "min": 57375,
+      "max": 114750,
+      "rate": 0.205,
+      "label": "20.5% on $57,375–$114,750"
+    },
+    {
+      "min": 114750,
+      "max": 158468,
+      "rate": 0.26,
+      "label": "26% on $114,750–$158,468"
+    },
+    {
+      "min": 158468,
+      "max": 221708,
+      "rate": 0.29,
+      "label": "29% on $158,468–$221,708"
+    },
+    {
+      "min": 221708,
+      "max": null,
+      "rate": 0.33,
+      "label": "33% on amounts over $221,708"
+    }
   ],
   "federal_basic_personal_amount": 16129,
-  "quebec_tax_brackets": [
-    { "min": 0, "max": 53255, "rate": 0.14 },
-    { "min": 53255, "max": 106495, "rate": 0.19 },
-    { "min": 106495, "max": 129590, "rate": 0.24 },
-    { "min": 129590, "max": null, "rate": 0.2575 }
+  "federal_self_employed_deduction": "Half of QPP contributions are deductible on federal return (line 22200)",
+
+  "quebec_tax_brackets_2026": [
+    { "min": 0, "max": 52455, "rate": 0.14, "label": "14% on first $52,455" },
+    {
+      "min": 52455,
+      "max": 104910,
+      "rate": 0.19,
+      "label": "19% on $52,455–$104,910"
+    },
+    {
+      "min": 104910,
+      "max": 126590,
+      "rate": 0.24,
+      "label": "24% on $104,910–$126,590"
+    },
+    {
+      "min": 126590,
+      "max": null,
+      "rate": 0.2575,
+      "label": "25.75% on amounts over $126,590"
+    }
   ],
-  "quebec_basic_personal_amount": 17183,
-  "federal_abatement_qc": 0.165,
-  "sales_taxes": {
-    "GST": {
-      "rate": 0.05,
-      "registration_threshold_cad": 30000,
-      "administered_by": "CRA"
-    },
-    "QST": {
-      "rate": 0.09975,
-      "registration_threshold_cad": 30000,
-      "administered_by": "Revenu Québec"
-    },
-    "combined_rate": 0.14975
+  "quebec_basic_personal_amount": 18056,
+  "quebec_abatement": 0.165,
+  "quebec_abatement_note": "Quebec residents receive a 16.5% federal tax abatement because Quebec funds its own programs (QPP, QPIP, etc.) instead of federal ones",
+
+  "corporate_tax_rate_small_business": {
+    "federal": 0.09,
+    "quebec": 0.032,
+    "combined": 0.122,
+    "applies_to_first": 500000,
+    "note": "Combined ~12.2% on first $500K of active business income for a Quebec CCPC (Canadian-Controlled Private Corporation)",
+    "general_rate_combined": 0.265,
+    "general_rate_note": "Income above $500K taxed at ~26.5% combined"
   },
-  "QPP": {
-    "year": 2026,
-    "basic_exemption": 3500,
-    "maximum_pensionable_earnings": 73200,
-    "employee_rate": 0.054,
-    "employer_rate": 0.054,
-    "self_employed_rate": 0.108,
-    "QPP2_rate_employee": 0.04,
-    "QPP2_rate_employer": 0.04,
-    "QPP2_rate_self_employed": 0.08,
-    "QPP2_upper_earnings": 81200
-  },
-  "EI": {
-    "year": 2026,
-    "employee_rate": 0.0166,
-    "employer_rate_multiplier": 1.4,
-    "maximum_insurable_earnings": 65700,
-    "note": "Self-employed workers in Quebec do not pay regular EI premiums but may opt into special benefits"
-  },
-  "QPIP": {
-    "year": 2026,
-    "employee_premium_rate": 0.00494,
-    "employer_premium_rate": 0.00692,
-    "self_employed_rate": 0.01186,
-    "maximum_insurable_earnings": 98000,
-    "basic_exemption": 2000
-  },
-  "small_business_deduction": {
-    "federal_rate": 0.09,
-    "quebec_rate": 0.03,
-    "threshold": 500000
-  }
+
+  "quarterly_installment_threshold": 3000,
+  "quarterly_installment_note": "If you expect to owe more than $3,000 in federal tax (or $1,800 in Quebec), you must make quarterly installments. Due: March 15, June 15, September 15, December 15.",
+
+  "common_deductions_self_employed": [
+    "Home office expenses (proportional to workspace %)",
+    "Vehicle expenses (business use portion)",
+    "Phone and internet (business use portion)",
+    "Professional development and courses",
+    "Business insurance premiums",
+    "Accounting and legal fees",
+    "Marketing and advertising",
+    "Equipment and tools (CCA deduction)",
+    "Meals with clients (50% deductible)",
+    "Bank fees for business accounts"
+  ]
 }

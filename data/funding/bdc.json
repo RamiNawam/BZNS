@@ -1,46 +1,148 @@
 {
+  "_meta": {
+    "file": "funding/bdc.json",
+    "description": "BDC (Business Development Bank of Canada) micro-loans and small business financing. Federal Crown corporation offering flexible loans to entrepreneurs who may not qualify for traditional bank financing.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "main": "https://www.bdc.ca/en/financing",
+      "small_business": "https://www.bdc.ca/en/financing/business-loans/small-business-loan",
+      "startup": "https://www.bdc.ca/en/articles-tools/start-buy-business/start-business",
+      "apply": "https://www.bdc.ca/en/financing/apply-online"
+    }
+  },
+
   "id": "bdc",
-  "name_en": "Business Development Bank of Canada (BDC)",
-  "name_fr": "Banque de développement du Canada (BDC)",
-  "website": "https://www.bdc.ca",
-  "description_en": "BDC is Canada's only bank devoted exclusively to entrepreneurs. It offers business loans, venture capital, and advisory services tailored to Canadian SMEs.",
-  "description_fr": "La BDC est la seule banque au Canada entièrement dédiée aux entrepreneurs. Elle offre des prêts aux entreprises, du capital de risque et des services-conseils.",
-  "products": [
+  "program_name_en": "BDC — Business Development Bank of Canada Financing",
+  "program_name_fr": "BDC — Banque de développement du Canada",
+  "program_key": "bdc",
+
+  "plain_language_summary": "The BDC is Canada's bank for entrepreneurs. Unlike regular banks, BDC's mandate is to support businesses that may not qualify for traditional financing. Their loans have flexible terms and they don't just look at credit scores — they look at your business plan and potential. They often partner with Futurpreneur for the matching $55,000 component.",
+
+  "type": "loan",
+  "amount": {
+    "micro_loan_min": 10000,
+    "micro_loan_max": 100000,
+    "larger_loans": "Up to several million for established businesses",
+    "note": "For micro-businesses and startups, typical range is $10,000–$100,000"
+  },
+
+  "programs": [
     {
-      "id": "small_business_loan",
-      "name_en": "Small Business Loan",
-      "description_en": "Flexible term loans for equipment purchase, working capital, leasehold improvements",
-      "amount_range_cad": "10,000–100,000",
-      "term_years": "Up to 10",
-      "collateral_required": false,
-      "note_en": "BDC uses a risk-based approach — weaker credit profiles can still qualify"
+      "id": "bdc_startup_loan",
+      "name": "BDC Small Business Loan",
+      "plain_language": "General business loan with flexible terms. More patient than a bank — they understand business takes time.",
+      "amount_range": "10,000 to 100,000+",
+      "interest_rate": "Floating rate — BDC base rate + spread. Typically competitive with or slightly above bank rates.",
+      "repayment": "Flexible terms — typically 5-10 years",
+      "collateral": "Sometimes required, sometimes not — depends on amount and risk"
     },
     {
-      "id": "startup_financing",
-      "name_en": "Startup / Early-Stage Financing",
-      "description_en": "For businesses less than 2 years old",
-      "amount_range_cad": "Up to $100,000",
-      "co_lending_en": "Often co-lent with Futurpreneur for younger entrepreneurs"
-    },
-    {
-      "id": "venture_capital",
-      "name_en": "BDC Venture Capital",
-      "description_en": "Equity investments for high-growth technology companies",
-      "stage": "Seed to Series B",
-      "focus_sectors_en": ["AI / Deep Tech", "CleanTech", "Life Sciences", "Industrial Innovation"]
+      "id": "futurpreneur_match",
+      "name": "Futurpreneur BDC Match Loan",
+      "plain_language": "If you get a Futurpreneur loan, BDC can match up to $55,000 more (total $75,000 combined). You apply through Futurpreneur and they refer you to BDC.",
+      "amount": 55000,
+      "note": "This is the most common BDC product for young entrepreneurs — accessed through Futurpreneur",
+      "ref": "funding/futurpreneur.json"
     }
   ],
-  "advisory_services": {
-    "available": true,
-    "description_en": "BDC advisors and consultants help with business planning, digital transformation, and management coaching",
-    "fee": "Paid — rates vary by engagement"
-  },
+
   "eligibility": {
-    "residency": "Canadian-owned or controlled business",
-    "sectors_excluded_en": ["Weapons", "Gambling", "Real estate (passive investment)"]
+    "scoring_weights": {
+      "business_viability": 0.35,
+      "immigration_status": 0.20,
+      "business_stage": 0.25,
+      "credit_history": 0.20
+    },
+
+    "criteria": {
+      "immigration_status": {
+        "eligible": ["canadian_citizen", "permanent_resident"],
+        "ineligible": ["work_permit", "student_visa"],
+        "note": "BDC requires Canadian citizenship or permanent residency",
+        "future_eligibility": "Eligible immediately upon receiving permanent residency"
+      },
+      "business_stage": {
+        "eligible": [
+          "Startups with a strong business plan",
+          "Businesses less than 2 years old",
+          "Established businesses seeking expansion financing"
+        ],
+        "note": "BDC is more startup-friendly than traditional banks"
+      },
+      "business_viability": {
+        "what_they_look_at": [
+          "Quality and realism of your business plan",
+          "Your relevant experience and skills",
+          "Market opportunity",
+          "Financial projections"
+        ]
+      },
+      "credit_history": {
+        "minimum_required": "No hard minimum — but poor credit history requires explanation and strong business case",
+        "note": "BDC works with entrepreneurs with imperfect credit more than traditional banks would"
+      },
+      "sector": {
+        "eligible": "Most sectors",
+        "ineligible": ["Cannabis (verify current policy)", "Adult entertainment", "Pure real estate speculation"]
+      }
+    }
   },
+
+  "bdc_advisory_services": {
+    "name": "BDC Advisory Services",
+    "available": true,
+    "cost": "Fee-based for most services, but initial consultations often free",
+    "what_they_offer": [
+      "Business plan review",
+      "Financial planning",
+      "Marketing strategy",
+      "Operations consulting"
+    ],
+    "url": "https://www.bdc.ca/en/advisory-services"
+  },
+
+  "free_resources": [
+    {
+      "name": "BDC Business Templates and Tools",
+      "url": "https://www.bdc.ca/en/articles-tools",
+      "note": "Free business plan templates, financial calculators, market research guides"
+    },
+    {
+      "name": "BDC Learning Platform",
+      "url": "https://www.bdc.ca/en/articles-tools/entrepreneur-toolkit",
+      "note": "Free online courses on business topics"
+    }
+  ],
+
   "montreal_office": {
-    "address": "5 Place Ville Marie, Suite 300, Montreal, QC H3B 2G2",
-    "phone": "514-283-5904"
-  }
+    "address": "500 Place d'Armes, Suite 2900, Montréal, QC H2Y 2W2",
+    "phone": "514-283-5904",
+    "url": "https://www.bdc.ca/en/offices/qc/montreal"
+  },
+
+  "what_you_need_to_apply": [
+    "Completed business plan",
+    "2-3 year financial projections",
+    "Personal financial statements",
+    "NEQ registration",
+    "Proof of citizenship or permanent residency",
+    "Personal credit consent"
+  ],
+
+  "timeline": {
+    "application_to_decision": "2-6 weeks",
+    "note": "BDC is generally faster than traditional banks for small business loans"
+  },
+
+  "common_mistakes": [
+    "Thinking you need perfect credit — BDC is more flexible than banks",
+    "Applying without a business plan — non-negotiable requirement",
+    "Not using BDC's free templates and tools before applying",
+    "Not knowing about the Futurpreneur-BDC match — if you're 18-39, apply through Futurpreneur first to access both"
+  ],
+
+  "application_url": "https://www.bdc.ca/en/financing/apply-online",
+  "source_url": "https://www.bdc.ca/en",
+  "government_body": "Business Development Bank of Canada (federal Crown corporation)",
+  "phone": "1-877-232-2269"
 }

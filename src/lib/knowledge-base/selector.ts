@@ -1,107 +1,261 @@
-import { loadDataFile, loadDirectory } from './loader';
-
-export type KnowledgeSection =
-  | 'registration'
-  | 'permits'
-  | 'tax'
-  | 'funding'
-  | 'compliance'
-  | 'financial';
+"use server";
 
 /**
- * Keyword map — maps topic keywords to knowledge base sections.
- * Used to select only the relevant context for a given user message.
+ * Knowledge Base Selector
+ * src/lib/knowledge-base/selector.ts
+ *
+ * Given a user's business type, returns only the relevant KB documents
+ * to inject into Claude's prompt. Keeps prompts lean — a bakery doesn't
+ * need IRAP (R&D funding) or RACJ (liquor permits).
+ *
+ * Funding files are handled separately — they are always fully loaded
+ * by the scorer (deterministic, no Claude involved). The selector only
+ * controls what goes into Claude prompts.
+ *
+ * Usage:
+ *   import { selectForPrompt } from '@/lib/knowledge-base/selector'
+ *   const docs = selectForPrompt(kb, 'food')
+ *   const kbString = serializeForPrompt(docs)
  */
-const KEYWORD_MAP: Record<string, KnowledgeSection[]> = {
-  register: ['registration'],
-  registration: ['registration'],
-  req: ['registration'],
-  neq: ['registration'],
-  cra: ['registration'],
-  'business number': ['registration'],
-  'revenu québec': ['registration', 'tax'],
-  permit: ['permits'],
-  mapaq: ['permits'],
-  restaurant: ['permits'],
-  food: ['permits'],
-  alcohol: ['permits'],
-  racj: ['permits'],
-  daycare: ['permits'],
-  tax: ['tax', 'financial'],
-  gst: ['tax'],
-  qst: ['tax'],
-  qpp: ['tax', 'financial'],
-  qpip: ['tax', 'financial'],
-  instalment: ['tax'],
-  deduction: ['tax'],
-  grant: ['funding'],
-  loan: ['funding'],
-  funding: ['funding'],
-  futurpreneur: ['funding'],
-  'pme mtl': ['funding'],
-  bdc: ['funding'],
-  irap: ['funding'],
-  'canada summer jobs': ['funding'],
-  bill96: ['compliance'],
-  'bill 96': ['compliance'],
-  french: ['compliance'],
-  signage: ['compliance'],
-  sign: ['compliance'],
-  income: ['financial', 'tax'],
-  'take-home': ['financial'],
-  revenue: ['financial', 'tax'],
-  salary: ['financial', 'tax'],
+
+import {
+  type KnowledgeBase,
+  type KBDocument,
+  type FundingProgram,
+  type KBFileKey,
+} from "./loader";
+
+// ---------------------------------------------------------------------------
+// Business types — must match what Claude returns from the profile prompt
+// ---------------------------------------------------------------------------
+
+export type BusinessType =
+  | "food"
+  | "freelance"
+  | "daycare"
+  | "retail"
+  | "personal_care"
+  | "other";
+
+// ---------------------------------------------------------------------------
+// The KB map from the project plan (Section 8), extended with new files.
+// Keys are the file paths in /data/ — must match KBFileKey exactly.
+// Funding files are NOT listed here — they go to the scorer, not Claude.
+// ---------------------------------------------------------------------------
+
+const KB_MAP: Record<BusinessType, KBFileKey[]> = {
+  food: [
+    "business_structures.json",
+    "financial_constants.json",
+    "registration/req.json",
+    "registration/revenu_quebec.json",
+    "permits/mapaq.json",
+    "permits/municipal_montreal.json",
+    "tax/gst_qst.json",
+    "tax/qpp.json",
+    "tax/deductions.json",
+    "tax/installments.json",
+    "compliance/bill96.json",
+    "compliance/signage.json",
+  ],
+
+  freelance: [
+    "business_structures.json",
+    "financial_constants.json",
+    "registration/req.json",
+    "registration/revenu_quebec.json",
+    "registration/cra.json",
+    "tax/gst_qst.json",
+    "tax/qpp.json",
+    "tax/deductions.json",
+    "tax/installments.json",
+    "compliance/bill96.json",
+    // professional_orders included conditionally below
+  ],
+
+  daycare: [
+    "business_structures.json",
+    "financial_constants.json",
+    "registration/req.json",
+    "registration/revenu_quebec.json",
+    "permits/famille.json",
+    "permits/municipal_montreal.json",
+    "tax/gst_qst.json",
+    "tax/qpp.json",
+    "tax/installments.json",
+    "compliance/bill96.json",
+  ],
+
+  retail: [
+    "business_structures.json",
+    "financial_constants.json",
+    "registration/req.json",
+    "registration/revenu_quebec.json",
+    "permits/municipal_montreal.json",
+    "tax/gst_qst.json",
+    "tax/qpp.json",
+    "tax/deductions.json",
+    "tax/installments.json",
+    "compliance/bill96.json",
+    "compliance/signage.json",
+  ],
+
+  personal_care: [
+    "business_structures.json",
+    "financial_constants.json",
+    "registration/req.json",
+    "registration/revenu_quebec.json",
+    "permits/municipal_montreal.json",
+    "permits/professional_orders.json",
+    "tax/gst_qst.json",
+    "tax/qpp.json",
+    "tax/deductions.json",
+    "tax/installments.json",
+    "compliance/bill96.json",
+  ],
+
+  other: [
+    "business_structures.json",
+    "financial_constants.json",
+    "registration/req.json",
+    "registration/revenu_quebec.json",
+    "tax/gst_qst.json",
+    "tax/qpp.json",
+    "tax/deductions.json",
+    "tax/installments.json",
+    "compliance/bill96.json",
+  ],
 };
 
-/**
- * Select relevant knowledge base sections based on user message content.
- * Returns a string of serialised JSON context for inclusion in the Claude prompt.
- */
-export function selectKnowledgeBase(userMessage: string): string {
-  const lower = userMessage.toLowerCase();
-  const sections = new Set<KnowledgeSection>();
+// ---------------------------------------------------------------------------
+// Optional context flags — add extra files based on profile details
+// ---------------------------------------------------------------------------
 
-  for (const [keyword, sects] of Object.entries(KEYWORD_MAP)) {
-    if (lower.includes(keyword)) {
-      sects.forEach((s) => sections.add(s));
+export interface SelectionContext {
+  businessType: BusinessType;
+  // Add these when known from the user's profile
+  isHomeBased?: boolean; // adds municipal_montreal if not already present
+  servesAlcohol?: boolean; // adds racj.json
+  isRegulatedProfession?: boolean; // adds professional_orders.json
+  hasCRAQuestion?: boolean; // adds cra.json
+}
+
+// ---------------------------------------------------------------------------
+// Core selector — returns the right KB documents for a given business type
+// ---------------------------------------------------------------------------
+
+export function selectForPrompt(
+  kb: KnowledgeBase,
+  context: SelectionContext | BusinessType,
+): Array<KBDocument | FundingProgram> {
+  // Accept either a plain BusinessType string or a full context object
+  const ctx: SelectionContext =
+    typeof context === "string" ? { businessType: context } : context;
+
+  const { businessType } = ctx;
+
+  // Start with the base file list for this business type
+  const fileKeys = new Set<KBFileKey>(KB_MAP[businessType] ?? KB_MAP.other);
+
+  // Add optional files based on context flags
+  if (ctx.isHomeBased && !fileKeys.has("permits/municipal_montreal.json")) {
+    fileKeys.add("permits/municipal_montreal.json");
+  }
+  if (ctx.servesAlcohol) {
+    fileKeys.add("permits/racj.json");
+  }
+  if (ctx.isRegulatedProfession) {
+    fileKeys.add("permits/professional_orders.json");
+  }
+  if (ctx.hasCRAQuestion) {
+    fileKeys.add("registration/cra.json");
+  }
+
+  // Resolve each key to its KB document, skip nulls
+  const docs: Array<KBDocument | FundingProgram> = [];
+  for (const key of fileKeys) {
+    const doc = kb.getByKey(key);
+    if (doc) docs.push(doc);
+  }
+
+  return docs;
+}
+
+// ---------------------------------------------------------------------------
+// Funding selector — returns ALL active funding programs for the scorer.
+// The scorer itself handles filtering by profile — we load everything here.
+// ---------------------------------------------------------------------------
+
+export function selectFundingForScorer(kb: KnowledgeBase): FundingProgram[] {
+  return kb.getAllFundingPrograms();
+}
+
+// ---------------------------------------------------------------------------
+// Assistant selector — broader context, includes more files.
+// The assistant chat has more tokens to work with and answers open questions.
+// ---------------------------------------------------------------------------
+
+export function selectForAssistant(
+  kb: KnowledgeBase,
+  context: SelectionContext,
+): Array<KBDocument | FundingProgram> {
+  // Start with the standard prompt selection
+  const base = selectForPrompt(kb, context);
+  const keys = new Set(base.map((d) => (d as KBDocument).id));
+
+  // Always add these for the assistant — users ask about anything
+  const extras: KBFileKey[] = [
+    "registration/cra.json",
+    "tax/installments.json",
+    "compliance/signage.json",
+  ];
+
+  for (const key of extras) {
+    const doc = kb.getByKey(key);
+    if (doc && !keys.has((doc as KBDocument).id)) {
+      base.push(doc);
     }
   }
 
-  // Default: include registration and financial if nothing matched
-  if (sections.size === 0) {
-    sections.add('registration');
-    sections.add('financial');
-  }
+  return base;
+}
 
-  const context: Record<string, unknown> = {};
+// ---------------------------------------------------------------------------
+// Utility: infer SelectionContext from a user profile
+// Call this in the API routes instead of building context manually
+// ---------------------------------------------------------------------------
 
-  for (const section of sections) {
-    try {
-      switch (section) {
-        case 'registration':
-          context.registration = loadDirectory('registration');
-          context.businessStructures = loadDataFile('business_structures.json');
-          break;
-        case 'permits':
-          context.permits = loadDirectory('permits');
-          break;
-        case 'tax':
-          context.tax = loadDirectory('tax');
-          break;
-        case 'funding':
-          context.funding = loadDirectory('funding');
-          break;
-        case 'compliance':
-          context.compliance = loadDirectory('compliance');
-          break;
-        case 'financial':
-          context.financialConstants = loadDataFile('financial_constants.json');
-          break;
-      }
-    } catch (err) {
-      console.error(`Failed to load knowledge base section: ${section}`, err);
-    }
-  }
+export interface UserProfile {
+  industry_sector?: string;
+  business_type: BusinessType;
+  is_home_based?: boolean;
+  // Extend with other profile fields as needed
+}
 
-  return JSON.stringify(context, null, 2);
+export function contextFromProfile(profile: UserProfile): SelectionContext {
+  return {
+    businessType: profile.business_type,
+    isHomeBased: profile.is_home_based ?? false,
+    // Heuristics — extend as you learn more about your users
+    isRegulatedProfession:
+      profile.business_type === "personal_care" ||
+      [
+        "lawyer",
+        "engineer",
+        "accountant",
+        "architect",
+        "psychologist",
+        "nurse",
+        "physiotherapist",
+        "pharmacist",
+      ].some((p) => profile.industry_sector?.toLowerCase().includes(p)),
+    servesAlcohol: [
+      "bar",
+      "restaurant",
+      "catering",
+      "brewery",
+      "winery",
+      "distillery",
+    ].some((p) => profile.industry_sector?.toLowerCase().includes(p)),
+  };
 }

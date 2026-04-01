@@ -1,59 +1,141 @@
 {
-  "description_en": "Quebec has 46 professional orders governed by the Professional Code. Members of regulated professions must belong to the relevant order and hold a valid permit to practise.",
-  "description_fr": "Le Québec compte 46 ordres professionnels régis par le Code des professions. Les membres des professions réglementées doivent appartenir à l'ordre concerné.",
-  "governing_body": {
-    "name_en": "Conseil interprofessionnel du Québec (CIQ)",
-    "website": "https://www.professions-quebec.org"
+  "_meta": {
+    "file": "permits/professional_orders.json",
+    "description": "Regulated professions in Quebec that require membership in a professional order (ordre professionnel) before you can legally practice. Critical for anyone in a regulated field.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "cpq": "https://www.professions-quebec.org/en/",
+      "oiq_engineers": "https://www.oiq.qc.ca/en/",
+      "barreau": "https://www.barreau.qc.ca/en/",
+      "cpa": "https://cpaquebec.ca/en/",
+      "oaq_architects": "https://www.oaq.com/en/",
+      "opq_psychologists": "https://www.ordrepsy.qc.ca/en/"
+    }
   },
-  "selected_orders": [
+
+  "id": "professional_orders",
+  "title_en": "Regulated Professions — Professional Orders in Quebec",
+  "title_fr": "Professions réglementées — Ordres professionnels du Québec",
+
+  "plain_language_summary": "Quebec has 46 professional orders (ordres professionnels) that regulate specific occupations. If your profession is regulated, you MUST be a member of your order before practicing — even as a self-employed person. Practicing a regulated profession without authorization is illegal and can result in significant fines. If your field is on this list, membership in your order is your very first step — before registering anything else.",
+
+  "critical_warning": "If you are in a regulated profession, you cannot legally practice or charge clients for these services until you are authorized by your professional order. This applies to self-employed work, consulting, and freelancing — not just salaried employment.",
+
+  "how_to_check": {
+    "tool": "Conseil des professions du Québec (CPQ) — official directory of all 46 orders",
+    "url": "https://www.professions-quebec.org/en",
+    "instruction": "Search your profession in the CPQ directory. If it appears, you must join that order before practicing."
+  },
+
+  "common_regulated_professions": [
     {
-      "id": "oiq",
-      "name_en": "Ordre des ingénieurs du Québec (OIQ)",
-      "profession_en": "Engineers",
-      "website": "https://www.oiq.qc.ca",
-      "annual_fee_range_cad": "400–700",
-      "permit_to_practise_required": true
+      "profession_en": "Engineer",
+      "profession_fr": "Ingénieur",
+      "order": "Ordre des ingénieurs du Québec (OIQ)",
+      "url": "https://www.oiq.qc.ca/en/",
+      "membership_cost": "Approximately $500-$800/year (verify at OIQ)",
+      "note": "Software engineers often don't realize they may need OIQ membership if they practice engineering. Purely coding/development work may not require it — verify with OIQ for your specific role."
     },
     {
-      "id": "barreau",
-      "name_en": "Barreau du Québec",
-      "profession_en": "Lawyers (barristers & solicitors)",
-      "website": "https://www.barreau.qc.ca",
-      "annual_fee_range_cad": "700–1500",
-      "permit_to_practise_required": true
+      "profession_en": "Chartered Professional Accountant",
+      "profession_fr": "Comptable professionnel agréé (CPA)",
+      "order": "CPA Quebec",
+      "url": "https://cpaquebec.ca/en/",
+      "membership_cost": "Varies — annual permit to practice required",
+      "note": "Must have CPA designation to use the title or offer services requiring CPA authorization"
     },
     {
-      "id": "oaq",
-      "name_en": "Ordre des architectes du Québec (OAQ)",
-      "profession_en": "Architects",
-      "website": "https://www.oaq.com",
-      "annual_fee_range_cad": "600–900",
-      "permit_to_practise_required": true
+      "profession_en": "Lawyer / Notary",
+      "profession_fr": "Avocat / Notaire",
+      "order": "Barreau du Québec / Chambre des notaires",
+      "url": "https://www.barreau.qc.ca/en/",
+      "note": "Must be called to the Bar or be a notary to practice law in Quebec"
     },
     {
-      "id": "opq",
-      "name_en": "Ordre des psychologues du Québec (OPQ)",
-      "profession_en": "Psychologists",
-      "website": "https://www.ordrepsy.qc.ca",
-      "annual_fee_range_cad": "500–800",
-      "permit_to_practise_required": true
+      "profession_en": "Architect",
+      "profession_fr": "Architecte",
+      "order": "Ordre des architectes du Québec (OAQ)",
+      "url": "https://www.oaq.com/en/",
+      "note": "Must be OAQ member to use the title 'architect' or offer architectural services"
     },
     {
-      "id": "cpa_quebec",
-      "name_en": "Ordre des CPA du Québec",
-      "profession_en": "Chartered Professional Accountants",
-      "website": "https://cpaquebec.ca",
-      "annual_fee_range_cad": "600–1100",
-      "permit_to_practise_required": true
+      "profession_en": "Psychologist",
+      "profession_fr": "Psychologue",
+      "order": "Ordre des psychologues du Québec (OPQ)",
+      "url": "https://www.ordrepsy.qc.ca/en/",
+      "note": "Must be OPQ member to use the title 'psychologist' or practice psychology"
     },
     {
-      "id": "oiiq",
-      "name_en": "Ordre des infirmières et infirmiers du Québec (OIIQ)",
-      "profession_en": "Nurses",
-      "website": "https://www.oiiq.org",
-      "annual_fee_range_cad": "300–500",
-      "permit_to_practise_required": true
+      "profession_en": "Nurse",
+      "profession_fr": "Infirmière / Infirmier",
+      "order": "Ordre des infirmières et infirmiers du Québec (OIIQ)",
+      "url": "https://www.oiiq.org",
+      "note": "Regulated nursing practice requires OIIQ registration"
+    },
+    {
+      "profession_en": "Physiotherapist",
+      "profession_fr": "Physiothérapeute",
+      "order": "Ordre professionnel de la physiothérapie du Québec (OPPQ)",
+      "url": "https://oppq.qc.ca/en/",
+      "note": "Must be OPPQ member to practice physiotherapy"
+    },
+    {
+      "profession_en": "Pharmacist",
+      "profession_fr": "Pharmacien",
+      "order": "Ordre des pharmaciens du Québec (OPQ)",
+      "url": "https://www.opq.org/en/",
+      "note": "Highly regulated — must be OPQ member"
+    },
+    {
+      "profession_en": "Naturopath / Homeopath / Acupuncturist",
+      "profession_fr": "Naturopathe / Homéopathe / Acupuncteur",
+      "order": "Varies — some regulated, some not",
+      "note": "Acupuncture is regulated (Ordre des acupuncteurs du Québec). Naturopathy and homeopathy are NOT regulated — you can practice without an order but cannot claim regulated titles. Verify your specific practice.",
+      "url": "https://www.professions-quebec.org/en"
+    },
+    {
+      "profession_en": "Hairdresser / Barber",
+      "profession_fr": "Coiffeur / Barbier",
+      "order": "Not an ordre professionnel — but requires vocational diploma (DEP)",
+      "note": "Hairdressing is not regulated by a professional order in Quebec, but salons and stylists may need municipal permits. A DEP in hairdressing is required to work in a licensed salon.",
+      "dep_url": "https://www.inforoutefpt.org"
+    },
+    {
+      "profession_en": "Real Estate Broker",
+      "profession_fr": "Courtier immobilier",
+      "order": "Organisme d'autoréglementation du courtage immobilier du Québec (OACIQ)",
+      "url": "https://www.oaciq.com/en",
+      "note": "Must be licensed by OACIQ to act as a real estate broker in Quebec"
     }
   ],
-  "note_en": "This is a representative selection. Verify with the CIQ directory for all 46 orders. Failure to hold a valid permit to practise is a professional offence."
+
+  "immigrant_credential_recognition": {
+    "plain_language": "If you obtained your professional credentials outside Quebec or Canada, you may need to have them recognized before you can join a Quebec professional order. This process varies by profession and country of origin.",
+    "process": "Contact your specific professional order — they each have their own credential recognition process",
+    "support_organization": {
+      "name": "Ordre des professions du Québec / MIFI",
+      "url": "https://www.immigration-quebec.gouv.qc.ca/en/employment/working-quebec/recognition-qualifications/",
+      "note": "MIFI provides support for immigrants navigating credential recognition"
+    },
+    "timeline": "Can take 6 months to 2+ years depending on profession and country of origin",
+    "bridging_programs": "Some professions have bridging programs for foreign-trained professionals — check with your order"
+  },
+
+  "cost_range": {
+    "application_fees": "Typically $100-$500 one-time",
+    "annual_membership": "Typically $400-$1,200/year depending on the order",
+    "exam_fees": "Some orders require qualifying exams — typically $200-$600",
+    "note": "Professional order fees are tax-deductible as business expenses"
+  },
+
+  "common_mistakes": [
+    "Providing services under a regulated title without being a member of the relevant order — illegal and can result in fines",
+    "Thinking you don't need order membership for freelance/self-employed work — the obligation applies regardless of employment type",
+    "Not checking credential recognition requirements before planning your business timeline",
+    "Using a title like 'engineer', 'architect', or 'psychologist' in marketing without being a member of the order — title protection is strict in Quebec"
+  ],
+
+  "source_url": "https://www.professions-quebec.org/en",
+  "government_body": "Conseil des professions du Québec (CPQ)",
+  "phone": "514-871-4411"
 }

@@ -1,52 +1,124 @@
 {
-  "agency": "RACJ",
-  "full_name_en": "Régie des alcools, des courses et des jeux",
-  "full_name_fr": "Régie des alcools, des courses et des jeux",
-  "website": "https://www.racj.gouv.qc.ca",
-  "description_en": "The RACJ issues permits for the sale and service of alcoholic beverages in Quebec, as well as permits for gaming and horse racing activities.",
-  "description_fr": "La RACJ émet les permis pour la vente et le service de boissons alcooliques au Québec, ainsi que les permis liés aux jeux et aux courses.",
-  "alcohol_permits": [
+  "_meta": {
+    "file": "permits/racj.json",
+    "description": "RACJ (Régie des alcools, des courses et des jeux) — Quebec alcohol permits. Required for any business selling, serving, or manufacturing alcohol.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "main": "https://www.racj.gouv.qc.ca/en/permit-holders/permits.html",
+      "restaurant_permit": "https://www.racj.gouv.qc.ca/en/permit-holders/permits/restaurant-permits.html",
+      "artisan_brewer": "https://www.racj.gouv.qc.ca/en/permit-holders/permits/production-permits.html",
+      "apply": "https://www.racj.gouv.qc.ca/en/permit-holders/applying-for-a-permit.html"
+    }
+  },
+
+  "id": "racj_alcohol_permit",
+  "title_en": "RACJ — Alcohol Permit (Régie des alcools, des courses et des jeux)",
+  "title_fr": "Permis d'alcool — RACJ",
+
+  "plain_language_summary": "If your business involves alcohol — serving it in a restaurant or bar, selling it for off-site consumption, or producing it (brewery, winery, distillery) — you need a permit from the RACJ. This is separate from your general business registration and is one of the more complex permits to obtain. Most micro-businesses don't need this, but caterers, restaurants, bars, and craft producers do.",
+
+  "who_needs_this": [
+    "Restaurants and cafés serving alcohol",
+    "Bars and lounges",
+    "Catering companies serving alcohol at events",
+    "Grocery stores and depanneurs selling alcohol",
+    "Craft breweries, wineries, cideries, distilleries (artisan producers)",
+    "Event venues where alcohol is served"
+  ],
+
+  "who_does_not_need_this": [
+    "Home bakers and food businesses that don't serve or sell alcohol",
+    "Caterers who only serve food (no alcohol)",
+    "Restaurants that choose to be alcohol-free (BYOB rules apply — see below)"
+  ],
+
+  "permit_types": [
     {
       "id": "restaurant_permit",
       "name_en": "Restaurant Permit",
-      "name_fr": "Permis de restaurant",
-      "description_en": "Allows serving alcohol for consumption on-site alongside meals",
-      "annual_fee_cad": 707,
-      "requires_food_service": true
+      "plain_language": "Allows a restaurant to serve alcohol with meals. Most common permit for food businesses.",
+      "cost": "Approximately $500-$1,500/year depending on permit class (verify at RACJ)",
+      "requirements": [
+        "Physical restaurant space (not home-based)",
+        "Full kitchen capable of serving complete meals",
+        "Compliance with zoning (restaurant use permitted in your zone)",
+        "Building meets fire code",
+        "At least one employee trained in responsible alcohol service (MAPAQ/RACJ training)",
+        "Criminal record check for permit holder"
+      ]
     },
     {
       "id": "bar_permit",
       "name_en": "Bar Permit",
-      "name_fr": "Permis de bar",
-      "description_en": "Allows serving alcohol for consumption on-site, with or without food",
-      "annual_fee_cad": 1060
+      "plain_language": "Allows serving alcohol without requiring full meals.",
+      "cost": "Verify at RACJ — typically higher than restaurant permit",
+      "requirements": "Similar to restaurant permit but zoning requirements differ"
     },
     {
-      "id": "grocery_permit",
-      "name_en": "Grocery Store Permit",
-      "name_fr": "Permis d'épicerie",
-      "description_en": "Allows sale of beer and cider for off-site consumption",
-      "annual_fee_cad": 380
+      "id": "artisan_producer",
+      "name_en": "Artisan Producer Permit (Brewery, Winery, Distillery)",
+      "plain_language": "For craft producers making and selling alcohol directly to consumers.",
+      "types": ["Artisan brewer", "Artisan winemaker", "Artisan cider maker", "Artisan distiller"],
+      "special_rules": "Artisan producers can sell directly from their production site and at some markets — specific rules apply",
+      "cost": "Varies significantly by production type and volume — verify at RACJ"
     },
     {
-      "id": "reunion_permit",
-      "name_en": "Reunion Permit (Special Event)",
-      "name_fr": "Permis de réunion",
-      "description_en": "Temporary permit for one-time events where alcohol will be served",
-      "fee_cad": 142,
-      "duration": "Single event"
+      "id": "byob_rules",
+      "name_en": "BYOB (Apportez votre vin) Rules",
+      "plain_language": "Restaurants without an alcohol permit can allow customers to bring their own wine (BYOB). You cannot charge a corkage fee or sell glassware specifically for alcohol. Your restaurant must not have any kind of alcohol permit.",
+      "no_permit_needed": true,
+      "note": "BYOB is a common choice for small restaurants wanting to avoid the cost and complexity of an alcohol permit"
     }
   ],
-  "application_requirements_en": [
-    "Proof of business registration (NEQ)",
-    "Floor plan of the establishment",
-    "Municipal zoning approval",
-    "Criminal background check for permit holders",
-    "Proof of responsible service of alcohol training (Éduc'alcool)"
+
+  "eligibility": {
+    "scoring_weights": {
+      "business_type_food_beverage": 0.60,
+      "business_stage": 0.25,
+      "immigration_status": 0.15
+    },
+    "criteria": {
+      "immigration_status": {
+        "eligible": ["canadian_citizen", "permanent_resident"],
+        "note": "Permit is issued to the individual — must be authorized to operate a business in Canada"
+      },
+      "criminal_record": "Certain convictions are automatic disqualifiers — RACJ reviews criminal record as part of application",
+      "zoning": "Your municipality must permit the type of establishment in your zone"
+    }
+  },
+
+  "prerequisites": [
+    { "step": "Get your NEQ number", "ref": "req_registration" },
+    { "step": "Secure your commercial space with appropriate zoning", "ref": "permits/municipal_montreal.json" },
+    { "step": "Obtain occupancy permit from the borough", "ref": "permits/municipal_montreal.json" },
+    { "step": "Complete responsible alcohol service training" }
   ],
-  "processing_time_en": "4–8 weeks",
-  "contact": {
-    "phone": "514-873-3577",
-    "toll_free": "1-800-363-0320"
-  }
+
+  "timeline": {
+    "application_to_permit": "4-12 weeks — RACJ inspects the premises before issuing a permit",
+    "note": "Do NOT open before receiving your permit — serving alcohol without a permit is a serious offence"
+  },
+
+  "cost": {
+    "application_fee": "Varies by permit type — approximately $500-$2,000",
+    "annual_renewal": "Yes — permits must be renewed annually",
+    "inspection_related": "No separate inspection fee, but you may need to make modifications to pass inspection"
+  },
+
+  "responsible_service_training": {
+    "name": "MAPAQ/RACJ Responsible Alcohol Service Training",
+    "mandatory": "Required for at least one staff member per permit",
+    "url": "https://www.racj.gouv.qc.ca/en/permit-holders/training.html"
+  },
+
+  "common_mistakes": [
+    "Opening a restaurant and serving alcohol before receiving the permit — illegal and can result in permit being denied permanently",
+    "Not checking zoning before signing a lease — some residential zones don't permit bars even if you get a permit",
+    "Not having a BYOB policy clearly communicated if you choose that route",
+    "Assuming a food permit (MAPAQ) covers alcohol service — it does not, these are completely separate"
+  ],
+
+  "source_url": "https://www.racj.gouv.qc.ca/en/permit-holders/permits.html",
+  "government_body": "Régie des alcools, des courses et des jeux (RACJ)",
+  "phone": "514-873-3577 (Montreal) / 1-800-363-0320"
 }

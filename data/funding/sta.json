@@ -1,34 +1,167 @@
 {
+  "_meta": {
+    "file": "funding/sta.json",
+    "description": "Soutien au travail autonome (STA) — Quebec government income support program for people starting a self-employed business. Provides weekly income replacement while you build your business.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "main": "https://www.emploiquebec.gouv.qc.ca/en/citizens/find-a-job/self-employment/",
+      "services_quebec": "https://www.quebec.ca/en/employment/self-employment/start-self-employment/soutien-travail-autonome",
+      "eligibility": "https://www.emploiquebec.gouv.qc.ca/en/citizens/find-a-job/self-employment/"
+    }
+  },
+
   "id": "sta",
-  "name_en": "Self-Employment Assistance (Aide à la création d'entreprise — IPOP / Objectif emploi)",
-  "name_fr": "Programme d'aide au travail autonome (ATA) — Services Québec",
-  "website": "https://www.quebec.ca/emploi/aide-financiere/aide-travail-autonome",
-  "administered_by": "Services Québec (formerly Emploi-Québec)",
-  "description_en": "Quebec's Self-Employment Assistance program helps unemployed individuals launch a business by providing weekly income support and business coaching during the startup phase.",
-  "description_fr": "Le programme ATA aide les personnes sans emploi à lancer une entreprise en offrant un soutien financier hebdomadaire et un accompagnement pendant la phase de démarrage.",
-  "funding_details": {
-    "weekly_allowance_cad": "Equivalent to regular EI or social assistance benefits",
-    "duration_weeks": 52,
-    "business_coaching_included": true,
-    "note_en": "Participants are exempt from job-search requirements while in the program"
+  "program_name_en": "Soutien au travail autonome (STA) — Self-Employment Income Support",
+  "program_name_fr": "Soutien au travail autonome (STA)",
+  "program_key": "sta",
+
+  "plain_language_summary": "⚠️ PROGRAMME SUSPENDU — The STA program has been suspended since May 1, 2024 for an indefinite period. No new applications are being accepted. The information below is kept for reference in case the program resumes. Do NOT present this as an available option to users.",
+
+  "status": "suspended",
+  "suspended_since": "2024-05-01",
+  "suspension_note": "Suspended indefinitely as of May 1, 2024. No new applications accepted. Check Emploi-Québec for updates on whether the program has resumed.",
+  "suspension_source": "Emploi-Québec — verify at https://www.emploiquebec.gouv.qc.ca",
+
+  "type": "grant",
+  "amount": {
+    "weekly_amount": "Approximately $400-$600/week (when active)",
+    "duration_weeks": "Up to 52 weeks (when active)",
+    "total_potential": "Approximately $20,000–$31,200 over 52 weeks (when active)",
+    "note": "Program is currently suspended — these amounts are historical reference only."
   },
+
+  "plain_language_how_it_works": "When active: unemployed individuals who want to start a business could collect STA instead of EI while building their business. Emploi-Québec would assign an advisor to follow progress monthly. Currently suspended as of May 1, 2024.",
+
   "eligibility": {
-    "must_be_en": [
-      "Currently receiving EI benefits, or eligible for EI, or receiving social assistance",
-      "Resident of Quebec",
-      "Have a viable business project assessed by a Services Québec advisor"
-    ],
-    "business_stage": "Pre-launch or very early stage (not yet operational for more than a few months)"
+    "scoring_weights": {
+      "employment_status": 0.35,
+      "immigration_status": 0.25,
+      "business_viability": 0.25,
+      "age": 0.15
+    },
+
+    "criteria": {
+      "employment_status": {
+        "required": true,
+        "eligible": [
+          "Currently receiving Employment Insurance (EI) benefits",
+          "Recently unemployed and EI-eligible (check with Emploi-Québec)",
+          "Recipients of certain social assistance programs",
+          "Some other qualifying circumstances — verify with Emploi-Québec"
+        ],
+        "note": "This is the main eligibility gate — you generally need to be EI-eligible or currently receiving EI",
+        "important": "If you're currently employed full-time, you don't qualify. The program is for people in job transition."
+      },
+      "immigration_status": {
+        "eligible": ["canadian_citizen", "permanent_resident"],
+        "ineligible_typically": ["work_permit", "student_visa"],
+        "note": "Work permit holders are generally not eligible as they may not qualify for EI. Verify with Emploi-Québec for your specific situation.",
+        "future_eligibility": "Permanent residents qualify. If you're transitioning from work permit to PR, you may qualify shortly after receiving PR status."
+      },
+      "business_viability": {
+        "required": true,
+        "what_they_assess": [
+          "Your business idea has genuine commercial viability",
+          "You have relevant skills or experience",
+          "Your financial projections are realistic",
+          "You're committed to full-time business development"
+        ],
+        "how_assessed": "Through an initial evaluation meeting with an Emploi-Québec advisor"
+      },
+      "age": {
+        "minimum": 18,
+        "maximum": "No age cap — available at any age",
+        "scoring": "Available to all ages — no age penalty"
+      },
+      "sector": {
+        "eligible": "Most sectors",
+        "note": "Home daycares (RSG) are specifically mentioned as eligible businesses"
+      }
+    }
   },
-  "application_process_en": [
-    "Contact your local Services Québec employment centre",
-    "Meet with an employment advisor",
-    "Submit a business plan for evaluation",
-    "Approved participants receive weekly financial support",
-    "Ongoing coaching and check-ins during the program"
+
+  "what_you_must_do_to_maintain_support": [
+    "Work full-time on your business (no other employment during program)",
+    "Meet monthly with your Emploi-Québec advisor",
+    "Provide updates on business progress",
+    "Complete the business plan and follow through on milestones",
+    "Register your business (NEQ) and comply with applicable regulations"
   ],
-  "contact": {
-    "phone": "1-877-644-4545",
-    "url": "https://www.quebec.ca/en/employment/employment-assistance/help-starting-a-business"
-  }
+
+  "process": [
+    {
+      "step": 1,
+      "title": "Contact your local Emploi-Québec / Services Québec office",
+      "detail": "Express interest in the STA program. You can also be referred by PME MTL, YES Montréal, or other partner organizations."
+    },
+    {
+      "step": 2,
+      "title": "Initial eligibility assessment",
+      "detail": "An advisor evaluates your situation, your business idea, and your EI/employment status."
+    },
+    {
+      "step": 3,
+      "title": "Prepare your business plan",
+      "detail": "You'll need a business plan to show your business is viable. Emploi-Québec advisors and partner organizations (PME MTL, YES Montréal) can help you prepare this."
+    },
+    {
+      "step": 4,
+      "title": "Application review and approval",
+      "detail": "Emploi-Québec reviews your plan and approves participation. This can take 2-6 weeks."
+    },
+    {
+      "step": 5,
+      "title": "Program start — monthly payments and advisor meetings",
+      "detail": "Payments begin and you meet monthly with your advisor to report progress and get support."
+    }
+  ],
+
+  "prerequisites": [
+    {
+      "step": "Be unemployed or EI-eligible",
+      "note": "Core eligibility requirement"
+    },
+    {
+      "step": "Have a business idea ready to develop",
+      "note": "The earlier you apply after job loss, the more EI entitlement you can convert to STA"
+    }
+  ],
+
+  "partner_organizations": [
+    {
+      "name": "Emploi-Québec / Services Québec",
+      "url": "https://www.emploiquebec.gouv.qc.ca",
+      "phone": "1-877-644-4545",
+      "note": "Direct entry point for STA — book appointment at local office"
+    },
+    {
+      "name": "YES Montréal",
+      "url": "https://www.yesmontreal.ca",
+      "note": "Can refer you to STA and help prepare your business plan for the application"
+    },
+    {
+      "name": "PME MTL",
+      "url": "https://www.pmemtl.com",
+      "note": "Local offices can facilitate STA referrals and help with business plan"
+    }
+  ],
+
+  "persona_fit": {
+    "Yara": "Potentially strong fit if unemployed or recently left previous job. Syrian immigrant — must be permanent resident to qualify.",
+    "Fatima": "Very strong fit — single mother starting home daycare, likely transitioning from employment or social assistance. RSG startup is specifically mentioned as eligible.",
+    "Marcus": "Less likely fit — McGill graduate likely not EI-eligible as student"
+  },
+
+  "common_mistakes": [
+    "Not knowing this program exists — it's underutilized and underadvertised",
+    "Waiting too long after job loss to apply — EI entitlement that hasn't been used can often be converted to STA",
+    "Thinking work permit holders automatically qualify — immigration status matters here",
+    "Not taking the monthly advisor meetings seriously — they're required and can actually be very helpful",
+    "Starting to earn significant business revenue without reporting it — this affects your STA payments"
+  ],
+
+  "application_url": "https://www.emploiquebec.gouv.qc.ca/en/citizens/find-a-job/self-employment/",
+  "source_url": "https://www.quebec.ca/en/employment/self-employment/start-self-employment/soutien-travail-autonome",
+  "government_body": "Emploi-Québec (Ministère du Travail, de l'Emploi et de la Solidarité sociale)",
+  "phone": "1-877-644-4545"
 }

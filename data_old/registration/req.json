@@ -1,0 +1,33 @@
+{
+  "agency": "REQ",
+  "full_name_en": "Registraire des entreprises du Québec",
+  "full_name_fr": "Registraire des entreprises du Québec",
+  "website": "https://www.registreentreprises.gouv.qc.ca",
+  "portal": "https://mon.registreentreprises.gouv.qc.ca",
+  "description_en": "The REQ is the official Quebec business registry. All businesses operating in Quebec must register here to obtain a NEQ (Quebec Enterprise Number).",
+  "description_fr": "Le REQ est le registre officiel des entreprises au Québec. Toutes les entreprises doivent s'y inscrire pour obtenir un NEQ.",
+  "NEQ": {
+    "description_en": "Numéro d'entreprise du Québec — your 10-digit Quebec business identifier",
+    "required_for": ["Sole proprietorship", "Partnership", "Corporation", "Cooperative"]
+  },
+  "fees_2026": {
+    "sole_proprietorship_registration": 36,
+    "partnership_registration": 36,
+    "corporation_registration": 357,
+    "annual_update": 54,
+    "currency": "CAD",
+    "note": "Fees subject to change — verify at REQ website"
+  },
+  "processing_time_en": "Online registration is typically immediate for sole proprietorships. Corporations may take 1–3 business days.",
+  "documents_required_en": [
+    "Personal identification",
+    "Business name (if using a name other than your own)",
+    "Business address in Quebec",
+    "Description of main activity (NAICS code)"
+  ],
+  "name_reservation": {
+    "available": true,
+    "fee_cad": 30,
+    "validity_days": 60
+  }
+}

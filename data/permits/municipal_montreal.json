@@ -1,45 +1,154 @@
 {
-  "municipality": "Montreal",
-  "authority": "Ville de Montréal",
-  "website": "https://montreal.ca/en/topics/opening-business",
-  "description_en": "All businesses operating in Montreal must obtain a municipal business permit. Additional zoning, signage, and construction permits may also apply depending on business type and location.",
-  "description_fr": "Toutes les entreprises exploitées à Montréal doivent obtenir un permis d'exploitation municipal.",
-  "business_permit": {
-    "name_en": "Business Operating Permit (Permis d'exploitation)",
-    "fee_range_cad": "115–500",
-    "renewal": "Annual",
-    "how_to_apply": "https://montreal.ca/en/articles/applying-business-operating-permit",
-    "processing_time_en": "5–15 business days"
+  "_meta": {
+    "file": "permits/municipal_montreal.json",
+    "description": "City of Montreal municipal permits for home-based businesses and commercial locations. Covers zoning compliance, occupancy permits, and borough-specific rules.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "main": "https://montreal.ca/en/topics/permits-and-licences",
+      "home_based_business": "https://montreal.ca/en/articles/operating-home-based-business",
+      "zoning": "https://montreal.ca/en/topics/urban-planning-and-zoning",
+      "occupancy_permit": "https://montreal.ca/en/articles/obtaining-occupancy-permit",
+      "business_licence": "https://montreal.ca/en/articles/business-licence"
+    }
   },
-  "zoning": {
-    "description_en": "Business use must comply with the borough's urban plan and zoning bylaws. Verify permitted uses before signing a lease.",
-    "tool": "https://montreal.ca/en/articles/using-urbanism-and-development-urban-plan",
-    "note_en": "Home-based businesses may have restrictions on signage, client visits, and noise"
+
+  "id": "municipal_montreal",
+  "title_en": "City of Montréal Municipal Permits & Licences",
+  "title_fr": "Permis et licences municipaux — Ville de Montréal",
+
+  "plain_language_summary": "Beyond provincial registration, Montréal has its own municipal requirements for operating a business. Home-based businesses have specific rules about what's allowed. Commercial businesses need an occupancy permit and possibly a business licence. Rules vary by borough and specific zoning.",
+
+  "home_based_business_rules": {
+    "title": "Home-Based Business (Travail à domicile / Entreprise à domicile)",
+    "plain_language": "Montréal allows many types of home-based businesses, but with restrictions to maintain residential character. Most micro-entrepreneurs starting out work from home legally — but there are limits.",
+
+    "generally_permitted": [
+      "Office work, consulting, professional services done from home",
+      "Online sales with no customer traffic to your home",
+      "Crafts and small-scale production with no employees",
+      "Tutoring (limited number of students)",
+      "Small food production under MAPAQ home kitchen exemption"
+    ],
+
+    "generally_not_permitted_in_residential_zones": [
+      "Receiving regular customer traffic at your home",
+      "Visible signage on your home (beyond small identification plaque in some zones)",
+      "Employees working on-site at your home",
+      "Operating equipment that causes noise, odours, or traffic",
+      "Storing commercial quantities of goods"
+    ],
+
+    "how_to_verify_your_specific_zone": {
+      "tool": "Montréal's Règlement d'urbanisme lookup tool",
+      "url": "https://montreal.ca/en/topics/urban-planning-and-zoning",
+      "note": "Enter your address to see what's permitted in your specific zone. Rules vary significantly by borough."
+    },
+
+    "borough_contact": "Your borough office can clarify what's permitted for your specific situation. Contacts at: https://montreal.ca/en/topics/boroughs"
   },
-  "home_based_business": {
-    "permitted": true,
-    "restrictions_en": [
-      "Maximum 1 non-resident employee on premises",
-      "No exterior signage larger than 0.2m²",
-      "No retail sales to the general public from the home",
-      "Business use must remain secondary to residential use"
-    ]
-  },
-  "additional_permits": [
+
+  "permits_by_situation": [
     {
-      "name_en": "Terrasse (Outdoor Patio) Permit",
-      "applicable_to": "Restaurants, bars, cafes",
-      "fee_cad": 350,
-      "renewal": "Annual (May–October)"
+      "situation": "Home-based business with no client visits and no employees",
+      "permit_required": false,
+      "note": "Generally no permit needed. Confirm with your borough that your activity is permitted in your residential zone.",
+      "cost": 0
     },
     {
-      "name_en": "Mobile Food Vendor Permit",
-      "applicable_to": "Food trucks, market stalls",
-      "fee_range_cad": "200–600"
+      "situation": "Home-based business with occasional client visits",
+      "permit_required": "Possibly — depends on zone and frequency",
+      "note": "Contact your borough. Some zones explicitly permit occasional professional meetings at home.",
+      "cost": "Varies if permit required"
+    },
+    {
+      "situation": "Commercial space — new tenant taking over existing commercial space",
+      "permit_required": true,
+      "permit_name": "Occupancy Permit (Certificat d'occupation)",
+      "cost": "Varies by project — typically $200–$500 for change of occupancy",
+      "timeline": "2-6 weeks",
+      "url": "https://montreal.ca/en/articles/obtaining-occupancy-permit"
+    },
+    {
+      "situation": "Commercial space — renovations or changes to the space",
+      "permit_required": true,
+      "permit_name": "Construction/Renovation Permit",
+      "note": "Required before any structural work. Apply to your borough.",
+      "cost": "Varies significantly by project scope"
+    },
+    {
+      "situation": "Food truck or mobile food business",
+      "permit_required": true,
+      "permit_name": "Mobile Food Vendor Permit",
+      "additional_requirements": ["MAPAQ food permit", "Designated parking/vending location approval"],
+      "url": "https://montreal.ca/en/articles/operating-food-truck",
+      "cost": "Verify at montreal.ca — typically $500–$1,500/year"
+    },
+    {
+      "situation": "Home daycare (RSG)",
+      "permit_required": false,
+      "note": "Home daycares recognized by a Bureau Coordonnateur generally operate under provincial (MFA) authorization, not municipal permits. Confirm with your borough.",
+      "ref": "permits/famille.json"
     }
   ],
+
+  "business_licence": {
+    "required_for": "Certain specific business types: restaurants, bars, certain retail, tattoo studios, massage establishments, etc.",
+    "not_required_for": "Most home-based businesses, professional services, freelancers, and general retail not on the licence list",
+    "how_to_check": "Use the Montreal business licence lookup or contact 311",
+    "url": "https://montreal.ca/en/articles/business-licence",
+    "cost": "Varies by business type — typically $100–$500/year if required"
+  },
+
+  "signage_rules": {
+    "plain_language": "If you have a commercial location, your signage must comply with Montréal's sign regulations AND Bill 96 French language requirements.",
+    "key_rules": [
+      "French must be markedly predominant on all commercial signage",
+      "English text may appear alongside but must be noticeably smaller",
+      "Certain sign types require a permit from the borough",
+      "Illuminated signs, projecting signs, and roof signs typically require permits"
+    ],
+    "ref": "compliance/bill96.json"
+  },
+
+  "borough_offices_montreal": [
+    { "name": "Villeray-Saint-Michel-Parc-Extension", "phone": "514-872-4680", "url": "https://montreal.ca/villeray-saint-michel-parc-extension" },
+    { "name": "Le Plateau-Mont-Royal", "phone": "514-872-2246", "url": "https://montreal.ca/plateau-mont-royal" },
+    { "name": "Rosemont-La Petite-Patrie", "phone": "514-872-2270", "url": "https://montreal.ca/rosemont-la-petite-patrie" },
+    { "name": "Côte-des-Neiges-Notre-Dame-de-Grâce", "phone": "514-872-9514", "url": "https://montreal.ca/cote-des-neiges-notre-dame-de-grace" },
+    { "name": "Ahuntsic-Cartierville", "phone": "514-872-3900", "url": "https://montreal.ca/ahuntsic-cartierville" },
+    { "name": "Mercier-Hochelaga-Maisonneuve", "phone": "514-872-3770", "url": "https://montreal.ca/mercier-hochelaga-maisonneuve" },
+    { "name": "Saint-Laurent", "phone": "514-855-6000", "url": "https://montreal.ca/saint-laurent" }
+  ],
+
+  "prerequisites": [
+    {
+      "step": "Get your NEQ number from the REQ",
+      "ref": "req_registration",
+      "required_for": "Applying for commercial occupancy permits and business licences"
+    }
+  ],
+
+  "cost_summary": {
+    "home_based_no_client_visits": 0,
+    "occupancy_permit_commercial": "200–500",
+    "business_licence_if_required": "100–500 annually",
+    "note": "Most home-based micro-entrepreneurs pay nothing to the city at startup"
+  },
+
+  "common_mistakes": [
+    "Not checking zoning before signing a commercial lease — some zones don't permit your type of business",
+    "Assuming home-based is always fine — some business types (regular client traffic, employees on-site) violate residential zoning",
+    "Not getting an occupancy permit before opening a commercial space — the city can order you to close",
+    "Forgetting that signage requires its own permit in most commercial zones"
+  ],
+
   "contact": {
-    "phone": "311",
-    "email": "permis@montreal.ca"
-  }
+    "general_info": "311 (Montréal info line)",
+    "online": "https://montreal.ca/en/topics/permits-and-licences",
+    "pmemtl": "PME MTL can help navigate permits — https://www.pmemtl.com"
+  },
+
+  "source_url": "https://montreal.ca/en/topics/permits-and-licences",
+  "government_body": "Ville de Montréal",
+  "phone": "311"
 }

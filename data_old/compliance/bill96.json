@@ -1,0 +1,40 @@
+{
+  "title_en": "Bill 96 — An Act respecting French, the official and common language of Québec",
+  "title_fr": "Loi sur la langue officielle et commune du Québec, le français (Loi 96)",
+  "year_adopted": 2022,
+  "fully_in_force_year": 2025,
+  "administered_by": "Office québécois de la langue française (OQLF)",
+  "website": "https://www.oqlf.gouv.qc.ca",
+  "description_en": "Bill 96 significantly strengthens the Charter of the French Language in Quebec. It imposes new obligations on businesses regarding the language of work, commerce, and service delivery.",
+  "key_obligations_for_businesses": [
+    {
+      "id": "language_of_work",
+      "name_en": "Language of Work",
+      "description_en": "Employees have the right to work in French. Employers with 25+ employees must have a Francisation (Frenchification) program approved by the OQLF.",
+      "threshold_employees": 25
+    },
+    {
+      "id": "commercial_signage",
+      "name_en": "Commercial Signage",
+      "description_en": "Public signage must be in French. Other languages may appear if French is markedly predominant (at least twice the size). Trade names must have a French version.",
+      "markedly_predominant_ratio": "2:1 French to other language"
+    },
+    {
+      "id": "contracts_and_documents",
+      "name_en": "Contracts and Documents",
+      "description_en": "Contracts with Quebec consumers must be offered in French first. Job postings, offer letters, and internal communications must be in French.",
+      "consumer_contracts": "French version must be offered before signing"
+    },
+    {
+      "id": "software_and_technology",
+      "name_en": "Software and Technology",
+      "description_en": "Businesses must offer French-language software to employees where a French equivalent exists. Websites serving Quebec customers must be available in French."
+    }
+  ],
+  "penalties_en": {
+    "individual": "Up to $7,000 per infraction",
+    "corporation": "Up to $30,000 per infraction",
+    "repeat_violations": "Fines double for repeat infractions"
+  },
+  "oqlf_complaint_process": "https://www.oqlf.gouv.qc.ca/english/charter/complaint.html"
+}

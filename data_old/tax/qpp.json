@@ -1,0 +1,36 @@
+{
+  "title_en": "Quebec Pension Plan (QPP) — Self-Employed Contributions",
+  "year": 2026,
+  "description_en": "Self-employed workers in Quebec must contribute both the employee and employer portions of QPP. QPP contributions are calculated on net self-employment income between the basic exemption and maximum pensionable earnings.",
+  "QPP_base": {
+    "basic_exemption_cad": 3500,
+    "maximum_pensionable_earnings_cad": 73200,
+    "maximum_contributory_earnings_cad": 69700,
+    "employee_rate": 0.054,
+    "employer_rate": 0.054,
+    "self_employed_combined_rate": 0.108,
+    "maximum_self_employed_contribution_cad": 7527.60
+  },
+  "QPP2": {
+    "description_en": "QPP2 is an additional layer that applies to earnings between the Year's Maximum Pensionable Earnings (YMPE) and the Year's Additional Maximum Pensionable Earnings (YAMPE).",
+    "YMPE_cad": 73200,
+    "YAMPE_cad": 81200,
+    "employee_rate": 0.04,
+    "employer_rate": 0.04,
+    "self_employed_rate": 0.08,
+    "maximum_self_employed_contribution_cad": 640
+  },
+  "tax_deduction": {
+    "description_en": "Self-employed individuals can deduct the employer-equivalent portion (50%) of QPP contributions on their federal and Quebec income tax returns.",
+    "deductible_portion": 0.5
+  },
+  "QPIP": {
+    "title_en": "Quebec Parental Insurance Plan (QPIP)",
+    "year": 2026,
+    "self_employed_rate": 0.01186,
+    "maximum_insurable_earnings_cad": 98000,
+    "basic_exemption_cad": 2000,
+    "maximum_contribution_cad": 1139.63,
+    "description_en": "Self-employed workers in Quebec are required to pay QPIP premiums, unlike in other provinces where EI parental benefits apply. QPIP premiums entitle self-employed workers to maternity, paternity, and adoption benefits."
+  }
+}

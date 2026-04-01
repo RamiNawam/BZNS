@@ -1,50 +1,139 @@
 {
-  "title_en": "Business Signage Requirements in Quebec",
-  "description_en": "Business signage in Quebec is governed by the Charter of the French Language (as amended by Bill 96), municipal bylaws, and in some cases federal trademark law.",
-  "french_language_requirements": {
-    "administered_by": "Office québécois de la langue française (OQLF)",
-    "rules": [
-      {
-        "id": "exterior_signage",
-        "name_en": "Exterior Signs and Posters",
-        "rule_en": "French must be markedly predominant — meaning French text must be at least twice the visual size of any other language text.",
-        "applies_to": "All exterior commercial signs visible to the public"
-      },
-      {
-        "id": "trade_name",
-        "name_en": "Trade Name (Business Name)",
-        "rule_en": "Trade names must include a French generic term or description if the name is not already French. A French-language version must be displayed.",
-        "example_en": "e.g., 'Joe's Bakery' → 'Boulangerie Joe's'"
-      },
-      {
-        "id": "interior_signage",
-        "name_en": "Interior Signs and Menus",
-        "rule_en": "French must appear, but other languages can appear alongside French in equal size for interior signage and menus."
-      }
-    ]
-  },
-  "municipal_requirements_montreal": {
-    "authority": "Ville de Montréal — Direction de l'urbanisme",
-    "sign_permit_required": true,
-    "when_required_en": "Any new exterior sign or change to an existing sign typically requires a municipal sign permit.",
-    "fee_range_cad": "50–300",
-    "restrictions_en": [
-      "Maximum sign dimensions vary by zoning (commercial, residential, industrial)",
-      "Illuminated signs may require additional permits",
-      "Heritage buildings have strict signage rules",
-      "No roof-top signage in many zones"
-    ],
-    "url": "https://montreal.ca/en/articles/applying-sign-permit"
-  },
-  "federal_trademark_note_en": "Registered Canadian trademarks may be displayed on signs without French translation, but must still comply with the markedly predominant rule for accompanying descriptive text.",
-  "resources": [
-    {
-      "name_en": "OQLF Signage Guide",
-      "url": "https://www.oqlf.gouv.qc.ca/english/affichage/index.html"
-    },
-    {
-      "name_en": "Montreal Sign Permit Application",
-      "url": "https://montreal.ca/en/articles/applying-sign-permit"
+  "_meta": {
+    "file": "compliance/signage.json",
+    "description": "Detailed signage rules for Quebec businesses — French language requirements, sign permit rules, and Montreal-specific bylaws. Companion to bill96.json.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "oqlf_signage": "https://www.legisquebec.gouv.qc.ca/fr",
+      "montreal_signage_permits": "https://montreal.ca/en/articles/signs-permits",
+      "montreal_sign_bylaw": "https://montreal.ca/en/topics/urban-planning-and-zoning"
     }
-  ]
+  },
+
+  "id": "signage",
+  "title_en": "Commercial Signage Rules in Quebec",
+  "title_fr": "Règles d'affichage commercial au Québec",
+
+  "plain_language_summary": "If your business has any public-facing sign — storefront, market stall banner, vehicle wrap, window decal — it must comply with Quebec's French language rules (Bill 96) AND Montreal's municipal sign permit rules. Most small violations result in a warning first, but repeat offenders face fines. Getting this right from day one is easy and cheap.",
+
+  "french_language_rules": {
+    "source": "Charter of the French Language (Bill 96)",
+    "core_rule": "French must be markedly predominant on all commercial public signage in Quebec",
+    "what_markedly_predominant_means": [
+      "French text must be at least twice the size of any other language text",
+      "French must appear first (above or to the left of other languages)",
+      "French must be at least as visible in terms of contrast and placement",
+      "The overall impression of the sign must be that French dominates"
+    ],
+
+    "applies_to": [
+      "Exterior storefront signs",
+      "Window signs and decals",
+      "Market stall banners and displays",
+      "Sandwich boards and A-frame signs",
+      "Vehicle wraps and magnetic signs",
+      "Awnings with business name",
+      "Menu boards (outdoor)",
+      "Price tags and shelf labels in retail"
+    ],
+
+    "does_not_apply_to": [
+      "Internal signage not visible from outside (though French service must still be offered)",
+      "Signs in private spaces with no public access",
+      "Cultural and artistic content (some exceptions)"
+    ],
+
+    "business_name_rules": {
+      "french_name": "If your business name is in French — fully compliant as-is",
+      "english_or_other_name": "If your business name is in English or another language, you have two options: (1) Add a French descriptor or slogan that appears in markedly larger text, or (2) Redesign the name to incorporate French elements",
+      "examples": [
+        {
+          "name": "Marcus Tech Solutions",
+          "compliant": false,
+          "fix": "Add French descriptor e.g. 'Solutions technologiques' in larger text below"
+        },
+        {
+          "name": "Yara's Kitchen / Cuisine de Yara",
+          "compliant": true,
+          "note": "Bilingual with French component"
+        },
+        {
+          "name": "La Boulangerie de Yara",
+          "compliant": true,
+          "note": "French name — no issue"
+        }
+      ]
+    },
+
+    "generic_descriptors_exception": "Recognized trademarks and brand names have some protection — the OQLF has specific rules for franchises and registered trademarks. Contact OQLF for your specific situation."
+  },
+
+  "montreal_sign_permits": {
+    "plain_language": "Beyond language rules, Montreal requires permits for certain types of signs. Small signs on your storefront window usually don't need a permit. Large or illuminated signs usually do.",
+
+    "no_permit_required_typically": [
+      "Window decals under a certain size threshold (verify with borough)",
+      "A-frame / sandwich board signs on your own property during business hours",
+      "Small identification plaques (home-based businesses)"
+    ],
+
+    "permit_required_typically": [
+      "Any sign attached to the exterior of a building",
+      "Illuminated signs (backlit, neon, LED)",
+      "Projecting signs (extends perpendicular from the building)",
+      "Roof signs",
+      "Signs over a certain square footage (threshold varies by borough and zone)",
+      "Signs on vehicles permanently parked as advertising"
+    ],
+
+    "how_to_apply": "Contact your borough office. Bring: proposed sign dimensions, design/mockup, location on building, materials.",
+    "cost": "Typically $100–$300 for standard sign permit — varies by borough and sign type",
+    "timeline": "2-4 weeks",
+    "url": "https://montreal.ca/en/articles/signs-permits"
+  },
+
+  "by_business_type": {
+    "home_based_no_storefront": {
+      "signage_needs": "Minimal — you may want a small identification sign on your door or mailbox",
+      "french_requirement": "Even a small nameplate should be in French or bilingual with French predominant",
+      "permit": "Usually not required for a small residential identification plaque — verify with borough",
+      "tip": "Many home-based businesses skip physical signage entirely and focus on online presence"
+    },
+    "market_vendor": {
+      "signage_needs": "Banner, table sign, price tags",
+      "french_requirement": "All market signage must be French-predominant. Price tags in French.",
+      "permit": "No city permit needed for temporary market stall signs — but market organizer may have their own rules",
+      "tip": "Invest in a good bilingual banner — it's your main marketing at the market. French on top/larger, English below/smaller."
+    },
+    "commercial_storefront": {
+      "signage_needs": "Exterior sign, window signage, interior menu/price boards",
+      "french_requirement": "Full compliance required — all exterior signage French-predominant",
+      "permit": "Required for most exterior signs — apply to borough before installing",
+      "tip": "Get the sign permit BEFORE you order the sign — permits can take 2-4 weeks and you don't want to be stuck with a non-compliant sign"
+    }
+  },
+
+  "enforcement": {
+    "who": "Office québécois de la langue française (OQLF) for language compliance; borough inspectors for sign permits",
+    "process": "Complaint-based and periodic inspections. OQLF typically sends a compliance notice first before fining.",
+    "first_violation": "Usually a written notice with 90 days to comply",
+    "fines": "Up to $20,000 for a business; up to $700 for an individual",
+    "montreal_sign_permit_fines": "Operating without a required sign permit: $500–$2,000"
+  },
+
+  "practical_tips": [
+    "When in doubt, make your sign predominantly French and add other languages in smaller text — you'll never be wrong",
+    "Keep proof that you applied for sign permits even if still pending — shows good faith",
+    "OQLF has a free consultation service — call them before installing signage if unsure",
+    "Many print shops in Montreal are familiar with Bill 96 requirements and can advise"
+  ],
+
+  "free_consultation": {
+    "oqlf": "https://www.oqlf.gouv.qc.ca/english/",
+    "phone": "514-873-6565",
+    "note": "OQLF offers free guidance for businesses trying to comply — they prefer helping you get it right over fining you"
+  },
+
+  "source_url": "https://www.legisquebec.gouv.qc.ca/fr",
+  "government_body": "Office québécois de la langue française (OQLF)"
 }

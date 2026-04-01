@@ -1,45 +1,82 @@
 {
+  "_meta": {
+    "file": "funding/investissement_quebec.json",
+    "description": "Investissement Québec — Quebec's provincial investment agency. Offers loans, loan guarantees, and business support for Quebec companies. Includes Plan PME for small businesses.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "main": "https://www.investquebec.com/quebec/en/",
+      "plan_pme": "https://www.investquebec.com/quebec/en/financial-products/all-our-solutions/Loan-for-small-and-medium-sized-businesses.html",
+      "startup": "https://www.investquebec.com/quebec/en/financial-products/startups.html"
+    }
+  },
+
   "id": "investissement_quebec",
-  "name_en": "Investissement Québec",
-  "name_fr": "Investissement Québec",
-  "website": "https://www.investissement-quebec.com",
-  "description_en": "Investissement Québec is the Quebec government's economic development agency. It offers loans, loan guarantees, and equity investments to support business creation, expansion, and innovation in Quebec.",
-  "description_fr": "Investissement Québec est l'agence de développement économique du gouvernement du Québec. Elle offre des prêts, des garanties de prêt et des prises de participation.",
+  "program_name_en": "Investissement Québec — Plan PME",
+  "program_name_fr": "Investissement Québec — Plan PME",
+  "program_key": "investissement_quebec",
+  "type": "loan",
+
+  "plain_language_summary": "Investissement Québec (IQ) is the provincial government's main business financing arm. Their Plan PME offers loans and loan guarantees to Quebec businesses that may not qualify for conventional bank financing. They focus on growth and job creation in Quebec.",
+
+  "amount": {
+    "minimum": 50000,
+    "maximum": "No upper limit for larger projects — varies by program",
+    "note": "IQ typically focuses on businesses needing $50,000+. For amounts under $50,000, PME MTL or FLI are better fits for micro-businesses.",
+    "micro_business_relevance": "Medium — IQ is better suited for businesses that have launched and are looking to grow, rather than brand new micro-businesses"
+  },
+
+  "eligibility": {
+    "scoring_weights": {
+      "business_stage": 0.35,
+      "quebec_economic_impact": 0.30,
+      "immigration_status": 0.20,
+      "sector": 0.15
+    },
+    "criteria": {
+      "location": "Must operate in Quebec",
+      "immigration_status": { "eligible": ["canadian_citizen", "permanent_resident"] },
+      "business_stage": {
+        "best_fit": "Businesses that have launched and are seeking growth capital",
+        "can_also_fund": "Startups with strong business plans and experienced founders",
+        "note": "IQ is less ideal for very early-stage micro-businesses — consider PME MTL or FLI first"
+      },
+      "sector": {
+        "priority_sectors": ["Manufacturing", "Technology", "Export-oriented", "Green economy"],
+        "also_eligible": "Most sectors including food, services, retail"
+      }
+    }
+  },
+
   "products": [
     {
-      "id": "startup_loan",
-      "name_en": "Startup Financing",
-      "description_en": "Subordinated loans and loan guarantees for early-stage businesses",
-      "amount_range_cad": "50,000–5,000,000",
-      "type": "Subordinated loan or guarantee",
-      "note_en": "IQ often takes a subordinated position to allow traditional bank financing to proceed"
+      "name": "Plan PME Loan",
+      "plain_language": "Direct loan for small businesses that can't get conventional financing. Can be used for equipment, working capital, or expansion.",
+      "amount_min": 50000,
+      "interest_rate": "Competitive — typically prime + 1-3%"
     },
     {
-      "id": "innovation_financing",
-      "name_en": "Innovation Financing",
-      "description_en": "Support for R&D projects and technology commercialisation",
-      "amount_range_cad": "100,000+",
-      "refundable_tax_credit_link": true
-    },
-    {
-      "id": "export_financing",
-      "name_en": "Export Development Financing",
-      "description_en": "Financing to support Quebec businesses expanding into international markets"
+      "name": "Loan Guarantee",
+      "plain_language": "IQ guarantees part of your bank loan, allowing you to borrow more than the bank would normally approve. You still borrow from your bank, but IQ backs part of it.",
+      "benefit": "Can unlock bank financing you wouldn't otherwise qualify for"
     }
   ],
-  "eligibility": {
-    "location": "Must operate in Quebec",
-    "business_type": "For-profit companies (most sectors)",
-    "sectors_prioritized_en": [
-      "Aerospace",
-      "Artificial Intelligence",
-      "Agri-food",
-      "Life sciences",
-      "Clean tech"
-    ]
+
+  "free_advisory": {
+    "available": true,
+    "plain_language": "IQ advisors provide free consultations and can help you figure out if IQ financing is right for you — or refer you to a better-fit program.",
+    "url": "https://www.investquebec.com/quebec/en/contact-us.html"
   },
-  "contact": {
-    "phone": "1-844-474-6367",
-    "montreal_office": "1200 avenue McGill College, Bureau 1500, Montréal, QC H3B 4G7"
-  }
+
+  "timeline": "6-12 weeks for loan approval — slower than local programs",
+
+  "common_mistakes": [
+    "Applying to IQ when PME MTL or FLI would be faster and more appropriate for micro-businesses",
+    "Not using the free advisory consultation first — they'll tell you if you're a good fit",
+    "Thinking IQ is only for large companies — Plan PME is specifically for small businesses"
+  ],
+
+  "application_url": "https://www.investquebec.com/quebec/en/financial-products/all-our-solutions.html",
+  "source_url": "https://www.investquebec.com/quebec/en/",
+  "government_body": "Investissement Québec (provincial Crown corporation)",
+  "phone": "1-844-474-6367"
 }

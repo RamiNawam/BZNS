@@ -1,0 +1,42 @@
+{
+  "id": "futurpreneur",
+  "name_en": "Futurpreneur Canada",
+  "name_fr": "Futurpreneur Canada",
+  "website": "https://www.futurpreneur.ca",
+  "description_en": "Futurpreneur Canada provides financing, mentoring, and resources to aspiring entrepreneurs aged 18–39. Offers startup loans up to $20,000 co-lent with BDC.",
+  "description_fr": "Futurpreneur Canada offre du financement, du mentorat et des ressources aux entrepreneurs de 18 à 39 ans.",
+  "type": "loan_and_mentorship",
+  "eligibility": {
+    "age_min": 18,
+    "age_max": 39,
+    "residency": "Canadian citizen or permanent resident",
+    "business_stage": "Pre-launch or within 12 months of launch",
+    "business_type": "For-profit businesses in most sectors"
+  },
+  "funding_details": {
+    "futurpreneur_loan_max_cad": 20000,
+    "bdc_co_loan_max_cad": 40000,
+    "total_max_cad": 60000,
+    "interest_rate": "Prime + 3%",
+    "term_years": 5,
+    "mentorship_included": true,
+    "mentorship_duration_months": 24
+  },
+  "application_process_en": [
+    "Complete online application at futurpreneur.ca",
+    "Submit a business plan",
+    "Interview with a Futurpreneur advisor",
+    "Matched with a business mentor",
+    "Loan disbursement upon approval"
+  ],
+  "sectors_excluded_en": [
+    "Firearms and weapons",
+    "Gambling",
+    "Illegal activities",
+    "Real estate investment (passive)"
+  ],
+  "quebec_office": {
+    "city": "Montreal",
+    "phone": "514-284-2888"
+  }
+}

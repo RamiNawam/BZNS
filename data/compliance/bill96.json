@@ -1,40 +1,171 @@
 {
-  "title_en": "Bill 96 — An Act respecting French, the official and common language of Québec",
-  "title_fr": "Loi sur la langue officielle et commune du Québec, le français (Loi 96)",
-  "year_adopted": 2022,
-  "fully_in_force_year": 2025,
-  "administered_by": "Office québécois de la langue française (OQLF)",
-  "website": "https://www.oqlf.gouv.qc.ca",
-  "description_en": "Bill 96 significantly strengthens the Charter of the French Language in Quebec. It imposes new obligations on businesses regarding the language of work, commerce, and service delivery.",
-  "key_obligations_for_businesses": [
+  "_meta": {
+    "file": "compliance/bill96.json",
+    "description": "Bill 96 (Loi sur la langue officielle et commune du Québec, le français) — French language requirements for businesses in Quebec. Covers commercial signage, customer communications, employment, and compliance timelines.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "main": "https://www.oqlf.gouv.qc.ca/english/charter/bill96.html",
+      "signage": "https://www.legisquebec.gouv.qc.ca/fr",
+      "small_business": "https://www.oqlf.gouv.qc.ca/english/charter/bill96_smallbusiness.html",
+      "oqlf": "https://www.oqlf.gouv.qc.ca/english/"
+    }
+  },
+
+  "id": "bill96_compliance",
+  "title_en": "Bill 96 — French Language Requirements for Quebec Businesses",
+  "title_fr": "Loi 96 — Obligations linguistiques des entreprises québécoises",
+
+  "plain_language_summary": "Bill 96 (passed 2022, fully in effect 2025-2026) strengthened Quebec's French language requirements for businesses. For most micro-businesses and sole proprietors, the main impact is on: commercial signage (French must be markedly predominant), customer communications (must be offered in French), and any written contracts with clients. The law is more demanding on larger employers.",
+
+  "who_is_affected": {
+    "all_businesses": "All businesses operating in Quebec must offer services in French and use French in commercial signage",
+    "businesses_with_employees": "Additional language requirements for workplaces with 25+ employees (francization program)",
+    "micro_businesses": "Sole proprietors and very small businesses — mainly affects signage, client communications, and contracts"
+  },
+
+  "key_requirements_by_category": [
     {
-      "id": "language_of_work",
-      "name_en": "Language of Work",
-      "description_en": "Employees have the right to work in French. Employers with 25+ employees must have a Francisation (Frenchification) program approved by the OQLF.",
-      "threshold_employees": 25
+      "category": "Commercial Signage",
+      "applies_to": "All businesses with physical presence (storefront, market stall, delivery vehicle with business name)",
+      "requirements": [
+        "French must be markedly predominant on all public-facing signage",
+        "'Markedly predominant' generally means French text is twice as large as any other language text",
+        "Any slogan, tagline, or motto must appear in French",
+        "Business name: if it contains non-French words, an explanatory French descriptor should accompany it",
+        "French must appear first in any bilingual text"
+      ],
+      "plain_language": "Your signs must be primarily in French. You can add English (or Arabic, etc.) but the French must be bigger and first. If your business name is in English (e.g., 'Marcus Tech Solutions'), you may need a French descriptor added.",
+      "enforcement": "OQLF (Office québécois de la langue française) can receive complaints and inspect compliance",
+      "penalty": "Warnings first; fines up to $30,000 for repeat violations"
     },
     {
-      "id": "commercial_signage",
-      "name_en": "Commercial Signage",
-      "description_en": "Public signage must be in French. Other languages may appear if French is markedly predominant (at least twice the size). Trade names must have a French version.",
-      "markedly_predominant_ratio": "2:1 French to other language"
+      "category": "Customer Communications",
+      "applies_to": "All businesses",
+      "requirements": [
+        "Clients and customers have the right to be served in French",
+        "Websites serving Quebec customers must be available in French",
+        "Marketing materials, catalogues, and brochures must be available in French",
+        "Order forms and contracts with consumers must be in French"
+      ],
+      "plain_language": "You must be able to communicate with customers in French. You can also offer English service — but French must be available. Your website must have a French version if you serve Quebec clients.",
+      "note": "This doesn't mean employees must speak French to internal team members — it means external customer-facing communications must be in French"
     },
     {
-      "id": "contracts_and_documents",
-      "name_en": "Contracts and Documents",
-      "description_en": "Contracts with Quebec consumers must be offered in French first. Job postings, offer letters, and internal communications must be in French.",
-      "consumer_contracts": "French version must be offered before signing"
+      "category": "Contracts with Clients (Consumer Contracts)",
+      "applies_to": "B2C (business to consumer) contracts",
+      "requirements": [
+        "Consumer contracts must be provided in French by default",
+        "Clients can choose to have their contract in another language — but you must first offer French",
+        "Standard form contracts (terms and conditions) must be in French"
+      ],
+      "plain_language": "If you have a service agreement or contract with clients, you need a French version. The client can sign an English version if they prefer — but you must offer French first.",
+      "b2b_note": "Business-to-business contracts have more flexibility — both parties can agree to operate in English"
     },
     {
-      "id": "software_and_technology",
-      "name_en": "Software and Technology",
-      "description_en": "Businesses must offer French-language software to employees where a French equivalent exists. Websites serving Quebec customers must be available in French."
+      "category": "Product Labelling",
+      "applies_to": "All products sold in Quebec",
+      "requirements": [
+        "Product names and descriptions must be in French",
+        "Instructions and safety warnings must be in French (and equally prominent as any other language)",
+        "French must appear on packaging"
+      ],
+      "plain_language": "If you sell a product, the label needs French. For home food businesses, this means ingredients, product names, and any instructions must be in French. English can be added alongside.",
+      "ref": "permits/mapaq.json"
+    },
+    {
+      "category": "Workplace Language (25+ employees)",
+      "applies_to": "Businesses with 25 or more employees",
+      "requirements": [
+        "Must register with OQLF and implement a francization program",
+        "Must conduct workplace activities in French",
+        "Cannot require knowledge of a language other than French for employment (with limited exceptions)"
+      ],
+      "plain_language": "Most micro-businesses won't hit this threshold. If you have 25+ employees, this is significant — consult an HR advisor.",
+      "micro_business_note": "Not applicable to sole proprietors and very small businesses"
     }
   ],
-  "penalties_en": {
-    "individual": "Up to $7,000 per infraction",
-    "corporation": "Up to $30,000 per infraction",
-    "repeat_violations": "Fines double for repeat infractions"
+
+  "micro_business_practical_guide": {
+    "title": "What Bill 96 Means for You Specifically",
+    "by_business_type": {
+      "home_based_no_storefront": {
+        "impact": "Low",
+        "what_to_do": [
+          "Ensure your website has a French version (or at minimum French language option)",
+          "Use French in any marketing materials and social media",
+          "Have a French version of your service contract/agreement",
+          "Respond to clients in French if they write in French"
+        ]
+      },
+      "market_vendor": {
+        "impact": "Medium",
+        "what_to_do": [
+          "All market signage and price tags in French (prominently)",
+          "Product labels in French",
+          "Can also show English/Arabic pricing — French must be larger/first"
+        ]
+      },
+      "commercial_storefront": {
+        "impact": "High",
+        "what_to_do": [
+          "All exterior and interior signage French-predominant",
+          "French-first menus, price lists, brochures",
+          "Website in French",
+          "Contracts in French",
+          "Staff must be able to serve customers in French"
+        ]
+      },
+      "online_business_quebec_clients": {
+        "impact": "Medium",
+        "what_to_do": [
+          "Website must have French version",
+          "Checkout process in French",
+          "Order confirmation emails in French (or matching client language preference)",
+          "Terms and conditions in French"
+        ]
+      }
+    }
   },
-  "oqlf_complaint_process": "https://www.oqlf.gouv.qc.ca/english/charter/complaint.html"
+
+  "compliance_resources": [
+    {
+      "name": "OQLF (Office québécois de la langue française)",
+      "plain_language": "The government body that enforces Bill 96. Their website has guides and a free consultation service for businesses.",
+      "url": "https://www.oqlf.gouv.qc.ca/english/",
+      "phone": "514-873-6565",
+      "free_consultation": true
+    },
+    {
+      "name": "OQLF Business Guide",
+      "url": "https://www.oqlf.gouv.qc.ca/english/charter/bill96_smallbusiness.html",
+      "note": "Specific guide for small businesses on Bill 96 compliance"
+    },
+    {
+      "name": "Éducaloi — Language Rights Plain Language Explainer",
+      "url": "https://educaloi.qc.ca/en/capsules/language-rights-at-work/",
+      "note": "Free, plain-language legal information"
+    }
+  ],
+
+  "common_mistakes": [
+    "Having an English-only website and thinking it's fine because your personal language is English — Quebec clients have the right to French service",
+    "Using English-only signage at market stalls — OQLF does inspect farmers' markets",
+    "Not having a French version of your client service contract — required for consumer contracts",
+    "Thinking Bill 96 only applies to large companies — it applies to all businesses in Quebec for signage and client communications",
+    "Having a business name in English without a French descriptor — OQLF may require you to add one"
+  ],
+
+  "translations_help": {
+    "free_resources": [
+      "DeepL (deepl.com) — high quality for French-English translation",
+      "Google Translate — adequate for simple documents",
+      "OQLF offers free language advice"
+    ],
+    "professional_services": "For legally important documents (contracts, terms), consider a professional translator — freelance translators typically charge $0.10-$0.20/word"
+  },
+
+  "source_url": "https://www.oqlf.gouv.qc.ca/english/charter/bill96.html",
+  "government_body": "Office québécois de la langue française (OQLF)",
+  "phone": "514-873-6565",
+  "email": "oqlf@oqlf.gouv.qc.ca"
 }

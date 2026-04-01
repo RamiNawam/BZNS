@@ -1,34 +1,80 @@
 {
+  "_meta": {
+    "file": "funding/canada_summer_jobs.json",
+    "description": "Canada Summer Jobs — federal wage subsidy for hiring youth (15-30) during summer. Relevant for businesses planning to hire a student assistant.",
+    "last_verified": "2026-03-31",
+    "verify_urls": {
+      "main": "https://www.canada.ca/en/employment-social-development/services/funding/canada-summer-jobs.html",
+      "apply": "https://www.canada.ca/en/employment-social-development/services/funding/canada-summer-jobs/applicant-guide.html"
+    }
+  },
+
   "id": "canada_summer_jobs",
-  "name_en": "Canada Summer Jobs (CSJ)",
-  "name_fr": "Emplois d'été Canada (EEÉ)",
-  "website": "https://www.canada.ca/en/employment-social-development/services/funding/canada-summer-jobs.html",
-  "administered_by": "Employment and Social Development Canada (ESDC)",
-  "description_en": "Canada Summer Jobs provides wage subsidies to employers who create summer job placements for young people aged 15–30. Small businesses with under 50 employees are eligible.",
-  "description_fr": "Emplois d'été Canada fournit des subventions salariales aux employeurs qui créent des emplois d'été pour les jeunes de 15 à 30 ans.",
-  "funding_details": {
-    "subsidy_rate_private_sector": 0.50,
-    "subsidy_rate_public_sector": 1.00,
-    "subsidy_rate_non_profit": 1.00,
-    "eligible_wage_en": "Up to the provincial/territorial minimum wage, or the actual wage paid, whichever is lower",
-    "minimum_hours_per_week": 30,
-    "max_weeks": 16,
-    "note_en": "Employers must pay at least minimum wage. Subsidy covers 50% of minimum wage for private sector."
+  "program_name_en": "Canada Summer Jobs",
+  "program_name_fr": "Emplois d'été Canada",
+  "program_key": "canada_summer_jobs",
+  "type": "wage_subsidy",
+
+  "plain_language_summary": "Canada Summer Jobs provides a wage subsidy to help businesses and non-profits hire young people aged 15-30 during summer (typically May–August). You hire a student, the government reimburses 50-100% of their minimum wage. Great for micro-businesses that need seasonal help but can't afford a full salary.",
+
+  "amount": {
+    "for_profit_businesses": "50% reimbursement of provincial minimum wage per hour worked",
+    "non_profits_and_public_sector": "100% reimbursement of provincial minimum wage",
+    "quebec_minimum_wage_2026": "$16.10/hour (verify — updated annually)",
+    "example": "If you hire a student for 35 hours/week for 10 weeks: ~$5,635 total cost. Government reimburses ~$2,817 (50% of minimum wage). Your net cost: ~$2,817 — plus any wages above minimum if you pay more.",
+    "note": "Subsidy is based on minimum wage even if you pay the student more"
   },
+
   "eligibility": {
-    "employer_type": "Private sector, public sector, non-profit",
-    "employees_max_private": 50,
-    "employee_age_range": "15–30 years old",
-    "residency": "Canadian citizen, permanent resident, or person with refugee protection"
+    "scoring_weights": {
+      "has_employees_or_plans_to_hire": 0.40,
+      "business_stage": 0.30,
+      "immigration_status": 0.20,
+      "sector": 0.10
+    },
+    "criteria": {
+      "employer": {
+        "eligible": ["For-profit small businesses", "Non-profit organizations", "Public sector employers"],
+        "must_be": "Canadian business with a valid CRA Business Number",
+        "immigration_status_employer": { "eligible": ["canadian_citizen", "permanent_resident"], "note": "Business owner must have valid authorization to hire in Canada" }
+      },
+      "employee_youth": {
+        "age": "15 to 30 years old at start of employment",
+        "must_be": "Canadian citizen, permanent resident, or person to whom refugee protection has been conferred",
+        "note": "The YOUTH must meet these criteria — not the business owner"
+      },
+      "job_requirements": {
+        "must_be": "Full-time position (30-40 hours/week) during summer months",
+        "must_not_be": "A position that replaces a laid-off worker",
+        "duration": "Typically 6-16 weeks"
+      }
+    }
   },
-  "application": {
-    "window_en": "Applications typically open in October–November for the following summer",
-    "url": "https://srv217.services.gc.ca/ihst4/Intro.aspx?cid=9c2f3750-7f49-4a78-b8f1-6d4267eada14&lang=eng",
-    "note_en": "Competitive process — applications are scored on community impact and alignment with CSJ priorities"
+
+  "application_timeline": {
+    "when_to_apply": "Applications typically open in November–January for the following summer",
+    "decision": "Results announced in spring (March–April)",
+    "important": "You must apply months in advance — this is NOT a program you can access last-minute",
+    "hackathon_note": "For the April 2026 hackathon demo, the 2026 summer jobs cycle is already in progress — relevant as a future planning tool for users"
   },
-  "csj_priorities_en": [
-    "Youth-serving organizations",
-    "Francophone minority communities",
-    "Official Language Minority Communities (OLMCs)"
-  ]
+
+  "how_to_apply": "Through the Grants and Contributions Online Services (GCOS) portal at canada.ca",
+  "url": "https://www.canada.ca/en/employment-social-development/services/funding/canada-summer-jobs.html",
+
+  "persona_fit": {
+    "Yara": "Relevant if she plans to hire a student helper for her bakery during summer markets",
+    "Marcus": "Could hire a junior developer or student intern",
+    "Fatima": "Could hire a student assistant for her daycare (if she has space and meets capacity rules)"
+  },
+
+  "common_mistakes": [
+    "Missing the application window — you must apply in November-January, not in spring",
+    "Thinking it covers 100% of wages for for-profit businesses — it only covers 50% of minimum wage",
+    "Not accounting for employer contributions (QPP, QPIP, EI) on top of wages — those are your cost",
+    "Hiring youth who don't meet the citizenship/PR requirement — the youth themselves must be eligible"
+  ],
+
+  "source_url": "https://www.canada.ca/en/employment-social-development/services/funding/canada-summer-jobs.html",
+  "government_body": "Employment and Social Development Canada (ESDC)",
+  "phone": "1-800-935-5555"
 }

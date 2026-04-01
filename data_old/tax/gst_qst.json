@@ -1,0 +1,55 @@
+{
+  "title_en": "GST/QST — Goods and Services Tax / Quebec Sales Tax",
+  "year": 2026,
+  "rates": {
+    "GST": {
+      "rate": 0.05,
+      "administered_by": "CRA",
+      "registration_threshold_cad": 30000,
+      "small_supplier_rule_en": "If your worldwide taxable revenues are under $30,000 in the last four consecutive quarters, you are a small supplier and registration is optional."
+    },
+    "QST": {
+      "rate": 0.09975,
+      "administered_by": "Revenu Québec",
+      "registration_threshold_cad": 30000
+    },
+    "combined": 0.14975
+  },
+  "filing_periods": [
+    {
+      "annual_revenue_cad": "Under $1,500,000",
+      "default_period": "Annual",
+      "option_to_file": "Quarterly or Monthly"
+    },
+    {
+      "annual_revenue_cad": "$1,500,000 – $6,000,000",
+      "default_period": "Quarterly",
+      "option_to_file": "Monthly"
+    },
+    {
+      "annual_revenue_cad": "Over $6,000,000",
+      "default_period": "Monthly"
+    }
+  ],
+  "input_tax_credits": {
+    "description_en": "Registrants can claim input tax credits (ITCs) on the GST paid on business expenses to recover tax paid on inputs.",
+    "simplified_method_threshold_cad": 500000
+  },
+  "exempt_supplies_examples_en": [
+    "Most healthcare services",
+    "Educational services (tuition)",
+    "Financial services",
+    "Residential rent (long-term)"
+  ],
+  "zero_rated_supplies_examples_en": [
+    "Basic groceries",
+    "Prescription drugs",
+    "Exports of goods and services",
+    "International travel"
+  ],
+  "quick_method": {
+    "available": true,
+    "description_en": "Small businesses with revenues under $400,000 may use the Quick Method to simplify GST/QST remittances by applying a flat remittance rate instead of tracking all ITCs.",
+    "revenue_threshold_cad": 400000
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "agency": "RACJ",
+  "full_name_en": "Régie des alcools, des courses et des jeux",
+  "full_name_fr": "Régie des alcools, des courses et des jeux",
+  "website": "https://www.racj.gouv.qc.ca",
+  "description_en": "The RACJ issues permits for the sale and service of alcoholic beverages in Quebec, as well as permits for gaming and horse racing activities.",
+  "description_fr": "La RACJ émet les permis pour la vente et le service de boissons alcooliques au Québec, ainsi que les permis liés aux jeux et aux courses.",
+  "alcohol_permits": [
+    {
+      "id": "restaurant_permit",
+      "name_en": "Restaurant Permit",
+      "name_fr": "Permis de restaurant",
+      "description_en": "Allows serving alcohol for consumption on-site alongside meals",
+      "annual_fee_cad": 707,
+      "requires_food_service": true
+    },
+    {
+      "id": "bar_permit",
+      "name_en": "Bar Permit",
+      "name_fr": "Permis de bar",
+      "description_en": "Allows serving alcohol for consumption on-site, with or without food",
+      "annual_fee_cad": 1060
+    },
+    {
+      "id": "grocery_permit",
+      "name_en": "Grocery Store Permit",
+      "name_fr": "Permis d'épicerie",
+      "description_en": "Allows sale of beer and cider for off-site consumption",
+      "annual_fee_cad": 380
+    },
+    {
+      "id": "reunion_permit",
+      "name_en": "Reunion Permit (Special Event)",
+      "name_fr": "Permis de réunion",
+      "description_en": "Temporary permit for one-time events where alcohol will be served",
+      "fee_cad": 142,
+      "duration": "Single event"
+    }
+  ],
+  "application_requirements_en": [
+    "Proof of business registration (NEQ)",
+    "Floor plan of the establishment",
+    "Municipal zoning approval",
+    "Criminal background check for permit holders",
+    "Proof of responsible service of alcohol training (Éduc'alcool)"
+  ],
+  "processing_time_en": "4–8 weeks",
+  "contact": {
+    "phone": "514-873-3577",
+    "toll_free": "1-800-363-0320"
+  }
+}
