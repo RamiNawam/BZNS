@@ -3,6 +3,7 @@
     "file": "registration/cra.json",
     "description": "Canada Revenue Agency (CRA) federal business registration — Business Number (BN), GST/HST account, and payroll account. Separate from Quebec's REQ/NEQ registration.",
     "last_verified": "2026-03-31",
+    "status": "active",
     "verify_urls": {
       "main": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/registering-your-business.html",
       "business_number": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/registering-your-business/register.html",
@@ -10,15 +11,11 @@
       "my_business_account": "https://www.canada.ca/en/revenue-agency/services/e-services/e-services-businesses/business-account.html"
     }
   },
-
   "id": "cra_registration",
   "title_en": "CRA Federal Business Registration (Business Number)",
   "title_fr": "Inscription fédérale à l'ARC (Numéro d'entreprise)",
-
   "plain_language_summary": "The CRA Business Number (BN) is your 9-digit federal business identifier. In Quebec, you often get this automatically when you register for GST with the CRA. It's separate from your provincial NEQ. You need a BN to: register for GST/HST federally, open a payroll account if you hire employees, and interact with the federal government about your business.",
-
   "quebec_context": "Quebec is unique in Canada — it has its own tax agency (Revenu Québec) that administers both federal GST and provincial QST together for Quebec businesses. This means most Quebec businesses interact primarily with Revenu Québec, not CRA, for their day-to-day tax needs. However, you still need a federal BN for certain situations.",
-
   "when_you_need_a_bn": [
     "Registering for GST/HST (though in Quebec, Revenu Québec handles this — a BN is assigned automatically)",
     "Hiring employees and running payroll (federal payroll deductions account)",
@@ -26,13 +23,11 @@
     "Applying for federal programs that require a BN",
     "Incorporating federally (federal corporation number is linked to BN)"
   ],
-
   "how_bn_is_obtained_in_quebec": {
     "automatic": "When you register for GST with Revenu Québec, the CRA is notified and a Business Number is automatically assigned",
     "direct_registration": "You can also register directly with CRA online at canada.ca/en/revenue-agency",
     "note": "Most Quebec sole proprietors get their BN automatically through Revenu Québec's GST/QST registration — you may already have one without knowing it"
   },
-
   "registration_process": {
     "online": {
       "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/registering-your-business/register.html",
@@ -44,13 +39,11 @@
       "hours": "Monday–Friday 9 AM–6 PM local time"
     }
   },
-
   "bn_structure": {
     "format": "123456789",
     "digits": 9,
     "note": "Your BN is the root number. Different program accounts are added as suffixes: RT0001 (GST/HST), RP0001 (Payroll), RC0001 (Corporate income tax)"
   },
-
   "my_business_account": {
     "what_it_is": "CRA's online portal for businesses (equivalent to Revenu Québec's clicSÉQUR)",
     "url": "https://www.canada.ca/en/revenue-agency/services/e-services/e-services-businesses/business-account.html",
@@ -62,29 +55,27 @@
       "Submit documents and correspondence"
     ]
   },
-
   "payroll_account": {
     "when_needed": "When you hire your first employee",
     "what_it_is": "A RP account linked to your BN for remitting federal payroll deductions (CPP... wait, Quebec uses QPP — and EI, federal income tax)",
     "quebec_note": "Quebec has its own payroll deductions system through Revenu Québec for QPP and QPIP. Federal EI and federal income tax deductions are remitted to CRA. You need BOTH a federal payroll account (CRA) and provincial source deductions account (Revenu Québec) when you hire.",
     "micro_business_note": "Most micro-entrepreneurs start as sole proprietors with no employees — you don't need a payroll account until you hire someone"
   },
-
   "eligibility": {
     "who_needs_it": "Any business operating in Canada, including Quebec sole proprietors who need to register federally",
     "immigration_status": "No restrictions — available to all business owners regardless of immigration status",
     "note": "Getting a BN does not require Canadian citizenship or PR"
   },
-
-  "cost": { "registration": 0, "note": "Free" },
-
+  "cost": {
+    "registration": 0,
+    "note": "Free"
+  },
   "common_mistakes": [
     "Quebec businesses thinking they need to file GST separately with CRA — Revenu Québec handles both GST and QST for Quebec businesses in most cases",
     "Not knowing you already have a BN — if you registered for GST through Revenu Québec, one was assigned automatically",
     "Confusing NEQ (Quebec provincial) with BN (federal) — they are different numbers for different purposes",
     "Not setting up My Business Account — it's useful for tracking your federal tax obligations"
   ],
-
   "source_url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/registering-your-business.html",
   "government_body": "Canada Revenue Agency (CRA)",
   "phone": "1-800-959-5525"

@@ -3,50 +3,56 @@
     "file": "funding/investissement_quebec.json",
     "description": "Investissement Québec — Quebec's provincial investment agency. Offers loans, loan guarantees, and business support for Quebec companies. Includes Plan PME for small businesses.",
     "last_verified": "2026-03-31",
+    "status": "active",
     "verify_urls": {
-      "main": "https://www.investquebec.com/quebec/en/",
-      "plan_pme": "https://www.investquebec.com/quebec/en/financial-products/all-our-solutions/Loan-for-small-and-medium-sized-businesses.html",
-      "startup": "https://www.investquebec.com/quebec/en/financial-products/startups.html"
+      "main": "https://www.investquebec.com/en/",
+      "plan_pme": "https://www.investquebec.com/en/",
+      "startup": "https://www.investquebec.com/en/"
     }
   },
-
   "id": "investissement_quebec",
   "program_name_en": "Investissement Québec — Plan PME",
   "program_name_fr": "Investissement Québec — Plan PME",
   "program_key": "investissement_quebec",
   "type": "loan",
-
   "plain_language_summary": "Investissement Québec (IQ) is the provincial government's main business financing arm. Their Plan PME offers loans and loan guarantees to Quebec businesses that may not qualify for conventional bank financing. They focus on growth and job creation in Quebec.",
-
   "amount": {
     "minimum": 50000,
     "maximum": "No upper limit for larger projects — varies by program",
     "note": "IQ typically focuses on businesses needing $50,000+. For amounts under $50,000, PME MTL or FLI are better fits for micro-businesses.",
     "micro_business_relevance": "Medium — IQ is better suited for businesses that have launched and are looking to grow, rather than brand new micro-businesses"
   },
-
   "eligibility": {
     "scoring_weights": {
       "business_stage": 0.35,
-      "quebec_economic_impact": 0.30,
-      "immigration_status": 0.20,
+      "quebec_economic_impact": 0.3,
+      "immigration_status": 0.2,
       "sector": 0.15
     },
     "criteria": {
       "location": "Must operate in Quebec",
-      "immigration_status": { "eligible": ["canadian_citizen", "permanent_resident"] },
+      "immigration_status": {
+        "eligible": [
+          "canadian_citizen",
+          "permanent_resident"
+        ]
+      },
       "business_stage": {
         "best_fit": "Businesses that have launched and are seeking growth capital",
         "can_also_fund": "Startups with strong business plans and experienced founders",
         "note": "IQ is less ideal for very early-stage micro-businesses — consider PME MTL or FLI first"
       },
       "sector": {
-        "priority_sectors": ["Manufacturing", "Technology", "Export-oriented", "Green economy"],
+        "priority_sectors": [
+          "Manufacturing",
+          "Technology",
+          "Export-oriented",
+          "Green economy"
+        ],
         "also_eligible": "Most sectors including food, services, retail"
       }
     }
   },
-
   "products": [
     {
       "name": "Plan PME Loan",
@@ -60,23 +66,19 @@
       "benefit": "Can unlock bank financing you wouldn't otherwise qualify for"
     }
   ],
-
   "free_advisory": {
     "available": true,
     "plain_language": "IQ advisors provide free consultations and can help you figure out if IQ financing is right for you — or refer you to a better-fit program.",
-    "url": "https://www.investquebec.com/quebec/en/contact-us.html"
+    "url": "https://www.investquebec.com/en/"
   },
-
   "timeline": "6-12 weeks for loan approval — slower than local programs",
-
   "common_mistakes": [
     "Applying to IQ when PME MTL or FLI would be faster and more appropriate for micro-businesses",
     "Not using the free advisory consultation first — they'll tell you if you're a good fit",
     "Thinking IQ is only for large companies — Plan PME is specifically for small businesses"
   ],
-
-  "application_url": "https://www.investquebec.com/quebec/en/financial-products/all-our-solutions.html",
-  "source_url": "https://www.investquebec.com/quebec/en/",
+  "application_url": "https://www.investquebec.com/en/",
+  "source_url": "https://www.investquebec.com/en/",
   "government_body": "Investissement Québec (provincial Crown corporation)",
   "phone": "1-844-474-6367"
 }

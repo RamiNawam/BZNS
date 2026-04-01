@@ -3,6 +3,7 @@
     "file": "permits/famille.json",
     "description": "Home daycare (garde en milieu familial) regulations, permit requirements, and the STA income support program. Covers RSG (responsable de service de garde) recognition, CPE affiliation, and independent operation.",
     "last_verified": "2026-03-31",
+    "status": "active",
     "verify_urls": {
       "main": "https://www.mfa.gouv.qc.ca/fr/services-de-garde/rsg/pages/index.aspx",
       "become_rsg": "https://www.mfa.gouv.qc.ca/fr/services-de-garde/rsg/devenir-rsg/pages/index.aspx",
@@ -10,14 +11,13 @@
       "independent_daycare": "https://www.mfa.gouv.qc.ca/fr/services-de-garde/garderies/pages/index.aspx"
     }
   },
-
   "id": "home_daycare_permit",
   "title_en": "Home Daycare — Recognition as RSG (Responsable de service de garde)",
   "title_fr": "Garde en milieu familial — Reconnaissance comme RSG",
-  "applies_to_business_types": ["daycare"],
-
+  "applies_to_business_types": [
+    "daycare"
+  ],
   "plain_language_summary": "Running a home daycare in Quebec is one of the most regulated micro-businesses. You need to be officially recognized as an RSG (responsable de service de garde) by a coordinating office (bureau coordonnateur). This takes 2-6 months and involves training, a home inspection, and a criminal record check. BUT — once recognized, you benefit from government subsidized rates, access to the $10/day system, and potentially the STA income support program during your startup period.",
-
   "two_pathways": [
     {
       "id": "affiliated_rsg",
@@ -25,7 +25,6 @@
       "name_fr": "RSG affiliée à un bureau coordonnateur (BC)",
       "plain_language": "The most common path. You operate your home daycare through a coordinating office (like a CPE) that handles administration, subsidized rates, and support. Parents pay the reduced $10-$12/day rate and the government pays you the rest.",
       "recommended": true,
-
       "eligibility": {
         "who_qualifies": [
           "Quebec residents (citizen, permanent resident, or valid work permit)",
@@ -41,14 +40,12 @@
         ],
         "future_eligibility": "If you're currently on a work permit, you may qualify depending on your specific permit type. Permanent residents qualify fully. If your criminal record contains minor convictions, review with the bureau coordonnateur — not all convictions disqualify."
       },
-
       "capacity": {
         "max_children": 6,
         "max_children_under_18_months": 2,
         "with_assistant": "Up to 9 children if you hire a qualified assistant",
         "note": "Your own children under 9 years old count toward the 6-child maximum"
       },
-
       "steps": [
         {
           "order": 1,
@@ -98,14 +95,12 @@
           "timeline_from_start": "Typically 2-6 months from first contact"
         }
       ],
-
       "compensation": {
         "how_paid": "The BC collects parent contributions and government subsidies and pays you a daily rate per child",
         "approximate_daily_rate_per_child": "Approximately $45-$60/day per child (government subsidy + parent contribution)",
         "annual_estimate_6_children": "Approximately $65,000-$80,000 gross/year at full capacity",
         "note": "Verify current rates with your BC — rates are set by the government and updated periodically"
       },
-
       "sta_program": {
         "name": "Soutien au travail autonome (STA) — Income Support During Startup",
         "status": "suspended",
@@ -114,21 +109,17 @@
         "plain_language": "When active, this program provided income replacement while setting up your business — valuable for new RSGs building their client base. Currently suspended as of May 1, 2024."
       }
     },
-
     {
       "id": "independent_daycare",
       "name_en": "Independent Home Childcare (Non-subsidized)",
       "name_fr": "Garde en milieu familial non subventionnée",
       "plain_language": "You can also operate independently without a BC affiliation. Parents pay your full rate directly (typically $30-$60/day). You're not part of the $10/day system but have more flexibility in rates and operations. Still requires recognition from the MFA.",
-
       "eligibility": {
         "note": "Similar requirements to affiliated RSG — recognition is still required for more than 6 visits/year by the same children"
       },
-
       "tradeoff": "Higher potential daily rate but no guaranteed government income, no BC administrative support, must find your own clients"
     }
   ],
-
   "sta_program_detail": {
     "name": "Soutien au travail autonome (STA)",
     "status": "suspended",
@@ -138,7 +129,6 @@
     "monitor_for_resumption": "https://www.emploiquebec.gouv.qc.ca/en/citizens/find-a-job/self-employment/",
     "url": "https://www.emploiquebec.gouv.qc.ca/en/citizens/find-a-job/self-employment/"
   },
-
   "cost_summary": {
     "training": "Free to $2,000 depending on prior education and subsidies available",
     "criminal_record_check": "25–75 per adult in household",
@@ -147,7 +137,6 @@
     "total_estimated_startup": "300–3,300",
     "note": "Many costs may be subsidized through Emploi-Québec if you qualify for STA"
   },
-
   "timeline": {
     "total": "2-6 months from first contact to first child",
     "by_step": {
@@ -157,7 +146,6 @@
       "recognition_issued": "2-4 weeks after all documents submitted"
     }
   },
-
   "common_mistakes": [
     "Starting to care for children before receiving official recognition — illegal and can result in permanent disqualification",
     "Not knowing about the STA program — many new RSGs lose income during the startup period unnecessarily",
@@ -165,7 +153,6 @@
     "Not contacting the BC early enough — some areas have waiting lists for new RSG spots",
     "Forgetting that your own children under 9 count toward the 6-child maximum"
   ],
-
   "support_resources": [
     {
       "name": "Ministère de la Famille — RSG Information",
@@ -178,7 +165,6 @@
       "note": "Entry point for STA application"
     }
   ],
-
   "source_url": "https://www.mfa.gouv.qc.ca/fr/services-de-garde/rsg/devenir-rsg/pages/index.aspx",
   "government_body": "Ministère de la Famille du Québec",
   "phone": "1-855-336-8568"

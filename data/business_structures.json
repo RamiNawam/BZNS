@@ -3,20 +3,19 @@
     "file": "business_structures.json",
     "description": "Comparison of business structures available to Quebec micro-entrepreneurs. Used by the roadmap and assistant to explain trade-offs.",
     "last_verified": "2026-03-31",
+    "status": "active",
     "verify_urls": {
       "req_structures": "https://www.registreentreprises.gouv.qc.ca/en/demarrer/choisir/",
       "revenu_quebec_structures": "https://www.revenuquebec.ca/en/businesses/starting-a-business/",
       "incorporation_federal": "https://www.ic.gc.ca/eic/site/cd-dgc.nsf/eng/home"
     }
   },
-
   "structures": [
     {
       "id": "sole_proprietorship",
       "name_en": "Sole Proprietorship (Self-Employed)",
       "name_fr": "Entreprise individuelle (Travailleur autonome)",
       "plain_language_summary": "The simplest way to start. You and your business are legally the same entity. Most micro-entrepreneurs in Quebec start here. You register with the REQ and get an NEQ number, then operate under your own name or a trade name.",
-
       "best_for": [
         "Freelancers and consultants",
         "Home-based food businesses",
@@ -24,7 +23,6 @@
         "Anyone testing a business idea before committing",
         "Businesses with low liability risk"
       ],
-
       "registration": {
         "where": "Registre des entreprises du Québec (REQ)",
         "cost": 42,
@@ -34,7 +32,6 @@
         "annual_renewal_cost": 38,
         "url": "https://www.registreentreprises.gouv.qc.ca"
       },
-
       "taxes": {
         "summary": "Business income flows directly onto your personal tax return (T1/TP1). You pay personal income tax rates, not corporate rates.",
         "income_tax": "Personal rates (14–25.75% Quebec + 15–33% federal, after abatement)",
@@ -43,13 +40,11 @@
         "tax_filing": "File Schedule T2125 (federal) and TP-80 (Quebec) with personal return",
         "installments": "Required quarterly if expected tax owing > $3,000 federal or $1,800 Quebec"
       },
-
       "liability": {
         "summary": "You are personally liable for all business debts and legal claims. Your personal assets (savings, car, home) can be seized if the business is sued.",
         "risk_level": "high",
         "risk_note": "Acceptable for low-risk businesses. Get business liability insurance to mitigate."
       },
-
       "pros": [
         "Cheapest and fastest to set up ($42)",
         "No separate corporate tax return — one personal return",
@@ -57,7 +52,6 @@
         "No complex annual reporting",
         "Easy to dissolve if things don't work out"
       ],
-
       "cons": [
         "Full personal liability for business debts",
         "Pays personal income tax rates (higher than small business corporate rate at higher incomes)",
@@ -65,16 +59,13 @@
         "Harder to raise investment capital",
         "Less credible to some corporate clients"
       ],
-
       "income_threshold_note": "At net income above ~$80,000, a corporation often becomes more tax-efficient. Below that, sole proprietorship is usually simpler and cheaper overall."
     },
-
     {
       "id": "corporation",
       "name_en": "Corporation (Incorporation)",
       "name_fr": "Société par actions (Incorporation)",
       "plain_language_summary": "A separate legal entity from you personally. More complex and expensive to set up and maintain, but offers liability protection and significant tax advantages at higher incomes. Usually not necessary for a micro-business in the first year.",
-
       "best_for": [
         "Businesses with significant liability risk (contractors working on client sites, professionals)",
         "Income consistently above $80,000/year",
@@ -82,7 +73,6 @@
         "Businesses planning to raise investment",
         "IT consultants and professionals with corporate clients requiring incorporation"
       ],
-
       "registration": {
         "where": "REQ (Quebec provincial) or Corporations Canada (federal)",
         "cost_provincial": 367,
@@ -94,7 +84,6 @@
         "url_provincial": "https://www.registreentreprises.gouv.qc.ca",
         "url_federal": "https://www.ic.gc.ca/eic/site/cd-dgc.nsf/eng/home"
       },
-
       "taxes": {
         "summary": "Corporation pays its own tax at low small business rates. You pay personal tax only when you take money out as salary or dividends.",
         "corporate_rate": "~12.2% on first $500,000 of active business income (Quebec CCPC)",
@@ -102,13 +91,11 @@
         "personal_on_dividends": "Dividends taxed at lower personal rates (dividend tax credit applies)",
         "tax_filing": "Separate T2 corporate return (federal) + CO-17 (Quebec) — requires an accountant (~$1,500–3,000/year)"
       },
-
       "liability": {
         "summary": "The corporation is a separate legal entity. Your personal assets are generally protected from business debts and lawsuits.",
         "risk_level": "low",
         "risk_note": "Protection is not absolute — personal guarantees on loans and director liability for unpaid taxes/wages still apply"
       },
-
       "pros": [
         "Personal liability protection",
         "Low corporate tax rate (~12.2%) allows tax deferral",
@@ -116,7 +103,6 @@
         "More credible to corporate clients and investors",
         "Can split income with family shareholders (within limits)"
       ],
-
       "cons": [
         "Much more expensive to set up ($367+ provincial or $200+ federal)",
         "Requires separate corporate bank account",
@@ -125,22 +111,18 @@
         "More administrative burden (minutes, resolutions, shareholder registers)",
         "Losses stay inside the corporation — can't offset personal income"
       ],
-
       "income_threshold_note": "For most micro-entrepreneurs earning under $60,000–$80,000 net, the accounting costs of a corporation often outweigh the tax savings. Start as sole proprietor and incorporate when it makes financial sense."
     },
-
     {
       "id": "partnership",
       "name_en": "General Partnership",
       "name_fr": "Société en nom collectif (SENC)",
       "plain_language_summary": "Two or more people operating a business together, sharing profits and liabilities. Each partner reports their share on their personal tax return. Must be registered with the REQ.",
-
       "best_for": [
         "Two co-founders starting together",
         "Professional partnerships (lawyers, accountants — some regulated professions require this)",
         "Businesses where partners contribute different resources (one contributes capital, one contributes labour)"
       ],
-
       "registration": {
         "where": "Registre des entreprises du Québec (REQ)",
         "cost": 42,
@@ -148,25 +130,21 @@
         "partnership_agreement": "Strongly recommended — a written agreement covering profit split, decision-making, exit terms. Not legally required but critical.",
         "url": "https://www.registreentreprises.gouv.qc.ca"
       },
-
       "taxes": {
         "summary": "Partnership itself doesn't pay tax. Each partner reports their share of income on their personal return.",
         "qpp": "Each partner pays QPP on their share of business income",
         "filing": "Partnership files an information return; each partner files personal return with their share"
       },
-
       "liability": {
         "summary": "Each partner is jointly and personally liable for ALL partnership debts — even debts created by your partner without your knowledge.",
         "risk_level": "very_high",
         "risk_note": "Choose your partners carefully. Consider a limited partnership or LLP for liability protection."
       },
-
       "pros": [
         "Simple to set up (same cost as sole proprietorship)",
         "Combines different skills and resources",
         "Shared financial burden of startup costs"
       ],
-
       "cons": [
         "Full personal liability for all partnership debts, including partner's actions",
         "Disputes between partners can destroy the business",
@@ -175,21 +153,14 @@
       ]
     }
   ],
-
   "decision_guide": {
     "question_1": "Is your expected net income under $80,000/year?",
-    "if_yes": "Sole proprietorship is almost certainly the right choice. Simpler, cheaper, and losses offset personal income.",
-    "if_no": "Consider incorporation — the tax savings at higher incomes often justify the accounting costs.",
-
-    "question_2": "Do you have significant liability risk (working on client property, giving advice that could cause harm, handling food for the public)?",
-    "if_yes": "Consider incorporation for liability protection, OR get business liability insurance as a sole proprietor.",
-
-    "question_3": "Are you starting with a co-founder?",
     "if_yes": "Register a partnership or incorporate together. Do NOT just work informally — if one person gets sued or leaves, you need legal clarity.",
-
+    "if_no": "Consider incorporation — the tax savings at higher incomes often justify the accounting costs.",
+    "question_2": "Do you have significant liability risk (working on client property, giving advice that could cause harm, handling food for the public)?",
+    "question_3": "Are you starting with a co-founder?",
     "default_recommendation_hackathon": "For most users of this tool, sole proprietorship is the right first step. They can always incorporate later."
   },
-
   "free_resources": [
     {
       "name": "YES Montréal — Business Structure Advising",
@@ -199,7 +170,7 @@
     {
       "name": "Info entrepreneurs",
       "phone": "1-888-576-4444",
-      "url": "https://www.infoentrepreneurs.org",
+      "url": "https://ced.canada.ca/en/",
       "note": "Free government-funded business information service"
     }
   ]

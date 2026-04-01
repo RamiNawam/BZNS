@@ -3,20 +3,18 @@
     "file": "funding/canada_summer_jobs.json",
     "description": "Canada Summer Jobs — federal wage subsidy for hiring youth (15-30) during summer. Relevant for businesses planning to hire a student assistant.",
     "last_verified": "2026-03-31",
+    "status": "active",
     "verify_urls": {
       "main": "https://www.canada.ca/en/employment-social-development/services/funding/canada-summer-jobs.html",
       "apply": "https://www.canada.ca/en/employment-social-development/services/funding/canada-summer-jobs/applicant-guide.html"
     }
   },
-
   "id": "canada_summer_jobs",
   "program_name_en": "Canada Summer Jobs",
   "program_name_fr": "Emplois d'été Canada",
   "program_key": "canada_summer_jobs",
   "type": "wage_subsidy",
-
   "plain_language_summary": "Canada Summer Jobs provides a wage subsidy to help businesses and non-profits hire young people aged 15-30 during summer (typically May–August). You hire a student, the government reimburses 50-100% of their minimum wage. Great for micro-businesses that need seasonal help but can't afford a full salary.",
-
   "amount": {
     "for_profit_businesses": "50% reimbursement of provincial minimum wage per hour worked",
     "non_profits_and_public_sector": "100% reimbursement of provincial minimum wage",
@@ -24,19 +22,28 @@
     "example": "If you hire a student for 35 hours/week for 10 weeks: ~$5,635 total cost. Government reimburses ~$2,817 (50% of minimum wage). Your net cost: ~$2,817 — plus any wages above minimum if you pay more.",
     "note": "Subsidy is based on minimum wage even if you pay the student more"
   },
-
   "eligibility": {
     "scoring_weights": {
-      "has_employees_or_plans_to_hire": 0.40,
-      "business_stage": 0.30,
-      "immigration_status": 0.20,
-      "sector": 0.10
+      "has_employees_or_plans_to_hire": 0.4,
+      "business_stage": 0.3,
+      "immigration_status": 0.2,
+      "sector": 0.1
     },
     "criteria": {
       "employer": {
-        "eligible": ["For-profit small businesses", "Non-profit organizations", "Public sector employers"],
+        "eligible": [
+          "For-profit small businesses",
+          "Non-profit organizations",
+          "Public sector employers"
+        ],
         "must_be": "Canadian business with a valid CRA Business Number",
-        "immigration_status_employer": { "eligible": ["canadian_citizen", "permanent_resident"], "note": "Business owner must have valid authorization to hire in Canada" }
+        "immigration_status_employer": {
+          "eligible": [
+            "canadian_citizen",
+            "permanent_resident"
+          ],
+          "note": "Business owner must have valid authorization to hire in Canada"
+        }
       },
       "employee_youth": {
         "age": "15 to 30 years old at start of employment",
@@ -50,30 +57,25 @@
       }
     }
   },
-
   "application_timeline": {
     "when_to_apply": "Applications typically open in November–January for the following summer",
     "decision": "Results announced in spring (March–April)",
     "important": "You must apply months in advance — this is NOT a program you can access last-minute",
     "hackathon_note": "For the April 2026 hackathon demo, the 2026 summer jobs cycle is already in progress — relevant as a future planning tool for users"
   },
-
   "how_to_apply": "Through the Grants and Contributions Online Services (GCOS) portal at canada.ca",
   "url": "https://www.canada.ca/en/employment-social-development/services/funding/canada-summer-jobs.html",
-
   "persona_fit": {
     "Yara": "Relevant if she plans to hire a student helper for her bakery during summer markets",
     "Marcus": "Could hire a junior developer or student intern",
     "Fatima": "Could hire a student assistant for her daycare (if she has space and meets capacity rules)"
   },
-
   "common_mistakes": [
     "Missing the application window — you must apply in November-January, not in spring",
     "Thinking it covers 100% of wages for for-profit businesses — it only covers 50% of minimum wage",
     "Not accounting for employer contributions (QPP, QPIP, EI) on top of wages — those are your cost",
     "Hiring youth who don't meet the citizenship/PR requirement — the youth themselves must be eligible"
   ],
-
   "source_url": "https://www.canada.ca/en/employment-social-development/services/funding/canada-summer-jobs.html",
   "government_body": "Employment and Social Development Canada (ESDC)",
   "phone": "1-800-935-5555"

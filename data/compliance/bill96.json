@@ -3,6 +3,7 @@
     "file": "compliance/bill96.json",
     "description": "Bill 96 (Loi sur la langue officielle et commune du Québec, le français) — French language requirements for businesses in Quebec. Covers commercial signage, customer communications, employment, and compliance timelines.",
     "last_verified": "2026-03-31",
+    "status": "active",
     "verify_urls": {
       "main": "https://www.oqlf.gouv.qc.ca/english/charter/bill96.html",
       "signage": "https://www.legisquebec.gouv.qc.ca/fr",
@@ -10,19 +11,15 @@
       "oqlf": "https://www.oqlf.gouv.qc.ca/english/"
     }
   },
-
   "id": "bill96_compliance",
   "title_en": "Bill 96 — French Language Requirements for Quebec Businesses",
   "title_fr": "Loi 96 — Obligations linguistiques des entreprises québécoises",
-
   "plain_language_summary": "Bill 96 (passed 2022, fully in effect 2025-2026) strengthened Quebec's French language requirements for businesses. For most micro-businesses and sole proprietors, the main impact is on: commercial signage (French must be markedly predominant), customer communications (must be offered in French), and any written contracts with clients. The law is more demanding on larger employers.",
-
   "who_is_affected": {
     "all_businesses": "All businesses operating in Quebec must offer services in French and use French in commercial signage",
     "businesses_with_employees": "Additional language requirements for workplaces with 25+ employees (francization program)",
     "micro_businesses": "Sole proprietors and very small businesses — mainly affects signage, client communications, and contracts"
   },
-
   "key_requirements_by_category": [
     {
       "category": "Commercial Signage",
@@ -84,7 +81,6 @@
       "micro_business_note": "Not applicable to sole proprietors and very small businesses"
     }
   ],
-
   "micro_business_practical_guide": {
     "title": "What Bill 96 Means for You Specifically",
     "by_business_type": {
@@ -126,7 +122,6 @@
       }
     }
   },
-
   "compliance_resources": [
     {
       "name": "OQLF (Office québécois de la langue française)",
@@ -142,11 +137,10 @@
     },
     {
       "name": "Éducaloi — Language Rights Plain Language Explainer",
-      "url": "https://educaloi.qc.ca/en/capsules/language-rights-at-work/",
+      "url": "https://educaloi.qc.ca/en/capsules/language-laws-and-doing-business-in-quebec/",
       "note": "Free, plain-language legal information"
     }
   ],
-
   "common_mistakes": [
     "Having an English-only website and thinking it's fine because your personal language is English — Quebec clients have the right to French service",
     "Using English-only signage at market stalls — OQLF does inspect farmers' markets",
@@ -154,7 +148,6 @@
     "Thinking Bill 96 only applies to large companies — it applies to all businesses in Quebec for signage and client communications",
     "Having a business name in English without a French descriptor — OQLF may require you to add one"
   ],
-
   "translations_help": {
     "free_resources": [
       "DeepL (deepl.com) — high quality for French-English translation",
@@ -163,7 +156,6 @@
     ],
     "professional_services": "For legally important documents (contracts, terms), consider a professional translator — freelance translators typically charge $0.10-$0.20/word"
   },
-
   "source_url": "https://www.oqlf.gouv.qc.ca/english/charter/bill96.html",
   "government_body": "Office québécois de la langue française (OQLF)",
   "phone": "514-873-6565",

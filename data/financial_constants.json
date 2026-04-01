@@ -3,6 +3,7 @@
     "file": "financial_constants.json",
     "description": "All 2026 tax rates, brackets, and thresholds used by the deterministic tax calculator. No AI needed — pure math inputs.",
     "last_verified": "2026-03-31",
+    "status": "active",
     "verify_by": "2027-01-15",
     "verify_urls": {
       "federal_brackets": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/frequently-asked-questions-individuals/canadian-income-tax-rates-individuals-current-previous-years.html",
@@ -12,9 +13,7 @@
       "gst_qst": "https://www.revenuquebec.ca/en/businesses/consumption-taxes/gsthst-and-qst/"
     }
   },
-
   "year": 2026,
-
   "gst_rate": 0.05,
   "qst_rate": 0.09975,
   "gst_qst_registration_threshold": 30000,
@@ -23,7 +22,6 @@
     "Once threshold is crossed, registration is mandatory within 30 days",
     "Some supplies are zero-rated (basic groceries) or exempt — home bakers selling at markets must verify with Revenu Québec"
   ],
-
   "qpp": {
     "rate_self_employed": 0.128,
     "rate_employee": 0.064,
@@ -34,7 +32,6 @@
     "note": "Self-employed pay BOTH the employee (6.4%) and employer (6.4%) shares = 12.8% total. This surprises most first-time self-employed people.",
     "plain_language": "If you earn $50,000 self-employed, you pay QPP on ($50,000 - $3,500) = $46,500 × 12.8% = $5,952. An employee earning the same would only pay $2,976."
   },
-
   "qpip": {
     "rate_self_employed": 0.00878,
     "max_insurable_earnings": 98000,
@@ -42,9 +39,13 @@
     "note": "Quebec Parental Insurance Plan — provides maternity/paternity benefits. Self-employed pay a single combined rate.",
     "benefit": "Unlike CPP, QPIP actually provides parental leave benefits to self-employed workers who pay in"
   },
-
   "federal_tax_brackets_2026": [
-    { "min": 0, "max": 57375, "rate": 0.15, "label": "15% on first $57,375" },
+    {
+      "min": 0,
+      "max": 57375,
+      "rate": 0.15,
+      "label": "15% on first $57,375"
+    },
     {
       "min": 57375,
       "max": 114750,
@@ -72,9 +73,13 @@
   ],
   "federal_basic_personal_amount": 16129,
   "federal_self_employed_deduction": "Half of QPP contributions are deductible on federal return (line 22200)",
-
   "quebec_tax_brackets_2026": [
-    { "min": 0, "max": 52455, "rate": 0.14, "label": "14% on first $52,455" },
+    {
+      "min": 0,
+      "max": 52455,
+      "rate": 0.14,
+      "label": "14% on first $52,455"
+    },
     {
       "min": 52455,
       "max": 104910,
@@ -97,7 +102,6 @@
   "quebec_basic_personal_amount": 18056,
   "quebec_abatement": 0.165,
   "quebec_abatement_note": "Quebec residents receive a 16.5% federal tax abatement because Quebec funds its own programs (QPP, QPIP, etc.) instead of federal ones",
-
   "corporate_tax_rate_small_business": {
     "federal": 0.09,
     "quebec": 0.032,
@@ -107,10 +111,8 @@
     "general_rate_combined": 0.265,
     "general_rate_note": "Income above $500K taxed at ~26.5% combined"
   },
-
   "quarterly_installment_threshold": 3000,
   "quarterly_installment_note": "If you expect to owe more than $3,000 in federal tax (or $1,800 in Quebec), you must make quarterly installments. Due: March 15, June 15, September 15, December 15.",
-
   "common_deductions_self_employed": [
     "Home office expenses (proportional to workspace %)",
     "Vehicle expenses (business use portion)",

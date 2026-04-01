@@ -1,0 +1,193 @@
+{
+  "checked": 92,
+  "ok": 77,
+  "broken_count": 15,
+  "broken": [
+    {
+      "url": "https://ced.canada.ca/en/",
+      "status": "Error: The read operation timed out",
+      "locations": [
+        {
+          "file": "business_structures.json",
+          "json_path": ".free_resources[1].url"
+        }
+      ]
+    },
+    {
+      "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/frequently-asked-questions-individuals/canadian-income-tax-rates-individuals-current-previous-years.html",
+      "status": "Error: The read operation timed out",
+      "locations": [
+        {
+          "file": "financial_constants.json",
+          "json_path": "._meta.verify_urls.federal_brackets"
+        }
+      ]
+    },
+    {
+      "url": "https://www.canada.ca/en/employment-social-development/services/funding/canada-summer-jobs.html",
+      "status": "Error: The read operation timed out",
+      "locations": [
+        {
+          "file": "funding/canada_summer_jobs.json",
+          "json_path": "._meta.verify_urls.main"
+        },
+        {
+          "file": "funding/canada_summer_jobs.json",
+          "json_path": ".url"
+        },
+        {
+          "file": "funding/canada_summer_jobs.json",
+          "json_path": ".source_url"
+        }
+      ]
+    },
+    {
+      "url": "https://www.canada.ca/en/employment-social-development/services/funding/canada-summer-jobs/applicant-guide.html",
+      "status": "Error: The read operation timed out",
+      "locations": [
+        {
+          "file": "funding/canada_summer_jobs.json",
+          "json_path": "._meta.verify_urls.apply"
+        }
+      ]
+    },
+    {
+      "url": "https://www.canada.ca/en/revenue-agency/services/scientific-research-experimental-development-tax-incentive-program.html",
+      "status": "Error: The read operation timed out",
+      "locations": [
+        {
+          "file": "funding/irap.json",
+          "json_path": ".sred_comparison.sred_url"
+        }
+      ]
+    },
+    {
+      "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/registering-your-business.html",
+      "status": "Error: The read operation timed out",
+      "locations": [
+        {
+          "file": "registration/cra.json",
+          "json_path": "._meta.verify_urls.main"
+        },
+        {
+          "file": "registration/cra.json",
+          "json_path": ".source_url"
+        }
+      ]
+    },
+    {
+      "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/registering-your-business/register.html",
+      "status": "Error: The read operation timed out",
+      "locations": [
+        {
+          "file": "registration/cra.json",
+          "json_path": "._meta.verify_urls.business_number"
+        },
+        {
+          "file": "registration/cra.json",
+          "json_path": ".registration_process.online.url"
+        }
+      ]
+    },
+    {
+      "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/account-register.html",
+      "status": "Error: The read operation timed out",
+      "locations": [
+        {
+          "file": "registration/cra.json",
+          "json_path": "._meta.verify_urls.gst_registration"
+        },
+        {
+          "file": "tax/gst_qst.json",
+          "json_path": ".registration_process.gst_registration.url"
+        }
+      ]
+    },
+    {
+      "url": "https://www.canada.ca/en/revenue-agency/services/e-services/e-services-businesses/business-account.html",
+      "status": "Error: The read operation timed out",
+      "locations": [
+        {
+          "file": "registration/cra.json",
+          "json_path": "._meta.verify_urls.my_business_account"
+        },
+        {
+          "file": "registration/cra.json",
+          "json_path": ".my_business_account.url"
+        }
+      ]
+    },
+    {
+      "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/business-expenses.html",
+      "status": "Error: The read operation timed out",
+      "locations": [
+        {
+          "file": "tax/deductions.json",
+          "json_path": "._meta.verify_urls.cra_expenses"
+        },
+        {
+          "file": "tax/deductions.json",
+          "json_path": ".source_url"
+        }
+      ]
+    },
+    {
+      "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/business-expenses/business-use-home-expenses.html",
+      "status": "Error: The read operation timed out",
+      "locations": [
+        {
+          "file": "tax/deductions.json",
+          "json_path": "._meta.verify_urls.home_office"
+        }
+      ]
+    },
+    {
+      "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/business-expenses/motor-vehicle-expenses.html",
+      "status": "Error: The read operation timed out",
+      "locations": [
+        {
+          "file": "tax/deductions.json",
+          "json_path": "._meta.verify_urls.vehicle"
+        }
+      ]
+    },
+    {
+      "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses.html",
+      "status": "Error: The read operation timed out",
+      "locations": [
+        {
+          "file": "tax/gst_qst.json",
+          "json_path": "._meta.verify_urls.gst_cra"
+        }
+      ]
+    },
+    {
+      "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/when-register-charge.html",
+      "status": "Error: The read operation timed out",
+      "locations": [
+        {
+          "file": "tax/gst_qst.json",
+          "json_path": "._meta.verify_urls.small_supplier"
+        }
+      ]
+    },
+    {
+      "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/making-payments-individuals/paying-your-income-tax-instalments.html",
+      "status": "Error: The read operation timed out",
+      "locations": [
+        {
+          "file": "tax/installments.json",
+          "json_path": "._meta.verify_urls.cra_installments"
+        },
+        {
+          "file": "tax/installments.json",
+          "json_path": ".federal_installments.url"
+        },
+        {
+          "file": "tax/installments.json",
+          "json_path": ".source_url"
+        }
+      ]
+    }
+  ]
+}

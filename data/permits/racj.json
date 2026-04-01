@@ -3,6 +3,7 @@
     "file": "permits/racj.json",
     "description": "RACJ (Régie des alcools, des courses et des jeux) — Quebec alcohol permits. Required for any business selling, serving, or manufacturing alcohol.",
     "last_verified": "2026-03-31",
+    "status": "active",
     "verify_urls": {
       "main": "https://www.racj.gouv.qc.ca/en/permit-holders/permits.html",
       "restaurant_permit": "https://www.racj.gouv.qc.ca/en/permit-holders/permits/restaurant-permits.html",
@@ -10,13 +11,10 @@
       "apply": "https://www.racj.gouv.qc.ca/en/permit-holders/applying-for-a-permit.html"
     }
   },
-
   "id": "racj_alcohol_permit",
   "title_en": "RACJ — Alcohol Permit (Régie des alcools, des courses et des jeux)",
   "title_fr": "Permis d'alcool — RACJ",
-
   "plain_language_summary": "If your business involves alcohol — serving it in a restaurant or bar, selling it for off-site consumption, or producing it (brewery, winery, distillery) — you need a permit from the RACJ. This is separate from your general business registration and is one of the more complex permits to obtain. Most micro-businesses don't need this, but caterers, restaurants, bars, and craft producers do.",
-
   "who_needs_this": [
     "Restaurants and cafés serving alcohol",
     "Bars and lounges",
@@ -25,13 +23,11 @@
     "Craft breweries, wineries, cideries, distilleries (artisan producers)",
     "Event venues where alcohol is served"
   ],
-
   "who_does_not_need_this": [
     "Home bakers and food businesses that don't serve or sell alcohol",
     "Caterers who only serve food (no alcohol)",
     "Restaurants that choose to be alcohol-free (BYOB rules apply — see below)"
   ],
-
   "permit_types": [
     {
       "id": "restaurant_permit",
@@ -58,7 +54,12 @@
       "id": "artisan_producer",
       "name_en": "Artisan Producer Permit (Brewery, Winery, Distillery)",
       "plain_language": "For craft producers making and selling alcohol directly to consumers.",
-      "types": ["Artisan brewer", "Artisan winemaker", "Artisan cider maker", "Artisan distiller"],
+      "types": [
+        "Artisan brewer",
+        "Artisan winemaker",
+        "Artisan cider maker",
+        "Artisan distiller"
+      ],
       "special_rules": "Artisan producers can sell directly from their production site and at some markets — specific rules apply",
       "cost": "Varies significantly by production type and volume — verify at RACJ"
     },
@@ -70,54 +71,61 @@
       "note": "BYOB is a common choice for small restaurants wanting to avoid the cost and complexity of an alcohol permit"
     }
   ],
-
   "eligibility": {
     "scoring_weights": {
-      "business_type_food_beverage": 0.60,
+      "business_type_food_beverage": 0.6,
       "business_stage": 0.25,
       "immigration_status": 0.15
     },
     "criteria": {
       "immigration_status": {
-        "eligible": ["canadian_citizen", "permanent_resident"],
+        "eligible": [
+          "canadian_citizen",
+          "permanent_resident"
+        ],
         "note": "Permit is issued to the individual — must be authorized to operate a business in Canada"
       },
       "criminal_record": "Certain convictions are automatic disqualifiers — RACJ reviews criminal record as part of application",
       "zoning": "Your municipality must permit the type of establishment in your zone"
     }
   },
-
   "prerequisites": [
-    { "step": "Get your NEQ number", "ref": "req_registration" },
-    { "step": "Secure your commercial space with appropriate zoning", "ref": "permits/municipal_montreal.json" },
-    { "step": "Obtain occupancy permit from the borough", "ref": "permits/municipal_montreal.json" },
-    { "step": "Complete responsible alcohol service training" }
+    {
+      "step": "Get your NEQ number",
+      "ref": "req_registration"
+    },
+    {
+      "step": "Secure your commercial space with appropriate zoning",
+      "ref": "permits/municipal_montreal.json"
+    },
+    {
+      "step": "Obtain occupancy permit from the borough",
+      "ref": "permits/municipal_montreal.json"
+    },
+    {
+      "step": "Complete responsible alcohol service training"
+    }
   ],
-
   "timeline": {
     "application_to_permit": "4-12 weeks — RACJ inspects the premises before issuing a permit",
     "note": "Do NOT open before receiving your permit — serving alcohol without a permit is a serious offence"
   },
-
   "cost": {
     "application_fee": "Varies by permit type — approximately $500-$2,000",
     "annual_renewal": "Yes — permits must be renewed annually",
     "inspection_related": "No separate inspection fee, but you may need to make modifications to pass inspection"
   },
-
   "responsible_service_training": {
     "name": "MAPAQ/RACJ Responsible Alcohol Service Training",
     "mandatory": "Required for at least one staff member per permit",
     "url": "https://www.racj.gouv.qc.ca/en/permit-holders/training.html"
   },
-
   "common_mistakes": [
     "Opening a restaurant and serving alcohol before receiving the permit — illegal and can result in permit being denied permanently",
     "Not checking zoning before signing a lease — some residential zones don't permit bars even if you get a permit",
     "Not having a BYOB policy clearly communicated if you choose that route",
     "Assuming a food permit (MAPAQ) covers alcohol service — it does not, these are completely separate"
   ],
-
   "source_url": "https://www.racj.gouv.qc.ca/en/permit-holders/permits.html",
   "government_body": "Régie des alcools, des courses et des jeux (RACJ)",
   "phone": "514-873-3577 (Montreal) / 1-800-363-0320"

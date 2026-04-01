@@ -3,22 +3,19 @@
     "file": "registration/req.json",
     "description": "NEQ (Numéro d'entreprise du Québec) registration through the Registre des entreprises du Québec. Required for all businesses operating in Quebec.",
     "last_verified": "2026-03-31",
+    "status": "active",
     "verify_urls": {
       "main": "https://www.registreentreprises.gouv.qc.ca/en/demarrer/immatriculer/",
       "fees": "https://www.registreentreprises.gouv.qc.ca/en/nous-joindre/tarifs/",
       "online_registration": "https://www.registreentreprises.gouv.qc.ca"
     }
   },
-
   "id": "req_registration",
   "title_en": "Register Your Business with the REQ (Get Your NEQ Number)",
   "title_fr": "Immatriculation au Registre des entreprises (Obtenir votre numéro NEQ)",
-
   "plain_language_summary": "The NEQ (Numéro d'entreprise du Québec) is your Quebec business ID number. Almost every business operating in Quebec must register with the Registre des entreprises du Québec (REQ) to get one. You need your NEQ before you can register for taxes, apply for permits, or open a business bank account. It's your first step.",
-
   "is_mandatory": true,
   "mandatory_note": "Required for all businesses, including home-based and sole proprietorships operating under a trade name. If you operate under your exact legal name (e.g., 'Jane Smith Consulting'), registration is technically optional but strongly recommended.",
-
   "eligibility": {
     "who_must_register": [
       "Any business using a name other than the owner's full legal name",
@@ -32,9 +29,7 @@
     ],
     "automatic_disqualifiers": []
   },
-
   "prerequisites": [],
-
   "steps": [
     {
       "order": 1,
@@ -58,7 +53,6 @@
       "detail": "You receive your 10-digit NEQ number immediately online, or within 1-3 business days by mail. This number goes on all your invoices, contracts, and permit applications."
     }
   ],
-
   "cost": {
     "registration_fee": 41,
     "annual_update_fee": 36,
@@ -69,12 +63,10 @@
       "Late annual update fee: $79"
     ]
   },
-
   "timeline": {
     "online": "Immediate — NEQ issued same day",
     "by_mail": "5-10 business days"
   },
-
   "what_you_need": [
     "Social Insurance Number (SIN) — for sole proprietorship",
     "Full legal name and home address",
@@ -83,20 +75,17 @@
     "Description of business activities (NAICS code — REQ helps you find the right one)",
     "Credit card for payment"
   ],
-
   "what_you_get": {
     "neq_number": "A 10-digit unique Quebec business identifier",
     "certificate": "Certificate of registration (downloadable PDF)",
     "public_listing": "Your business appears in the public REQ directory"
   },
-
   "common_mistakes": [
     "Thinking you don't need to register because you're small or home-based — if you use a trade name, you must register",
     "Forgetting the annual update ($36/year) — your registration gets cancelled after non-filing",
     "Not updating the REQ when your address or activities change — updates are required within 30 days of a change",
     "Using a trade name that's too similar to an existing registered name — the REQ will reject it"
   ],
-
   "after_registration": {
     "next_steps": [
       "Register with Revenu Québec for provincial taxes",
@@ -105,12 +94,13 @@
       "Apply for sector-specific permits using your NEQ"
     ]
   },
-
   "languages": {
-    "service_available_in": ["French", "English"],
+    "service_available_in": [
+      "French",
+      "English"
+    ],
     "note": "REQ website and services are available in both official languages"
   },
-
   "source_url": "https://www.registreentreprises.gouv.qc.ca/en/demarrer/immatriculer/",
   "government_body": "Registre des entreprises du Québec (REQ)",
   "phone": "1-877-644-4545"

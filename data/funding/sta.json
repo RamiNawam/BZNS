@@ -3,25 +3,22 @@
     "file": "funding/sta.json",
     "description": "Soutien au travail autonome (STA) — Quebec government income support program for people starting a self-employed business. Provides weekly income replacement while you build your business.",
     "last_verified": "2026-03-31",
+    "status": "active",
     "verify_urls": {
       "main": "https://www.emploiquebec.gouv.qc.ca/en/citizens/find-a-job/self-employment/",
-      "services_quebec": "https://www.quebec.ca/en/employment/self-employment/start-self-employment/soutien-travail-autonome",
+      "services_quebec": "https://www.emploiquebec.gouv.qc.ca/en/citizens/find-a-job/self-employment/",
       "eligibility": "https://www.emploiquebec.gouv.qc.ca/en/citizens/find-a-job/self-employment/"
     }
   },
-
   "id": "sta",
   "program_name_en": "Soutien au travail autonome (STA) — Self-Employment Income Support",
   "program_name_fr": "Soutien au travail autonome (STA)",
   "program_key": "sta",
-
   "plain_language_summary": "⚠️ PROGRAMME SUSPENDU — The STA program has been suspended since May 1, 2024 for an indefinite period. No new applications are being accepted. The information below is kept for reference in case the program resumes. Do NOT present this as an available option to users.",
-
   "status": "suspended",
   "suspended_since": "2024-05-01",
   "suspension_note": "Suspended indefinitely as of May 1, 2024. No new applications accepted. Check Emploi-Québec for updates on whether the program has resumed.",
   "suspension_source": "Emploi-Québec — verify at https://www.emploiquebec.gouv.qc.ca",
-
   "type": "grant",
   "amount": {
     "weekly_amount": "Approximately $400-$600/week (when active)",
@@ -29,9 +26,7 @@
     "total_potential": "Approximately $20,000–$31,200 over 52 weeks (when active)",
     "note": "Program is currently suspended — these amounts are historical reference only."
   },
-
   "plain_language_how_it_works": "When active: unemployed individuals who want to start a business could collect STA instead of EI while building their business. Emploi-Québec would assign an advisor to follow progress monthly. Currently suspended as of May 1, 2024.",
-
   "eligibility": {
     "scoring_weights": {
       "employment_status": 0.35,
@@ -39,7 +34,6 @@
       "business_viability": 0.25,
       "age": 0.15
     },
-
     "criteria": {
       "employment_status": {
         "required": true,
@@ -53,8 +47,14 @@
         "important": "If you're currently employed full-time, you don't qualify. The program is for people in job transition."
       },
       "immigration_status": {
-        "eligible": ["canadian_citizen", "permanent_resident"],
-        "ineligible_typically": ["work_permit", "student_visa"],
+        "eligible": [
+          "canadian_citizen",
+          "permanent_resident"
+        ],
+        "ineligible_typically": [
+          "work_permit",
+          "student_visa"
+        ],
         "note": "Work permit holders are generally not eligible as they may not qualify for EI. Verify with Emploi-Québec for your specific situation.",
         "future_eligibility": "Permanent residents qualify. If you're transitioning from work permit to PR, you may qualify shortly after receiving PR status."
       },
@@ -79,7 +79,6 @@
       }
     }
   },
-
   "what_you_must_do_to_maintain_support": [
     "Work full-time on your business (no other employment during program)",
     "Meet monthly with your Emploi-Québec advisor",
@@ -87,7 +86,6 @@
     "Complete the business plan and follow through on milestones",
     "Register your business (NEQ) and comply with applicable regulations"
   ],
-
   "process": [
     {
       "step": 1,
@@ -115,7 +113,6 @@
       "detail": "Payments begin and you meet monthly with your advisor to report progress and get support."
     }
   ],
-
   "prerequisites": [
     {
       "step": "Be unemployed or EI-eligible",
@@ -126,7 +123,6 @@
       "note": "The earlier you apply after job loss, the more EI entitlement you can convert to STA"
     }
   ],
-
   "partner_organizations": [
     {
       "name": "Emploi-Québec / Services Québec",
@@ -145,13 +141,11 @@
       "note": "Local offices can facilitate STA referrals and help with business plan"
     }
   ],
-
   "persona_fit": {
     "Yara": "Potentially strong fit if unemployed or recently left previous job. Syrian immigrant — must be permanent resident to qualify.",
     "Fatima": "Very strong fit — single mother starting home daycare, likely transitioning from employment or social assistance. RSG startup is specifically mentioned as eligible.",
     "Marcus": "Less likely fit — McGill graduate likely not EI-eligible as student"
   },
-
   "common_mistakes": [
     "Not knowing this program exists — it's underutilized and underadvertised",
     "Waiting too long after job loss to apply — EI entitlement that hasn't been used can often be converted to STA",
@@ -159,9 +153,8 @@
     "Not taking the monthly advisor meetings seriously — they're required and can actually be very helpful",
     "Starting to earn significant business revenue without reporting it — this affects your STA payments"
   ],
-
   "application_url": "https://www.emploiquebec.gouv.qc.ca/en/citizens/find-a-job/self-employment/",
-  "source_url": "https://www.quebec.ca/en/employment/self-employment/start-self-employment/soutien-travail-autonome",
+  "source_url": "https://www.emploiquebec.gouv.qc.ca/en/citizens/find-a-job/self-employment/",
   "government_body": "Emploi-Québec (Ministère du Travail, de l'Emploi et de la Solidarité sociale)",
   "phone": "1-877-644-4545"
 }

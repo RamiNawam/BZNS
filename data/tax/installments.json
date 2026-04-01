@@ -3,28 +3,30 @@
     "file": "tax/installments.json",
     "description": "Quarterly tax installment rules for self-employed workers in Quebec and federally. One of the most common financial surprises for first-year self-employed people.",
     "last_verified": "2026-03-31",
+    "status": "active",
     "verify_urls": {
       "cra_installments": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/making-payments-individuals/paying-your-income-tax-instalments.html",
       "revenu_quebec_installments": "https://www.revenuquebec.ca/en/citizens/income-tax-return/paying-your-income-tax/tax-instalments/"
     }
   },
-
   "id": "installments",
   "title_en": "Quarterly Tax Installments for Self-Employed Workers",
   "title_fr": "Acomptes provisionnels trimestriels — Travailleurs autonomes",
-
   "plain_language_summary": "When you're employed, your employer deducts taxes from every paycheque so you never owe a big lump sum. When you're self-employed, nobody withholds tax for you. If you'll owe more than a certain threshold, the government requires you to pay estimated taxes quarterly throughout the year — not just in April. Missing these payments means interest charges. Many first-year self-employed people are caught off guard by this.",
-
   "the_surprise": {
     "title": "Why this catches people off guard",
     "explanation": "In year 1, most self-employed people don't know about installments and don't pay them. They face a large tax bill in April plus interest. In year 2, the CRA and Revenu Québec send installment notices — but by then the habit of saving for taxes should already be established.",
     "action": "From your first month of self-employment: set aside 30-35% of every payment you receive in a separate savings account. This covers income tax + QPP + QPIP."
   },
-
   "federal_installments": {
     "threshold": "You must pay installments if your net tax owing exceeds $3,000 in the current year AND in either of the two previous years",
     "first_year_exception": "In your first year of self-employment, installments are technically not required if you didn't owe $3,000 in either of the two prior years — but you'll owe it all in April, so saving quarterly is still essential",
-    "due_dates": ["March 15", "June 15", "September 15", "December 15"],
+    "due_dates": [
+      "March 15",
+      "June 15",
+      "September 15",
+      "December 15"
+    ],
     "how_much_to_pay": {
       "option_1": "Prior year method: Pay 1/4 of last year's tax owing each quarter",
       "option_2": "Current year estimate: Estimate your current year tax and pay 1/4 quarterly",
@@ -41,11 +43,15 @@
     "interest_rate": "CRA charges prescribed interest rate + 4% on late installments (approximately 8-10% in 2026 — verify current rate)",
     "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/making-payments-individuals/paying-your-income-tax-instalments.html"
   },
-
   "quebec_installments": {
     "threshold": "You must pay Quebec installments if your net Quebec tax owing exceeds $1,800 in the current year AND in either of the two previous years",
     "note": "Quebec's threshold is lower than federal ($1,800 vs $3,000) — you may need to pay Quebec installments before triggering the federal requirement",
-    "due_dates": ["March 15", "June 15", "September 15", "December 15"],
+    "due_dates": [
+      "March 15",
+      "June 15",
+      "September 15",
+      "December 15"
+    ],
     "same_dates_as_federal": true,
     "how_to_pay": [
       "Online through Revenu Québec clicSÉQUR",
@@ -56,14 +62,25 @@
     ],
     "url": "https://www.revenuquebec.ca/en/citizens/income-tax-return/paying-your-income-tax/tax-instalments/"
   },
-
   "practical_calculation": {
     "title": "How much should I set aside each month?",
     "components": [
-      { "name": "Federal income tax", "approximate_rate": "15-26% of net income depending on bracket" },
-      { "name": "Quebec income tax (after abatement)", "approximate_rate": "14-19% of net income for most micro-entrepreneurs" },
-      { "name": "QPP contributions", "approximate_rate": "12.8% of net income (between $3,500 and $71,300)" },
-      { "name": "QPIP premiums", "approximate_rate": "0.878% of net income (up to $98,000)" }
+      {
+        "name": "Federal income tax",
+        "approximate_rate": "15-26% of net income depending on bracket"
+      },
+      {
+        "name": "Quebec income tax (after abatement)",
+        "approximate_rate": "14-19% of net income for most micro-entrepreneurs"
+      },
+      {
+        "name": "QPP contributions",
+        "approximate_rate": "12.8% of net income (between $3,500 and $71,300)"
+      },
+      {
+        "name": "QPIP premiums",
+        "approximate_rate": "0.878% of net income (up to $98,000)"
+      }
     ],
     "rule_of_thumb": "Set aside 30% of net income for taxes and contributions if you earn under $50,000. Set aside 35-40% if you earn $50,000-$100,000.",
     "examples": [
@@ -83,20 +100,17 @@
       }
     ]
   },
-
   "installment_reminders": {
     "cra_notices": "CRA sends installment reminder notices in February and August — these tell you the amount based on prior year. You are NOT required to follow these exact amounts — they're based on last year and may be wrong for your current year.",
     "revenu_quebec_notices": "Revenu Québec sends similar notices. Same principle applies.",
     "important": "Installment reminder notices are not bills — they're estimates. If your income is lower this year, you can pay less. If higher, pay more. You true up in April."
   },
-
   "penalties_and_interest": {
     "interest_only": "Unlike late filing, missed installments don't result in penalties — only interest charges on the shortfall",
     "interest_starts": "Interest starts accruing from the day the installment was due",
     "offset": "If you overpay in one quarter and underpay in another, the overpayment offsets the interest",
     "practical_note": "In year 1, if you genuinely didn't know about installments, the interest charge is usually manageable. In year 2+, there's no excuse — budget for it."
   },
-
   "common_mistakes": [
     "Not saving throughout the year and being hit with a $8,000+ bill in April — the most common first-year mistake",
     "Thinking the installment reminder notice is optional — it's required if you meet the threshold",
@@ -104,7 +118,6 @@
     "Forgetting that Quebec installments and federal installments are separate payments to separate agencies",
     "Not taking the Quebec $1,800 threshold seriously — it's lower than federal and kicks in sooner"
   ],
-
   "source_url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/making-payments-individuals/paying-your-income-tax-instalments.html",
   "government_body_federal": "Canada Revenue Agency (CRA)",
   "government_body_provincial": "Revenu Québec",

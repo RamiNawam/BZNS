@@ -3,21 +3,19 @@
     "file": "funding/futurpreneur.json",
     "description": "Futurpreneur Canada — financing and mentorship for entrepreneurs aged 18-39. One of the most accessible and well-known programs for young Quebec entrepreneurs.",
     "last_verified": "2026-03-31",
+    "status": "active",
     "verify_urls": {
       "main": "https://www.futurpreneur.ca/en/",
-      "financing": "https://www.futurpreneur.ca/en/get-started/financing/",
-      "eligibility": "https://www.futurpreneur.ca/en/get-started/eligibility/",
-      "apply": "https://www.futurpreneur.ca/en/get-started/apply/"
+      "financing": "https://www.futurpreneur.ca/en/",
+      "eligibility": "https://www.futurpreneur.ca/en/",
+      "apply": "https://www.futurpreneur.ca/en/"
     }
   },
-
   "id": "futurpreneur",
   "program_name_en": "Futurpreneur Canada — Startup Financing",
   "program_name_fr": "Futurpreneur Canada — Financement de démarrage",
   "program_key": "futurpreneur",
-
   "plain_language_summary": "Futurpreneur provides up to $75,000 in startup financing to young entrepreneurs aged 18-39, paired with 2 years of mentorship from an experienced business person. It's a loan (not a grant), but with better terms than a bank. The mentorship is often the most valuable part — your mentor has gone through what you're about to face.",
-
   "type": "loan",
   "amount": {
     "minimum": 15000,
@@ -26,33 +24,28 @@
     "futurpreneur_portion": 20000,
     "bdc_match": 55000
   },
-
   "interest_rate": {
     "futurpreneur_portion": "Prime rate + 1% (roughly 5-6% in 2026 — verify current rate)",
     "bdc_portion": "BDC standard rates apply"
   },
-
   "repayment": {
     "interest_only_period": "First year is interest-only payments — lower burden while starting up",
     "full_repayment": "Principal repayment begins year 2, over up to 5 years total"
   },
-
   "mentorship": {
     "included": true,
     "duration": "2 years",
     "format": "Monthly meetings with a volunteer mentor (experienced entrepreneur or executive)",
     "plain_language": "The mentor match is genuinely valuable — not just a checkbox. Many Futurpreneur alumni say the mentorship was more valuable than the money."
   },
-
   "eligibility": {
     "scoring_weights": {
-      "age": 0.30,
+      "age": 0.3,
       "business_stage": 0.25,
-      "immigration_status": 0.20,
+      "immigration_status": 0.2,
       "business_plan": 0.15,
-      "location": 0.10
+      "location": 0.1
     },
-
     "criteria": {
       "age": {
         "required": true,
@@ -62,8 +55,16 @@
         "scoring": "Full score if 18-39, zero if outside range"
       },
       "immigration_status": {
-        "eligible": ["canadian_citizen", "permanent_resident", "protected_person"],
-        "ineligible": ["work_permit", "student_visa", "visitor"],
+        "eligible": [
+          "canadian_citizen",
+          "permanent_resident",
+          "protected_person"
+        ],
+        "ineligible": [
+          "work_permit",
+          "student_visa",
+          "visitor"
+        ],
         "note": "Work permit holders are generally NOT eligible — this is a hard requirement",
         "future_eligibility": "If you're on a work permit, you become eligible once you receive permanent residency. Futurpreneur is worth applying to as soon as your PR comes through."
       },
@@ -100,7 +101,6 @@
       }
     }
   },
-
   "what_you_need_to_apply": [
     "Completed business plan (template available on Futurpreneur website)",
     "2-year cash flow projection",
@@ -108,19 +108,16 @@
     "Proof of age and eligibility (ID + immigration status)",
     "NEQ or proof of business registration (or intent to register)"
   ],
-
   "timeline": {
     "application_to_decision": "4-8 weeks typically",
     "note": "If approved, funds can take another 2-4 weeks to arrive after signing"
   },
-
   "free_resources_through_futurpreneur": [
     "Free business plan templates",
     "Free cash flow templates",
     "Free advisor consultations before applying",
     "Online business plan builder tool"
   ],
-
   "common_mistakes": [
     "Applying after your business is too established (12+ months) — apply early",
     "Not preparing a proper business plan — the quality of your plan significantly affects approval",
@@ -128,7 +125,6 @@
     "Underestimating the mentorship value — engage your mentor actively",
     "Not using the free advisor help before applying — they know what reviewers want to see"
   ],
-
   "who_this_is_best_for": {
     "best_match": "Young (18-39) Canadian citizen or PR launching a new business who needs startup capital and could benefit from mentorship",
     "persona_fit": {
@@ -137,8 +133,7 @@
       "Fatima": "Age 41 — may be just outside the range. Verify exact cutoff."
     }
   },
-
-  "application_url": "https://www.futurpreneur.ca/en/get-started/apply/",
+  "application_url": "https://www.futurpreneur.ca/en/",
   "source_url": "https://www.futurpreneur.ca/en/",
   "government_body": "Futurpreneur Canada (non-profit, funded by BDC and federal government)",
   "phone": "1-800-464-2923",

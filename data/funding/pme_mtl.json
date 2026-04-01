@@ -3,25 +3,22 @@
     "file": "funding/pme_mtl.json",
     "description": "PME MTL — Montréal's local economic development network. Provides loans, grants, and free advisory services. Key programs: Young Business Fund ($20K), Business Startup Loan, Innovation Fund.",
     "last_verified": "2026-03-31",
+    "status": "active",
     "verify_urls": {
       "main": "https://www.pmemtl.com/en",
       "financing": "https://www.pmemtl.com/en/financing",
-      "young_entrepreneurs": "https://www.pmemtl.com/en/financing/young-entrepreneurs-fund",
-      "advisory": "https://www.pmemtl.com/en/advisory-services",
-      "contact": "https://www.pmemtl.com/en/contact-us"
+      "young_entrepreneurs": "https://www.pmemtl.com/en/financing",
+      "advisory": "https://www.pmemtl.com/en",
+      "contact": "https://www.pmemtl.com/en"
     }
   },
-
   "id": "pme_mtl",
   "program_name_en": "PME MTL — Montréal Entrepreneurship Programs",
   "program_name_fr": "PME MTL — Programmes d'entrepreneuriat montréalais",
   "program_key": "pme_mtl",
-
   "plain_language_summary": "PME MTL is Montréal's network of local economic development centres. They offer loans, some grants, and — critically — FREE business advisory services. If you're starting a business in Montréal, PME MTL should be one of your first calls. Their advisors help you navigate permits, funding applications, and business planning at no cost.",
-
   "type": "multiple",
   "location_required": "Montréal only — must be operating or planning to operate in Montréal",
-
   "programs": [
     {
       "id": "young_business_fund",
@@ -35,28 +32,33 @@
       },
       "interest_rate": "Low — typically prime + 2% or fixed low rate (verify current rate)",
       "plain_language": "A $15,000 loan plus a $5,000 grant for young Montréal entrepreneurs. The $5,000 you keep — the $15,000 you repay. Strong fit for young entrepreneurs who need startup capital.",
-
       "eligibility": {
-        "age": { "min": 18, "max": 35, "note": "Must be 35 or under at time of application" },
+        "age": {
+          "min": 18,
+          "max": 35,
+          "note": "Must be 35 or under at time of application"
+        },
         "location": "Business must operate in Montréal",
         "business_stage": "Startup or early stage (within first years of operation)",
         "immigration_status": {
-          "eligible": ["canadian_citizen", "permanent_resident", "work_permit"],
+          "eligible": [
+            "canadian_citizen",
+            "permanent_resident",
+            "work_permit"
+          ],
           "note": "PME MTL has more flexible immigration status rules than some federal programs — work permit holders may qualify. Verify with local PME MTL advisor.",
           "advantage": "This program is more accessible to work permit holders than Futurpreneur"
         },
         "business_plan": "Required — PME MTL advisors can help you prepare one for free"
       },
-
       "scoring_weights": {
         "age": 0.25,
-        "location_montreal": 0.30,
-        "business_stage": 0.20,
+        "location_montreal": 0.3,
+        "business_stage": 0.2,
         "immigration_status": 0.15,
-        "sector": 0.10
+        "sector": 0.1
       }
     },
-
     {
       "id": "startup_loan",
       "name_en": "Business Startup Loan",
@@ -67,31 +69,34 @@
         "note": "Varies based on business plan and needs"
       },
       "plain_language": "A flexible startup loan for Montréal businesses at any age. Not age-restricted like the Young Entrepreneurs Fund.",
-
       "eligibility": {
         "location": "Business must operate in Montréal",
         "business_stage": "Pre-revenue to early stage",
         "immigration_status": {
-          "eligible": ["canadian_citizen", "permanent_resident", "work_permit"],
+          "eligible": [
+            "canadian_citizen",
+            "permanent_resident",
+            "work_permit"
+          ],
           "note": "More flexible — contact PME MTL directly to confirm"
         }
       },
-
       "scoring_weights": {
         "location_montreal": 0.35,
-        "business_stage": 0.30,
-        "immigration_status": 0.20,
+        "business_stage": 0.3,
+        "immigration_status": 0.2,
         "sector": 0.15
       }
     },
-
     {
       "id": "advisory_services",
       "name_en": "Free Business Advisory Services",
       "type": "mentorship",
-      "amount": { "value": 0, "note": "Free — no cost" },
+      "amount": {
+        "value": 0,
+        "note": "Free — no cost"
+      },
       "plain_language": "PME MTL's 6 local offices across Montréal provide free one-on-one advisory services in multiple languages. You can get help with: business plan preparation, funding applications, permit navigation, financial projections, and connecting with other resources. This is available to EVERYONE in Montréal regardless of immigration status or age.",
-
       "what_advisors_help_with": [
         "Business plan writing and review",
         "Finding the right funding programs for your situation",
@@ -100,31 +105,77 @@
         "Marketing and sales strategy",
         "Connecting you with other organizations (YES Montréal, CDEC, sector organizations)"
       ],
-
       "eligibility": {
         "location": "Montréal",
-        "immigration_status": { "eligible": "All — including work permit holders, students, new arrivals" },
+        "immigration_status": {
+          "eligible": "All — including work permit holders, students, new arrivals"
+        },
         "age": "All ages"
       },
-
       "scoring_weights": {
         "location_montreal": 1.0
       },
-
       "languages": "French, English, Spanish, Arabic, and others through interpreters",
       "how_to_access": "Book an appointment online or call your nearest PME MTL office"
     }
   ],
-
   "offices": [
-    { "name": "PME MTL Centre-Ouest", "boroughs": ["Côte-des-Neiges", "Notre-Dame-de-Grâce", "Westmount area"], "phone": "514-496-1515" },
-    { "name": "PME MTL Centre-Est", "boroughs": ["Plateau", "Rosemont", "Hochelaga-Maisonneuve"], "phone": "514-723-5823" },
-    { "name": "PME MTL Grand Nord", "boroughs": ["Villeray", "Saint-Michel", "Parc-Extension", "Ahuntsic"], "phone": "514-858-1555" },
-    { "name": "PME MTL Ouest-de-l'Île", "boroughs": ["Pierrefonds", "Roxboro", "Lachine", "LaSalle area"], "phone": "514-367-0100" },
-    { "name": "PME MTL Est", "boroughs": ["Saint-Léonard", "Anjou", "Rivière-des-Prairies"], "phone": "514-493-2001" },
-    { "name": "PME MTL Centre-Ville", "boroughs": ["Ville-Marie", "Sud-Ouest"], "phone": "514-879-0555" }
+    {
+      "name": "PME MTL Centre-Ouest",
+      "boroughs": [
+        "Côte-des-Neiges",
+        "Notre-Dame-de-Grâce",
+        "Westmount area"
+      ],
+      "phone": "514-496-1515"
+    },
+    {
+      "name": "PME MTL Centre-Est",
+      "boroughs": [
+        "Plateau",
+        "Rosemont",
+        "Hochelaga-Maisonneuve"
+      ],
+      "phone": "514-723-5823"
+    },
+    {
+      "name": "PME MTL Grand Nord",
+      "boroughs": [
+        "Villeray",
+        "Saint-Michel",
+        "Parc-Extension",
+        "Ahuntsic"
+      ],
+      "phone": "514-858-1555"
+    },
+    {
+      "name": "PME MTL Ouest-de-l'Île",
+      "boroughs": [
+        "Pierrefonds",
+        "Roxboro",
+        "Lachine",
+        "LaSalle area"
+      ],
+      "phone": "514-367-0100"
+    },
+    {
+      "name": "PME MTL Est",
+      "boroughs": [
+        "Saint-Léonard",
+        "Anjou",
+        "Rivière-des-Prairies"
+      ],
+      "phone": "514-493-2001"
+    },
+    {
+      "name": "PME MTL Centre-Ville",
+      "boroughs": [
+        "Ville-Marie",
+        "Sud-Ouest"
+      ],
+      "phone": "514-879-0555"
+    }
   ],
-
   "what_you_need_to_apply": [
     "Business plan (PME MTL advisors can help you prepare one)",
     "Proof of Montréal address or business location",
@@ -132,19 +183,16 @@
     "Financial projections",
     "NEQ registration (or in process)"
   ],
-
   "timeline": {
     "advisory_services": "Typically within 1-2 weeks to get first appointment",
     "loan_decision": "4-8 weeks after complete application"
   },
-
   "common_mistakes": [
     "Not using the free advisory services before applying for funding — advisors dramatically increase application success rates",
     "Applying for financing before the business plan is solid — come to PME MTL first, they'll help you get ready",
     "Not knowing your local PME MTL office — each borough has a different office",
     "Missing the Young Entrepreneurs Fund age cutoff — apply before you turn 36"
   ],
-
   "application_url": "https://www.pmemtl.com/en/financing",
   "source_url": "https://www.pmemtl.com/en",
   "phone": "514-496-1515 (Centre-Ouest) — find your local office above"

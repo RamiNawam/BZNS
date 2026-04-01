@@ -3,6 +3,7 @@
     "file": "tax/deductions.json",
     "description": "Common business expense deductions for self-employed workers in Quebec, organized by business type. Helps Claude suggest missing expense categories in the Financial Snapshot.",
     "last_verified": "2026-03-31",
+    "status": "active",
     "verify_urls": {
       "cra_expenses": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/business-expenses.html",
       "revenu_quebec_expenses": "https://www.revenuquebec.ca/en/citizens/income-tax-return/completing-your-income-tax-return/how-to-complete-your-income-tax-return/line-by-line-help/line-164-business-or-professional-income/",
@@ -10,13 +11,10 @@
       "vehicle": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/business-expenses/motor-vehicle-expenses.html"
     }
   },
-
   "id": "deductions",
   "title_en": "Business Expense Deductions for Self-Employed Workers",
   "title_fr": "Déductions pour dépenses d'entreprise — Travailleurs autonomes",
-
   "plain_language_summary": "As a self-employed person, you can deduct legitimate business expenses from your income before calculating tax. This directly reduces what you owe. Most new self-employed workers miss deductions — especially home office, vehicle, phone, and professional development. Track everything from day one.",
-
   "universal_deductions": {
     "note": "These apply to almost all self-employed business types",
     "categories": [
@@ -111,7 +109,6 @@
       }
     ]
   },
-
   "by_business_type": {
     "food": {
       "label": "Food Business (Bakery, Catering, Food Prep)",
@@ -119,12 +116,20 @@
         {
           "name": "Ingredients and Food Supplies",
           "plain_language": "The cost of ingredients used to make your products is a direct business expense.",
-          "examples": ["Flour, sugar, butter, eggs, chocolate", "Packaging materials (boxes, bags, stickers)", "Food coloring and decorating supplies"]
+          "examples": [
+            "Flour, sugar, butter, eggs, chocolate",
+            "Packaging materials (boxes, bags, stickers)",
+            "Food coloring and decorating supplies"
+          ]
         },
         {
           "name": "Commercial Kitchen Rental",
           "plain_language": "If you rent a commercial kitchen for production, the rental fee is fully deductible.",
-          "montreal_options": ["Espace Cuisine MTL", "La Cuisine Collective", "Various church/community kitchens available for hourly rental"]
+          "montreal_options": [
+            "Espace Cuisine MTL",
+            "La Cuisine Collective",
+            "Various church/community kitchens available for hourly rental"
+          ]
         },
         {
           "name": "Food Safety Training",
@@ -136,7 +141,11 @@
         },
         {
           "name": "Specialized Equipment",
-          "examples": ["Stand mixer, food processor, baking pans", "Display cases, serving equipment", "Coolers for transport"],
+          "examples": [
+            "Stand mixer, food processor, baking pans",
+            "Display cases, serving equipment",
+            "Coolers for transport"
+          ],
           "note": "Items over $500 typically use CCA (Capital Cost Allowance)"
         },
         {
@@ -145,15 +154,24 @@
           "how_to_track": "Keep a mileage log: date, destination, business purpose, km driven"
         }
       ],
-      "commonly_missed": ["Packaging and presentation materials", "Market stall fees", "Food safety certification renewal", "Mileage to markets and delivery"]
+      "commonly_missed": [
+        "Packaging and presentation materials",
+        "Market stall fees",
+        "Food safety certification renewal",
+        "Mileage to markets and delivery"
+      ]
     },
-
     "freelance": {
       "label": "Freelancer / Consultant (Software, Design, Writing, etc.)",
       "specific_deductions": [
         {
           "name": "Software and Subscriptions",
-          "examples": ["Development tools (GitHub Pro, JetBrains, etc.)", "Design tools (Figma, Adobe Creative Cloud)", "Project management (Notion, Linear, Jira)", "Communication tools (Slack, Zoom)"]
+          "examples": [
+            "Development tools (GitHub Pro, JetBrains, etc.)",
+            "Design tools (Figma, Adobe Creative Cloud)",
+            "Project management (Notion, Linear, Jira)",
+            "Communication tools (Slack, Zoom)"
+          ]
         },
         {
           "name": "Computer and Hardware",
@@ -171,12 +189,21 @@
         },
         {
           "name": "Professional Memberships",
-          "examples": ["IEEE, ACM, design associations", "Industry-specific certifications", "LinkedIn Premium for business development"]
+          "examples": [
+            "IEEE, ACM, design associations",
+            "Industry-specific certifications",
+            "LinkedIn Premium for business development"
+          ]
         }
       ],
-      "commonly_missed": ["Home office (biggest one)", "Internet at full business-use percentage", "Professional development courses", "Software subscriptions", "Subcontractor T4A slips (not a deduction but a compliance requirement)"]
+      "commonly_missed": [
+        "Home office (biggest one)",
+        "Internet at full business-use percentage",
+        "Professional development courses",
+        "Software subscriptions",
+        "Subcontractor T4A slips (not a deduction but a compliance requirement)"
+      ]
     },
-
     "daycare": {
       "label": "Home Daycare (RSG)",
       "specific_deductions": [
@@ -191,12 +218,19 @@
         },
         {
           "name": "Home Modifications for Safety",
-          "examples": ["Safety gates, outlet covers, cabinet locks", "First aid supplies"],
+          "examples": [
+            "Safety gates, outlet covers, cabinet locks",
+            "First aid supplies"
+          ],
           "note": "Major modifications (structural changes) use CCA; small safety items are current expenses"
         },
         {
           "name": "Training and Professional Development",
-          "examples": ["Early childhood education training", "First aid certification (renewal)", "Professional development workshops"]
+          "examples": [
+            "Early childhood education training",
+            "First aid certification (renewal)",
+            "Professional development workshops"
+          ]
         },
         {
           "name": "Home Insurance — Business Rider",
@@ -208,9 +242,13 @@
           "special_rule": "For home daycares, CRA allows a more generous calculation — verify with an accountant specializing in RSG tax returns"
         }
       ],
-      "commonly_missed": ["Food costs for children", "Toy and supply replacement costs", "Business portion of home insurance", "CPR/First aid training renewal"]
+      "commonly_missed": [
+        "Food costs for children",
+        "Toy and supply replacement costs",
+        "Business portion of home insurance",
+        "CPR/First aid training renewal"
+      ]
     },
-
     "retail": {
       "label": "Retail / Product Sales",
       "specific_deductions": [
@@ -229,21 +267,34 @@
         },
         {
           "name": "Marketplace Fees",
-          "examples": ["Etsy seller fees", "Amazon fees", "Shopify monthly fees", "Payment processing fees (Stripe, Square)"]
+          "examples": [
+            "Etsy seller fees",
+            "Amazon fees",
+            "Shopify monthly fees",
+            "Payment processing fees (Stripe, Square)"
+          ]
         }
       ]
     },
-
     "personal_care": {
       "label": "Personal Care (Hair, Nails, Massage, Esthetics)",
       "specific_deductions": [
         {
           "name": "Supplies and Products",
-          "examples": ["Hair color, styling products", "Nail supplies, gels, acrylics", "Massage oils, linens", "Disposables (gloves, masks, applicators)"]
+          "examples": [
+            "Hair color, styling products",
+            "Nail supplies, gels, acrylics",
+            "Massage oils, linens",
+            "Disposables (gloves, masks, applicators)"
+          ]
         },
         {
           "name": "Equipment",
-          "examples": ["Styling chair, hairdryer, scissors", "Massage table", "UV lamp, nail drill"]
+          "examples": [
+            "Styling chair, hairdryer, scissors",
+            "Massage table",
+            "UV lamp, nail drill"
+          ]
         },
         {
           "name": "Booth Rental or Studio Rental",
@@ -261,7 +312,6 @@
       ]
     }
   },
-
   "record_keeping_requirements": {
     "how_long_to_keep": "6 years from the end of the tax year they relate to",
     "what_to_keep": [
@@ -280,7 +330,6 @@
     ],
     "tip": "Take a photo of every receipt immediately — paper fades. Apps like Wave let you scan receipts with your phone."
   },
-
   "what_is_NOT_deductible": [
     "Personal expenses (groceries, personal clothing, personal trips)",
     "Fines and penalties (parking tickets, CRA penalties)",
@@ -289,7 +338,6 @@
     "Personal portion of mixed-use expenses",
     "Club memberships (unless exclusively for business client entertainment — rare)"
   ],
-
   "source_url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/business-expenses.html",
   "government_body": "Canada Revenue Agency (CRA) / Revenu Québec",
   "professional_advice": "For complex deductions or large purchases, consult a CPA. Many offer free initial consultations. Community tax clinics (CVITP) serve low-income self-employed individuals for free."

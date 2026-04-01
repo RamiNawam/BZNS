@@ -3,6 +3,7 @@
     "file": "tax/gst_qst.json",
     "description": "GST (federal) and QST (Quebec) sales tax obligations for self-employed workers and small businesses. Covers the $30,000 threshold, registration process, filing, and common exemptions.",
     "last_verified": "2026-03-31",
+    "status": "active",
     "verify_urls": {
       "gst_cra": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses.html",
       "qst_revenu_quebec": "https://www.revenuquebec.ca/en/businesses/consumption-taxes/gsthst-and-qst/",
@@ -10,13 +11,10 @@
       "small_supplier": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/when-register-charge.html"
     }
   },
-
   "id": "gst_qst",
   "title_en": "GST/QST — Sales Tax Registration and Collection",
   "title_fr": "TPS/TVQ — Inscription et perception des taxes de vente",
-
   "plain_language_summary": "GST is the 5% federal sales tax. QST is Quebec's 9.975% provincial sales tax. Once your business revenue exceeds $30,000 in any 12-month period, you MUST register for both and start collecting them from your customers. Under $30,000, you're a 'small supplier' and registration is optional — but there are reasons to register early.",
-
   "the_threshold": {
     "amount": 30000,
     "period": "Any 4 consecutive calendar quarters (not just a calendar year)",
@@ -28,14 +26,12 @@
     "when_to_register": "Within 30 days of exceeding $30,000. You must start collecting on all sales from that date.",
     "penalty_for_late_registration": "You're responsible for GST/QST you should have collected even if you didn't — you pay it from your own pocket"
   },
-
   "rates": {
     "gst_rate": 0.05,
     "qst_rate": 0.09975,
     "combined_rate": 0.14975,
     "example": "On a $100 invoice: GST = $5.00, QST = $9.975, total = $114.98"
   },
-
   "voluntary_registration": {
     "can_register_before_threshold": true,
     "why_register_early": [
@@ -51,7 +47,6 @@
     ],
     "recommendation": "Freelancers selling to businesses (B2B) should often register early since their clients can reclaim the GST/QST. Retailers and direct-to-consumer sellers can often wait."
   },
-
   "registration_process": {
     "gst_registration": {
       "where": "CRA Business Registration Online or by phone 1-800-959-5525",
@@ -69,7 +64,6 @@
     },
     "register_both_at_same_time": "Yes — you can register for GST and QST simultaneously. Revenu Québec coordinates with CRA."
   },
-
   "filing_periods": {
     "annual": {
       "who": "Businesses with revenue under $1.5M — can file annually",
@@ -86,7 +80,6 @@
     },
     "recommendation_for_micro_business": "Annual filing is simplest for micro-entrepreneurs under $1.5M. You only file once a year."
   },
-
   "input_tax_credits": {
     "plain_language": "When you're registered, you can get back the GST/QST you paid on business expenses — this is the main benefit of early registration.",
     "how_it_works": "Track all GST/QST you paid on business purchases (supplies, equipment, phone, software). Deduct these 'input tax credits' from the GST/QST you collected. Remit only the difference.",
@@ -94,7 +87,6 @@
     "what_qualifies": "Any business expense with GST/QST paid, where the expense is for business purposes",
     "record_keeping": "Keep all receipts for 6 years — CRA can audit back 4 years, Revenu Québec can audit back 4 years"
   },
-
   "exempt_supplies": {
     "plain_language": "Some sales are exempt from GST/QST — you don't charge tax on these, and you can't claim input tax credits on related expenses.",
     "examples": [
@@ -106,7 +98,6 @@
     ],
     "home_daycare_note": "Home daycare services provided by a recognized RSG are generally exempt from GST/QST. Verify with Revenu Québec for your specific situation."
   },
-
   "zero_rated_supplies": {
     "plain_language": "Zero-rated means 0% GST/QST — but unlike exempt, you CAN claim input tax credits. These are mostly food and exports.",
     "examples": [
@@ -116,7 +107,6 @@
     ],
     "home_baker_note": "This is nuanced for bakers. Bread sold as a grocery item may be zero-rated, but a cake sold for a party may be taxable. A dozen muffins sold as groceries may be zero-rated; a single muffin from a bakery counter is taxable. Verify with Revenu Québec for your specific products."
   },
-
   "what_to_put_on_invoices": [
     "Your GST registration number (format: 123456789 RT 0001)",
     "Your QST registration number (format: 1234567890 TQ 0001)",
@@ -125,7 +115,6 @@
     "Date of invoice",
     "Description of goods/services"
   ],
-
   "common_mistakes": [
     "Not registering within 30 days of crossing $30,000 — you owe the uncollected tax from your own pocket",
     "Charging GST/QST before being registered — illegal and must be refunded",
@@ -135,9 +124,7 @@
     "Missing the filing deadline — penalties of 1% of amount owing per month",
     "Not separating GST/QST collected into a separate bank account — it's not your money, set it aside"
   ],
-
   "practical_tip": "Open a separate savings account when you register. Every time you issue an invoice with GST/QST, transfer that tax amount to the savings account. When filing time comes, the money is already set aside.",
-
   "source_url": "https://www.revenuquebec.ca/en/businesses/consumption-taxes/gsthst-and-qst/",
   "government_body_federal": "Canada Revenue Agency (CRA)",
   "government_body_provincial": "Revenu Québec",
