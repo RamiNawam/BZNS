@@ -2,55 +2,82 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import {
+  LayoutDashboard,
+  Map,
+  DollarSign,
+  MessageSquare,
+  FileText,
+  LogOut,
+  Zap,
+  type LucideIcon,
+} from 'lucide-react';
 
-const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: '🏠' },
-  { href: '/intake', label: 'Business Profile', icon: '📋' },
-  { href: '/roadmap', label: 'Roadmap', icon: '🗺️' },
-  { href: '/funding', label: 'Funding', icon: '💰' },
-  { href: '/starter-kit', label: 'Starter Kit', icon: '📄' },
-  { href: '/assistant', label: 'AI Assistant', icon: '🤖' },
+const navItems: { href: string; label: string; icon: LucideIcon }[] = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/roadmap', label: 'Roadmap', icon: Map },
+  { href: '/funding', label: 'Funding', icon: DollarSign },
+  { href: '/assistant', label: 'AI Assistant', icon: MessageSquare },
+  { href: '/starter-kit', label: 'Starter Kit', icon: FileText },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
-      <div className="p-6 border-b border-gray-200">
-        <Link href="/" className="text-2xl font-bold text-brand-700">
-          BZNS
+    <aside className="w-60 shrink-0 bg-white border-r border-slate-200 flex flex-col h-full">
+
+      {/* Logo */}
+      <div className="h-16 flex items-center px-5 border-b border-slate-200">
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="h-7 w-7 rounded-lg bg-brand-600 flex items-center justify-center shrink-0">
+            <Zap size={14} className="text-white" />
+          </div>
+          <div>
+            <div className="font-heading font-bold text-slate-900 text-base leading-none">BZNS</div>
+            <div className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5">Micro-Business Launchpad</div>
+          </div>
         </Link>
-        <p className="text-xs text-gray-500 mt-1">Micro-Business Launchpad</p>
       </div>
 
-      <nav className="flex-1 p-4 space-y-1">
+      {/* Nav */}
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+          const Icon = item.icon;
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150 group ${
                 isActive
                   ? 'bg-brand-50 text-brand-700'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
-              <span>{item.icon}</span>
+              <Icon
+                size={17}
+                className={`shrink-0 transition-colors ${
+                  isActive ? 'text-brand-600' : 'text-slate-400 group-hover:text-slate-600'
+                }`}
+              />
               <span>{item.label}</span>
+              {isActive && (
+                <span className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500" />
+              )}
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 border-t border-gray-200">
+      {/* Bottom */}
+      <div className="px-3 py-4 border-t border-slate-100 space-y-0.5">
         <Link
           href="/login"
-          className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700"
+          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all duration-150 group"
         >
-          <span>⚙️</span>
-          <span>Account</span>
+          <LogOut size={17} className="shrink-0 text-slate-400 group-hover:text-slate-500 transition-colors" />
+          <span>Sign out</span>
         </Link>
       </div>
     </aside>

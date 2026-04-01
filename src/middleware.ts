@@ -20,6 +20,12 @@ export async function middleware(request: NextRequest) {
 
   let response = NextResponse.next({ request: { headers: requestHeaders } })
 
+  // If Supabase env vars are not configured yet (local dev without .env.local),
+  // skip auth middleware entirely so the app is still browsable.
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return response
+  }
+
   // Build a Supabase client that can read/write cookies in middleware
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
