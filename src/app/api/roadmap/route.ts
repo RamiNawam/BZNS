@@ -1,33 +1,59 @@
-import { NextRequest, NextResponse } from 'next/server';
-// import { createServerClient } from '@/lib/supabase/server';
-// import { generateRoadmap } from '@/lib/claude/client';
+// ============================================================
+// CONTROLLER: POST  /api/roadmap — generate roadmap for a profile
+//             GET   /api/roadmap — fetch existing roadmap steps
+//             PATCH /api/roadmap — update a step's status
+// Thin layer: validate input → call service → return JSON
+// ============================================================
 
-/**
- * GET /api/roadmap — Fetch the user's roadmap steps
- * POST /api/roadmap — Generate a new roadmap based on the user's profile
- */
+import { NextRequest, NextResponse } from 'next/server'
+import { RoadmapService } from '@/services/roadmap.service'
 
-export async function GET(_req: NextRequest) {
-  // TODO: Fetch roadmap_steps from Supabase for the authenticated user
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const profile_id = searchParams.get('profile_id')
 
-  return NextResponse.json({
-    message: 'Roadmap endpoint stub',
-    steps: [],
-  });
+    if (!profile_id) return NextResponse.json({ error: 'profile_id required' }, { status: 400 })
+
+    const steps = await RoadmapService.getByProfileId(profile_id)
+    return NextResponse.json({ steps })
+  } catch (err) {
+    console.error('[GET /api/roadmap]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { profileId } = body;
+  try {
+    const body = await req.json()
+    const { profile_id } = body
 
-  // TODO: Fetch profile from Supabase
-  // TODO: Load relevant knowledge base files (registration, permits, etc.)
-  // TODO: Call Claude to generate personalised roadmap steps
-  // TODO: Persist steps in roadmap_steps table
+    if (!profile_id) return NextResponse.json({ error: 'profile_id required' }, { status: 400 })
 
-  return NextResponse.json({
-    message: 'Roadmap generation triggered (stub)',
-    profileId,
-    steps: [],
-  });
+    const steps = await RoadmapService.generate(profile_id)
+    return NextResponse.json({ steps }, { status: 201 })
+  } catch (err) {
+    console.error('[POST /api/roadmap]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const body = await req.json()
+    const { step_id, profile_id, status, notes } = body
+
+    if (!step_id || !profile_id || !status) {
+      return NextResponse.json({ error: 'step_id, profile_id, and status are required' }, { status: 400 })
+    }
+
+    const updatedStep = await RoadmapService.updateStepStatus(step_id, profile_id, { status, notes })
+    return NextResponse.json({ step: updatedStep })
+  } catch (err: unknown) {
+    console.error('[PATCH /api/roadmap]', err)
+    if (err instanceof Error && err.message.startsWith('Cannot complete step')) {
+      return NextResponse.json({ error: err.message }, { status: 422 })
+    }
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }

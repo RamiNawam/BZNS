@@ -1,8 +1,14 @@
-import type { ChatMessage } from '@/types/chat';
+import type { MessageRole } from '@/types/chat';
 import SourceBadge from './source-badge';
 
+// Only the fields this component actually renders
 interface MessageBubbleProps {
-  message: ChatMessage;
+  message: {
+    id: string;
+    role: MessageRole;
+    content: string;
+    sources?: string[] | null;
+  };
 }
 
 export default function MessageBubble({ message }: MessageBubbleProps) {
@@ -11,7 +17,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} gap-2`}>
       {!isUser && (
-        <div className="h-7 w-7 rounded-full bg-brand-100 flex items-center justify-center text-sm flex-shrink-0 mt-0.5">
+        <div className="h-7 w-7 rounded-full bg-teal-100 flex items-center justify-center text-sm flex-shrink-0 mt-0.5">
           🤖
         </div>
       )}
@@ -20,7 +26,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
         <div
           className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
             isUser
-              ? 'bg-brand-600 text-white rounded-tr-sm'
+              ? 'bg-teal-600 text-white rounded-tr-sm'
               : 'bg-gray-100 text-gray-800 rounded-tl-sm'
           }`}
         >
@@ -37,7 +43,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
       </div>
 
       {isUser && (
-        <div className="h-7 w-7 rounded-full bg-brand-200 flex items-center justify-center text-sm flex-shrink-0 mt-0.5">
+        <div className="h-7 w-7 rounded-full bg-teal-200 flex items-center justify-center text-sm flex-shrink-0 mt-0.5">
           👤
         </div>
       )}

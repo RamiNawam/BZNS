@@ -1,4 +1,4 @@
-import type { UserProfile } from '@/types/profile';
+import type { Profile } from '@/types/profile';
 
 /**
  * System prompt templates for the various Claude calls in BZNS.
@@ -20,7 +20,7 @@ Always be:
 - Clear that your information is for guidance only and professional advice should be sought for complex situations`;
 
 export function buildSystemPrompt(options: {
-  profileContext?: Partial<UserProfile> | null;
+  profileContext?: Partial<Profile> | null;
   knowledgeBase?: string;
 }): string {
   const { profileContext, knowledgeBase } = options;
@@ -37,7 +37,7 @@ export function buildSystemPrompt(options: {
   return prompt;
 }
 
-export function buildRoadmapPrompt(profile: Partial<UserProfile>): string {
+export function buildRoadmapPrompt(profile: Partial<Profile>): string {
   return `Based on the following business profile, generate a detailed, prioritised list of registration and launch steps.
 Return the steps as a JSON array with fields: id, title_en, title_fr, description_en, description_fr, category, priority, estimated_time_hours, links.
 
@@ -45,7 +45,7 @@ Business Profile:
 ${JSON.stringify(profile, null, 2)}`;
 }
 
-export function buildFundingPrompt(profile: Partial<UserProfile>, programs: object[]): string {
+export function buildFundingPrompt(profile: Partial<Profile>, programs: object[]): string {
   return `You are a funding advisor. Evaluate the following funding programs against this business profile.
 Return a JSON array with: program_id, score (0–100), rationale_en, rationale_fr, recommended (boolean).
 

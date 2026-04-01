@@ -1,31 +1,59 @@
-import { NextRequest, NextResponse } from 'next/server';
-// import { scorePrograms } from '@/lib/funding/scorer';
+// ============================================================
+// CONTROLLER: POST  /api/funding — score funding programs for a profile
+//             GET   /api/funding — fetch existing funding matches
+//             PATCH /api/funding — bookmark or dismiss a match
+// Thin layer: validate input → call service → return JSON
+// ============================================================
 
-/**
- * GET /api/funding — Fetch funding matches for the current user
- * POST /api/funding — Re-score funding programs against an updated profile
- */
+import { NextRequest, NextResponse } from 'next/server'
+import { FundingService } from '@/services/funding.service'
 
-export async function GET(_req: NextRequest) {
-  // TODO: Fetch pre-scored funding_matches from Supabase for the authenticated user
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const profile_id = searchParams.get('profile_id')
 
-  return NextResponse.json({
-    message: 'Funding matches endpoint stub',
-    matches: [],
-  });
+    if (!profile_id) return NextResponse.json({ error: 'profile_id required' }, { status: 400 })
+
+    const matches = await FundingService.getByProfileId(profile_id)
+    return NextResponse.json({ matches })
+  } catch (err) {
+    console.error('[GET /api/funding]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  try {
+    const body = await req.json()
+    const { profile_id, explain_program } = body
 
-  // TODO: Load all funding JSON files from the knowledge base
-  // TODO: Score each program against the user's profile using scorer.ts
-  // TODO: Persist top matches in funding_matches table
-  // TODO: Return scored results
+    if (!profile_id) return NextResponse.json({ error: 'profile_id required' }, { status: 400 })
 
-  return NextResponse.json({
-    message: 'Funding scoring triggered (stub)',
-    received: body,
-    matches: [],
-  });
+    if (explain_program) {
+      const explanation = await FundingService.explainProgram(profile_id, explain_program)
+      return NextResponse.json({ explanation })
+    }
+
+    const result = await FundingService.scoreForProfile(profile_id)
+    return NextResponse.json(result, { status: 201 })
+  } catch (err) {
+    console.error('[POST /api/funding]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const body = await req.json()
+    const { match_id, is_bookmarked, is_dismissed } = body
+
+    if (!match_id) return NextResponse.json({ error: 'match_id required' }, { status: 400 })
+
+    const updated = await FundingService.updateMatch(match_id, { is_bookmarked, is_dismissed })
+    return NextResponse.json({ match: updated })
+  } catch (err) {
+    console.error('[PATCH /api/funding]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }
