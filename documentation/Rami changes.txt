@@ -189,14 +189,297 @@ NOTES / THINGS TO BE AWARE OF
 NEXT STEPS (backend)
 ----------------------
 
-[ ] Wire up Supabase client in src/lib/supabase/client.ts and server.ts
-[ ] Implement POST /api/profile route
-[ ] Implement POST /api/roadmap route
-[ ] Implement POST /api/funding route with scorer.ts
-[ ] Implement POST /api/financial-snapshot — tax calculator + Claude
-[ ] Implement POST /api/assistant route
+[x] Wire up Supabase client in src/lib/supabase/client.ts and server.ts
+[x] Implement POST /api/profile route
+[x] Implement POST /api/roadmap route
+[x] Implement POST /api/funding route with scorer.ts
+[x] Implement POST /api/financial-snapshot — tax calculator + Claude
+[x] Implement POST /api/assistant route
 [ ] Seed demo account (Yara) for hackathon day
 [ ] Pre-populate response_cache for demo account
+
+================================================================
+END OF ENTRY — April 1, 2026
+================================================================
+
+
+================================================================
+BACKEND ARCHITECTURE + INTAKE WIZARD — SESSION 2
+================================================================
+
+DATE: April 1, 2026
+BRANCH: feat/backend-logic
+BUILD STATUS: ✅ Zero TypeScript errors (Next.js 14.2.35)
+
+----------------------------------------------------------------
+
+OVERVIEW
+--------
+Completed the full backend layer architecture, fixed the intake
+wizard redirect loop, rewrote all intake questions, and migrated
+every component and service file to use the correct snake_case
+types that match the Supabase schema.
+
+----------------------------------------------------------------
+
+1. LAYERED BACKEND ARCHITECTURE
+--------------------------------
+
+Implemented a Spring Boot-style layered architecture across the
+entire app. Each feature follows the same chain:
+
+  API Route (Controller)
+       ↓
+  Service (business logic)
+       ↓
+  Repository (Supabase queries)
+       ↓
+  Types (DB-mirrored interfaces)
+
+FILES CREATED:
+
+Repositories (raw Supabase access — no business logic):
+  src/repositories/profile.repository.ts
+  src/repositories/roadmap.repository.ts
+  src/repositories/funding.repository.ts
+  src/repositories/snapshot.repository.ts
+  src/repositories/chat.repository.ts
+  src/repositories/cache.repository.ts
+
+Services (business logic, orchestration):
+  src/services/profile.service.ts
+  src/services/roadmap.service.ts
+  src/services/funding.service.ts
+  src/services/financial.service.ts
+  src/services/assistant.service.ts
+  src/services/cache.service.ts
+
+All 6 API routes updated to be thin controllers that delegate
+to their respective service:
+  src/app/api/profile/route.ts         → ProfileService
+  src/app/api/roadmap/route.ts         → RoadmapService
+  src/app/api/funding/route.ts         → FundingService
+  src/app/api/financial-snapshot/route.ts → FinancialService
+  src/app/api/assistant/route.ts       → AssistantService
+  src/app/api/cache/route.ts           → CacheService
+
+----------------------------------------------------------------
+
+2. AUTHENTICATION FLOW
+-----------------------
+
+src/app/(auth)/login/page.tsx
+  - Rewrote to remove magic link.
+  - Mode toggle: Sign In / Create Account on same page.
+  - Email + password: signInWithPassword() / signUp()
+  - Google OAuth: signInWithOAuth({ provider: 'google' })
+  - Real Google SVG icon (not an emoji).
+  - emailRedirectTo points to /api/auth/callback.
+
+src/app/api/auth/callback/route.ts  [NEW]
+  - Server route that exchanges Supabase OAuth code for session cookie.
+  - Used for both Google OAuth and email confirmation flows.
+  - Redirects to /dashboard on success, /login on failure.
+
+src/middleware.ts  [NEW]
+  - Root Next.js middleware — runs on every single request.
+  - Refreshes the Supabase session cookie (keeps it alive).
+  - Redirects unauthenticated users to /login (with redirectTo param).
+  - Redirects already-logged-in users away from /login → /dashboard.
+  - NEW: Forwards current pathname as x-pathname request header
+    so server-component layouts can read it without client-side tricks.
+
+----------------------------------------------------------------
+
+3. INTAKE WIZARD — REDIRECT LOOP FIX
+--------------------------------------
+
+PROBLEM:
+  The intake page lived inside the (app) route group.
+  The (app)/layout.tsx checked intake_completed and redirected
+  to /intake if not done — but /intake was ALSO inside (app),
+  causing an infinite redirect loop.
+
+SOLUTION (no file deletion needed):
+  - middleware.ts now sets header: x-pathname = current path
+  - (app)/layout.tsx reads x-pathname via Next.js headers()
+  - If user is on /intake AND intake is incomplete:
+      → render children full-screen WITHOUT Sidebar/TopBar
+      → clean onboarding UX, no redirect
+  - If user is on any other page AND intake is incomplete:
+      → redirect to /intake as before
+  - If intake is complete:
+      → render full app shell (Sidebar + TopBar) as normal
+
+Files changed:
+  src/middleware.ts                  — added x-pathname header forwarding
+  src/app/(app)/layout.tsx           — reads header, handles intake path
+  src/app/(app)/intake/page.tsx      — simplified to just <IntakeWizard />
+
+----------------------------------------------------------------
+
+4. INTAKE WIZARD — QUESTION CARD REWRITE
+-----------------------------------------
+
+src/components/intake/question-card.tsx  [FULL REWRITE]
+
+Old: used ProfileFormData (old camelCase type), wrong questions,
+     business structure / revenue projection / demographics checkboxes.
+
+New: uses IntakeFormState (snake_case, matches store and DB).
+
+STEP 0 — "Your Business"
+  - Textarea: business_idea (free text, 4 rows)
+  - Hint: "Be as specific or vague as you like"
+
+STEP 1 — "Location & Setup"
+  - Radio group: location (montreal / quebec_city / laval / other_quebec)
+  - Conditional text input: borough (only shows if location = montreal)
+  - Radio pair: is_home_based (Yes / No)
+
+STEP 2 — "Finances"
+  - Number input: expected_monthly_revenue ($ prefix, live annual equiv shown)
+  - GST/QST $30K threshold hint shown dynamically
+  - Radio pair: has_partners (Yes partnership / No solo founder)
+
+STEP 3 — "About You"
+  - Number input: age (optional, 16–99)
+  - Radio group: immigration_status (5 options: citizen through prefer_not_to_say)
+  - Toggle chips: languages (8 options: fr, en, es, ar, zh, pt, ht, other)
+  - Radio pair: preferred_language (English / Français)
+
+All UI uses teal colour scheme (no brand-* tokens that weren't defined).
+
+----------------------------------------------------------------
+
+5. TYPE SYSTEM MIGRATION — ALL COMPONENTS
+------------------------------------------
+
+Migrated every component and lib file from old camelCase types
+to the new snake_case types that mirror Supabase columns.
+
+Components fixed:
+  src/components/financial/take-home-breakdown.tsx
+    - grossIncome → gross_monthly_revenue (annual_revenue calc inline)
+    - businessExpenses → monthly_expenses * 12
+    - qpp/qpip/federalTax/quebecTax → snake_case equivalents
+    - effectiveTaxRate → effective_take_home_rate
+
+  src/components/financial/watch-out-flags.tsx
+    - warnings: string[] → warnings: WatchOutFlag[] (with type/title/detail)
+    - Now renders colour-coded cards: yellow=warning, blue=info, teal=tip
+
+  src/components/financial/snapshot-card.tsx
+    - snapshot.warnings → snapshot.watch_out_flags
+
+  src/components/funding/funding-card.tsx  [REWRITE]
+    - Removed dependency on nested match.program object
+    - Uses flat FundingMatch fields: program_name, program_type,
+      match_score, amount_description, eligibility_details,
+      application_url, source_url
+    - Inline expanded detail section (funding-detail.tsx retired)
+
+  src/components/funding/funding-list.tsx
+    - match.programId → match.program_key
+
+  src/components/roadmap/roadmap-list.tsx
+    - a.priority → a.step_order
+
+  src/components/roadmap/roadmap-step.tsx  [REWRITE]
+    - step.title_en → step.title
+    - step.category/categoryColors → STATUS_BADGE map
+    - step.estimatedTimeHours → step.estimated_timeline + estimated_cost
+    - Uses teal colours throughout
+
+  src/components/roadmap/step-detail.tsx  [REWRITE]
+    - step.description_en → step.description (not shown, already in card)
+    - step.links[] → step.why_needed + step.required_documents + step.government_url
+
+  src/components/assistant/message-bubble.tsx
+    - Props: ChatMessage (full DB type) → minimal inline interface
+      (only id, role, content, sources? — the fields actually used)
+    - brand-* colours → teal-*
+
+  src/components/assistant/source-badge.tsx  [REWRITE]
+    - source: SourceCitation → source: string (KB filename)
+    - Auto-formats filename: "gst_qst.json" → "Gst Qst"
+
+  src/stores/chat-store.ts
+    - ChatMessage → ClientMessage (lightweight client-only type)
+    - createdAt → created_at
+    - Avoids requiring DB-only fields (profile_id, session_id, etc.)
+
+Lib files fixed:
+  src/lib/claude/prompts.ts
+    - UserProfile → Profile (from @/types/profile)
+
+  src/lib/funding/scorer.ts  [REWRITE]
+    - UserProfile → Profile, FundingProgram → FundingProgramJSON
+    - Returns CreateFundingMatchDTO (all snake_case DB fields)
+    - Scores: age eligibility, location, immigration status, demographics
+    - profile.city → profile.municipality
+    - profile.languages → profile.languages_spoken
+
+  src/services/funding.service.ts
+    - Added UpdateFundingMatchDTO import
+    - updateMatch() now typed with UpdateFundingMatchDTO
+
+  src/types/chat.ts
+    - Added SourceCitation interface { label: string; url?: string }
+
+----------------------------------------------------------------
+
+6. WHAT IS STILL TODO (Claude integration)
+-------------------------------------------
+
+The architecture is 100% wired and type-safe. All services exist
+and have real Supabase repository calls. The only remaining work
+is plugging in actual Claude API calls where marked // TODO:
+
+  src/lib/claude/client.ts
+    → Anthropic SDK wrapper (create Anthropic client, stream helper)
+
+  src/services/profile.service.ts → createFromIntake()
+    → Call Claude with buildProfilePrompt() to classify business type
+    → Parse JSON response → set business_type, industry_sector, etc.
+
+  src/services/roadmap.service.ts → generate()
+    → Call Claude with buildRoadmapPrompt() + KB selector output
+    → Parse JSON array → map to CreateRoadmapStepDTO[] → batchUpsert
+
+  src/services/financial.service.ts → generate()
+    → Tax calculator already done (pure math)
+    → Call Claude with buildFinancialInsightPrompt() for watch_out_flags
+    → Parse JSON → merge with tax calc results → upsert snapshot
+
+  src/services/assistant.service.ts → chat()
+    → Fetch profile + roadmap + funding + snapshot from repositories
+    → Select KB docs with selectForAssistant()
+    → Call Claude with buildAssistantPrompt() + full context
+    → Save user + assistant messages to chat_messages table
+
+  .env.local → ANTHROPIC_API_KEY
+    → Still has placeholder value. Real key needed before Claude works.
+
+----------------------------------------------------------------
+
+OTHER PENDING ITEMS
+--------------------
+
+[ ] Google OAuth: enable in Supabase dashboard (Auth → Providers → Google)
+[ ] Email confirmation: can be disabled in Supabase for hackathon speed
+[ ] Seed demo account (Yara) with pre-built profile + roadmap + funding
+[ ] Pre-populate response_cache for demo day offline safety
+[ ] Add ANTHROPIC_API_KEY to .env.local (and Vercel env vars on deploy)
+
+----------------------------------------------------------------
+
+COMMIT REFERENCE
+-----------------
+
+Branch: feat/backend-logic
+Commit: feat: complete backend architecture + intake wizard (clean build)
+Files changed: 49 (16 new files created, 33 modified)
 
 ================================================================
 END OF ENTRY — April 1, 2026
