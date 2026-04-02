@@ -1,20 +1,22 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { Map } from 'lucide-react';
-import { useRoadmapStore } from '@/stores/roadmap-store';
-import RoadmapStep from './roadmap-step';
+import { useEffect } from "react";
+import { Map, RefreshCw } from "lucide-react";
+import { useRoadmapStore } from "@/stores/roadmap-store";
+import { useProfileStore } from "@/stores/profile-store";
+import RoadmapStep from "./roadmap-step";
+import ProgressBar from "@/components/ui/progress-bar";
 
 // ── Skeleton ──────────────────────────────────────────────────────────────────
 function StepSkeleton({ order }: { order: number }) {
   return (
     <div className="flex gap-4">
-      {/* Node */}
       <div className="flex flex-col items-center shrink-0">
         <div className="h-9 w-9 rounded-full skeleton" />
-        {order < 3 && <div className="w-0.5 flex-1 min-h-[40px] bg-slate-100 mt-1" />}
+        {order < 3 && (
+          <div className="w-0.5 flex-1 min-h-[40px] bg-slate-100 mt-1" />
+        )}
       </div>
-      {/* Card */}
       <div className="flex-1 pb-6">
         <div className="card p-5 space-y-2.5">
           <div className="skeleton h-4 w-2/3 rounded-lg" />
@@ -28,21 +30,32 @@ function StepSkeleton({ order }: { order: number }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function RoadmapList() {
-  const { steps, isLoading, loadRoadmap } = useRoadmapStore();
+  const { steps, isLoading, loadRoadmap, generateRoadmap } = useRoadmapStore();
+  const { profile } = useProfileStore();
+
+  const roadmapIsStale =
+    steps.length > 0 &&
+    !!profile?.updated_at &&
+    new Date(profile.updated_at) > new Date(steps[0].created_at);
 
   useEffect(() => {
-    loadRoadmap();
-  }, [loadRoadmap]);
+    if (profile?.id) {
+      loadRoadmap(profile.id);
+    }
+  }, [profile?.id, loadRoadmap]);
 
   const sorted = steps.slice().sort((a, b) => a.step_order - b.step_order);
-  const completed = steps.filter((s) => s.status === 'completed').length;
-  const progress = steps.length > 0 ? Math.round((completed / steps.length) * 100) : 0;
+  const completed = steps.filter((s) => s.status === "completed").length;
+  const progress =
+    steps.length > 0 ? Math.round((completed / steps.length) * 100) : 0;
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (isLoading) {
     return (
       <div className="space-y-0">
-        {[1, 2, 3].map((i) => <StepSkeleton key={i} order={i} />)}
+        {[1, 2, 3].map((i) => (
+          <StepSkeleton key={i} order={i} />
+        ))}
       </div>
     );
   }
@@ -55,11 +68,23 @@ export default function RoadmapList() {
           <Map size={24} className="text-slate-400" />
         </div>
         <div>
-          <p className="font-heading font-semibold text-slate-900">No roadmap yet</p>
+          <p className="font-heading font-semibold text-slate-900">
+            No roadmap yet
+          </p>
           <p className="text-sm text-slate-500 mt-1">
-            Complete your business profile and click &ldquo;Generate my roadmap&rdquo; to get started.
+            {profile?.id
+              ? "Generate your personalised legal checklist."
+              : "Complete your business profile first."}
           </p>
         </div>
+        {profile?.id && (
+          <button
+            onClick={() => generateRoadmap(profile.id)}
+            className="btn-primary"
+          >
+            Generate My Roadmap
+          </button>
+        )}
       </div>
     );
   }
@@ -67,37 +92,33 @@ export default function RoadmapList() {
   // ── Timeline ──────────────────────────────────────────────────────────────
   return (
     <div className="space-y-5">
-
-      {/* Progress header */}
-      <div className="card p-5">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <span className="font-heading font-semibold text-slate-900 text-sm">
-              {completed} of {steps.length} steps completed
-            </span>
-            <span className="badge badge-brand">{progress}%</span>
+      {/* Stale warning */}
+      {roadmapIsStale && (
+        <div className="flex items-center justify-between gap-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+          <div className="flex items-center gap-2.5 text-sm text-amber-800">
+            <RefreshCw size={15} className="shrink-0 text-amber-600" />
+            <span>Your settings changed since this roadmap was generated.</span>
           </div>
-          {completed === steps.length && steps.length > 0 && (
-            <span className="badge bg-emerald-100 text-emerald-800">
-              All done
-            </span>
-          )}
+          <button
+            onClick={() => profile?.id && generateRoadmap(profile.id)}
+            disabled={isLoading}
+            className="shrink-0 text-xs font-semibold text-amber-700 border border-amber-300 bg-white hover:bg-amber-50 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50"
+          >
+            Update roadmap
+          </button>
         </div>
-        {/* Progress bar */}
-        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-brand-500 rounded-full transition-all duration-500 ease-out"
-            style={{ width: `${progress}%` }}
-            role="progressbar"
-            aria-valuenow={progress}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label={`${progress}% of roadmap completed`}
-          />
-        </div>
+      )}
+
+      {/* Progress */}
+      <div className="card p-5">
+        <ProgressBar
+          value={progress}
+          label={`${completed} of ${steps.length} steps completed`}
+          showValue
+        />
       </div>
 
-      {/* Vertical timeline */}
+      {/* Timeline */}
       <div>
         {sorted.map((step, index) => (
           <RoadmapStep
@@ -108,7 +129,6 @@ export default function RoadmapList() {
           />
         ))}
       </div>
-
     </div>
   );
 }

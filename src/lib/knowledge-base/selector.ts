@@ -1,5 +1,3 @@
-"use server";
-
 /**
  * Knowledge Base Selector
  * src/lib/knowledge-base/selector.ts

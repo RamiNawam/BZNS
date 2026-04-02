@@ -4,16 +4,16 @@
 // ============================================================
 
 import { ProfileRepository } from '@/repositories/profile.repository'
+import { askClaude } from '@/lib/claude/client'
+import { buildProfilePrompt } from '@/lib/knowledge-base/prompts'
+import { ProfileClassificationSchema, parseClaudeJSON } from '@/lib/claude/schemas'
 import type {
   Profile,
   IntakeAnswers,
   CreateProfileDTO,
   UpdateProfileDTO,
-  BusinessType,
 } from '@/types/profile'
-
-// TODO: import { ClaudeClient } from '@/lib/claude/client'
-// TODO: import { ProfileSynthesisSchema } from '@/lib/claude/schemas'
+import type { IntakeAnswers as PromptIntakeAnswers } from '@/lib/knowledge-base/prompts'
 
 export const ProfileService = {
 
@@ -24,19 +24,49 @@ export const ProfileService = {
    * 3. Upserts into the profiles table
    */
   async createFromIntake(user_id: string, answers: IntakeAnswers): Promise<Profile> {
-    // Step 1: Call Claude to classify the business
-    // TODO: Uncomment when Claude client is wired up
-    // const claudeResult = await ClaudeClient.classifyBusiness(answers)
-    // const { business_type, industry_sector, business_name, business_description } =
-    //   ProfileSynthesisSchema.parse(claudeResult)
+    console.log(`[ProfileService.createFromIntake] START user_id=${user_id} business_idea="${answers.business_idea?.slice(0, 60)}"`)
 
-    // Step 2: Build the profile DTO (using stubs until Claude is live)
+    // Step 1: Map intake answers to the shape buildProfilePrompt expects
+    const promptAnswers: PromptIntakeAnswers = {
+      business_description: answers.business_idea,
+      location: answers.location,
+      stage: 'starting',
+      expected_revenue_cad: answers.expected_monthly_revenue ? answers.expected_monthly_revenue * 12 : null,
+      employee_count: answers.has_partners ? 2 : 1,
+      serves_alcohol: false,
+      is_home_based: answers.is_home_based,
+      is_regulated_profession: false,
+      age: answers.age ?? null,
+      is_newcomer: answers.immigration_status === 'work_permit' || answers.immigration_status === 'student',
+      is_indigenous: false,
+      is_woman: false,
+    }
+
+    // Step 2: Call Claude to classify the business type
+    console.log(`[ProfileService.createFromIntake] Calling Claude for business classification`)
+    let classification
+    try {
+      const systemPrompt = buildProfilePrompt(promptAnswers)
+      const rawText = await askClaude(systemPrompt, 'Classify this business profile now.', 'claude-haiku-4-5-20251001', 1024)
+      console.log(`[ProfileService.createFromIntake] Claude raw response: ${rawText.slice(0, 200)}`)
+      classification = ProfileClassificationSchema.parse(parseClaudeJSON(rawText))
+      console.log(`[ProfileService.createFromIntake] Classification: type=${classification.business_type} sector=${classification.industry_sector}`)
+    } catch (err) {
+      console.error(`[ProfileService.createFromIntake] Claude classification failed, falling back to "other":`, err)
+      classification = {
+        business_type: 'other' as const,
+        industry_sector: 'general',
+        business_summary: answers.business_idea,
+      }
+    }
+
+    // Step 3: Build the profile DTO
     const profileDTO: CreateProfileDTO = {
       user_id,
-      business_type: 'other' as BusinessType,            // TODO: replace with claudeResult.business_type
-      business_name: null,                                // TODO: replace with claudeResult.business_name
-      business_description: null,                         // TODO: replace with claudeResult.business_description
-      industry_sector: null,                              // TODO: replace with claudeResult.industry_sector
+      business_type: classification.business_type,
+      business_name: null,
+      business_description: classification.business_summary ?? answers.business_idea,
+      industry_sector: classification.industry_sector,
       municipality: answers.location,
       borough: answers.borough ?? null,
       is_home_based: answers.is_home_based,

@@ -229,31 +229,45 @@ ${kbJson}
 
 Generate a prioritized, numbered checklist of steps this person must complete to legally start and operate their business in Quebec.
 
-Return ONLY a valid JSON array. Do not add any text outside the JSON.
+Return ONLY a valid JSON array. Do not include any text or explanation outside the JSON array.
 
-\`\`\`json
 [
   {
-    "step_number": 1,
-    "title": "<short action-oriented title, e.g. 'Register with the REQ'>",
-    "description": "<2-4 sentences explaining what this step involves, why it matters, and any key details specific to this user>",
-    "urgency": "<required | conditional | recommended>",
-    "source_id": "<id field from the KB document this step comes from, if applicable>",
-    "action_url": "<direct URL to take action, from the KB — omit if none>"
+    "step_order": 1,
+    "step_key": "req_registration",
+    "title": "Register with the REQ",
+    "description": "2-4 sentences explaining what this step involves, why it matters, and key details specific to this user.",
+    "why_needed": "1-2 sentences explaining the legal or practical reason this step is required.",
+    "estimated_cost": "e.g. Free, $38, $50-$100",
+    "estimated_timeline": "e.g. Same day, 1-2 weeks, 2-4 weeks",
+    "required_documents": ["list", "of", "documents", "needed"],
+    "government_url": "https://direct-url-from-KB-or-empty-string",
+    "source": "id field from the KB document this step comes from",
+    "depends_on": ["step_key_of_prerequisite_step"]
   }
 ]
-\`\`\`
 
-## Rules
+## Field rules
 
-- "required" = legally mandatory for this business type. Must be done or the business cannot legally operate.
-- "conditional" = required only under certain conditions (e.g. revenue over $30,000 for GST/QST, serving alcohol, specific professional order).
-- "recommended" = strongly advisable but not legally required.
-- Order steps logically: registration before permits before tax registration before compliance.
-- Mark GST/QST registration as "conditional" if revenue is below or unknown, "required" if above $30,000.
+- step_order: integer starting at 1, ordered logically (registration → permits → tax → compliance)
+- step_key: unique snake_case slug for this step, e.g. "req_registration", "mapaq_permit", "gst_qst_registration"
+- description: specific to this user — mention their business type, location, or revenue where relevant
+- why_needed: plain-language reason this step matters legally or practically
+- estimated_cost: use "Free" if there is no cost; use a range like "$50–$100" if variable; use "Varies" if unknown
+- estimated_timeline: realistic time from starting the step to completion
+- required_documents: array of document names needed; use empty array [] if none
+- government_url: direct URL from the KB document's source_url or application_url field; use empty string "" if not available — never invent a URL
+- source: the "id" field from the KB document (e.g. "req", "mapaq", "gst_qst"); use empty string "" if no KB document applies
+- depends_on: array of step_key values for steps that must be completed first; use empty array [] if no dependencies
+
+## Step rules
+
 - Only include steps for which there is a corresponding KB document. Do not hallucinate requirements.
-- Keep descriptions specific to this user — mention their business type, location, or revenue where relevant.
-- Include between 5 and 15 steps total. Skip steps that clearly do not apply (e.g. RACJ for a daycare).`;
+- Order logically: entity registration → business permits → tax registrations → compliance steps
+- Mark GST/QST registration as conditional if revenue is below $30,000 or unknown; required if above $30,000 — reflect this in why_needed
+- Include between 5 and 15 steps total. Skip steps that clearly do not apply (e.g. RACJ liquor permit for a daycare)
+- Keep descriptions specific to this user — their business type, location, or revenue situation
+- Do NOT include bookkeeping setup, bank account opening, tax savings strategies, accounting software setup, or financial management steps — those are handled by a separate financial feature. Only include steps required by law or government regulation to legally operate the business`;
 }
 
 // ---------------------------------------------------------------------------

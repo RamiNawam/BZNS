@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Map,
@@ -10,9 +10,12 @@ import {
   MessageSquare,
   FileText,
   LogOut,
+  Settings,
   Zap,
   type LucideIcon,
 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { useProfileStore } from '@/stores/profile-store';
 
 const navItems: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/dashboard',  label: 'Dashboard',    icon: LayoutDashboard },
@@ -25,6 +28,15 @@ const navItems: { href: string; label: string; icon: LucideIcon }[] = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { clearProfile } = useProfileStore();
+
+  const handleSignOut = async () => {
+    console.log('[Sidebar] Signing out');
+    await createClient().auth.signOut();
+    clearProfile();
+    router.push('/');
+  };
 
   return (
     <aside className="w-60 shrink-0 bg-white border-r border-slate-200 flex flex-col h-full">
@@ -75,12 +87,33 @@ export default function Sidebar() {
       {/* Bottom */}
       <div className="px-3 py-4 border-t border-slate-100 space-y-0.5">
         <Link
-          href="/login"
-          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all duration-150 group"
+          href="/settings"
+          className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150 group ${
+            pathname === '/settings'
+              ? 'bg-brand-50 text-brand-700'
+              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+          }`}
+        >
+          <Settings
+            size={17}
+            className={`shrink-0 transition-colors ${
+              pathname === '/settings' ? 'text-brand-600' : 'text-slate-400 group-hover:text-slate-600'
+            }`}
+          />
+          <span>Settings</span>
+          {pathname === '/settings' && (
+            <span className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500" />
+          )}
+        </Link>
+
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all duration-150 group"
         >
           <LogOut size={17} className="shrink-0 text-slate-400 group-hover:text-slate-500 transition-colors" />
           <span>Sign out</span>
-        </Link>
+        </button>
       </div>
     </aside>
   );
