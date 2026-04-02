@@ -1,5 +1,3 @@
-"use server";
-
 /**
  * Knowledge Base Selector
  * src/lib/knowledge-base/selector.ts
@@ -71,7 +69,6 @@ const KB_MAP: Record<BusinessType, KBFileKey[]> = {
     "financial_constants.json",
     "registration/req.json",
     "registration/revenu_quebec.json",
-    "registration/cra.json",
     "tax/gst_qst.json",
     "tax/qpp.json",
     "tax/deductions.json",

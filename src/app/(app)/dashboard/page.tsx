@@ -11,6 +11,7 @@ import {
   Sparkles,
   TrendingUp,
   MapPin,
+  RefreshCw,
   type LucideIcon,
 } from 'lucide-react';
 import { useProfileStore } from '@/stores/profile-store';
@@ -79,14 +80,25 @@ function StatCard({
 
 export default function DashboardPage() {
   const { profile, loadProfile, isLoading: profileLoading } = useProfileStore();
-  const { steps, loadRoadmap } = useRoadmapStore();
+  const { steps, isLoading: roadmapLoading, error: roadmapError, loadRoadmap, generateRoadmap } = useRoadmapStore();
 
   useEffect(() => {
     loadProfile();
-    loadRoadmap();
-  }, [loadProfile, loadRoadmap]);
+  }, [loadProfile]);
+
+  useEffect(() => {
+    if (profile?.id) {
+      loadRoadmap(profile.id);
+    }
+  }, [profile?.id, loadRoadmap]);
 
   const completedSteps = steps.filter((s) => s.status === 'completed').length;
+
+  // True when the profile was updated after the roadmap was last generated
+  const roadmapIsStale =
+    steps.length > 0 &&
+    !!profile?.updated_at &&
+    new Date(profile.updated_at) > new Date(steps[0].created_at);
 
   // ── No profile yet ─────────────────────────────────────────────────────────
   if (!profileLoading && !profile?.intake_completed) {
@@ -180,6 +192,49 @@ export default function DashboardPage() {
           cta="Open chat"
         />
       </div>
+
+      {/* Stale roadmap warning */}
+      {roadmapIsStale && !roadmapLoading && (
+        <div className="flex items-center justify-between gap-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+          <div className="flex items-center gap-2.5 text-sm text-amber-800">
+            <RefreshCw size={15} className="shrink-0 text-amber-600" />
+            <span>Your settings changed since your roadmap was generated. Regenerate to get updated steps.</span>
+          </div>
+          <button
+            onClick={() => profile?.id && generateRoadmap(profile.id)}
+            disabled={roadmapLoading}
+            className="shrink-0 text-xs font-semibold text-amber-700 border border-amber-300 bg-white hover:bg-amber-50 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50"
+          >
+            Update roadmap
+          </button>
+        </div>
+      )}
+
+      {/* Roadmap error */}
+      {roadmapError && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <span className="font-medium">Roadmap error:</span> {roadmapError}
+        </div>
+      )}
+
+      {/* Generate roadmap CTA — shown when profile is complete but no roadmap yet */}
+      {!roadmapLoading && profile?.intake_completed && steps.length === 0 && (
+        <div className="card p-6 flex items-center justify-between gap-4">
+          <div>
+            <h3 className="font-heading font-semibold text-slate-900">Ready to build your roadmap?</h3>
+            <p className="text-sm text-slate-500 mt-0.5">
+              Generate a personalized legal checklist for your business.
+            </p>
+          </div>
+          <button
+            onClick={() => profile.id && generateRoadmap(profile.id)}
+            disabled={roadmapLoading}
+            className="btn-primary whitespace-nowrap disabled:opacity-50"
+          >
+            {roadmapLoading ? 'Generating…' : 'Generate My Roadmap'}
+          </button>
+        </div>
+      )}
 
       {/* Quick wins */}
       {steps.length > 0 && (

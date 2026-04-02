@@ -1,17 +1,25 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Check,
   Lock,
-  Clock,
-  DollarSign,
   ChevronDown,
   ChevronUp,
-} from 'lucide-react';
-import type { RoadmapStep as RoadmapStepType, StepStatus } from '@/types/roadmap';
-import { useRoadmapStore } from '@/stores/roadmap-store';
-import StepDetail from './step-detail';
+  AlertTriangle,
+  ShieldCheck,
+  Sparkles,
+  AlertCircle,
+} from "lucide-react";
+import type {
+  RoadmapStep as RoadmapStepType,
+  StepStatus,
+  StepConfidence,
+  GapFlag,
+} from "@/types/roadmap";
+import { useRoadmapStore } from "@/stores/roadmap-store";
+import { useProfileStore } from "@/stores/profile-store";
+import StepDetail from "./step-detail";
 
 interface RoadmapStepProps {
   step: RoadmapStepType;
@@ -24,29 +32,86 @@ interface RoadmapStepProps {
 function isLocked(step: RoadmapStepType, allSteps: RoadmapStepType[]): boolean {
   return (step.depends_on ?? []).some((dep) => {
     const prereq = allSteps.find((s) => s.step_key === dep);
-    return prereq?.status !== 'completed';
+    return prereq?.status !== "completed";
   });
 }
 
 function nextStatus(current: StepStatus): StepStatus {
-  if (current === 'pending') return 'in_progress';
-  if (current === 'in_progress') return 'completed';
-  return 'pending';
+  if (current === "pending") return "in_progress";
+  if (current === "in_progress") return "completed";
+  return "pending";
 }
 
 const STATUS_BADGE: Record<StepStatus, string> = {
-  pending:     'badge bg-slate-100 text-slate-600',
-  in_progress: 'badge bg-blue-100 text-blue-700',
-  completed:   'badge bg-emerald-100 text-emerald-700',
-  skipped:     'badge bg-slate-100 text-slate-400',
+  pending: "badge bg-slate-100 text-slate-600",
+  in_progress: "badge bg-blue-100 text-blue-700",
+  completed: "badge bg-emerald-100 text-emerald-700",
+  skipped: "badge bg-slate-100 text-slate-400",
 };
 
 const STATUS_LABEL: Record<StepStatus, string> = {
-  pending:     'To do',
-  in_progress: 'In progress',
-  completed:   'Done',
-  skipped:     'Skipped',
+  pending: "To do",
+  in_progress: "In progress",
+  completed: "Done",
+  skipped: "Skipped",
 };
+
+// ── Confidence styling ───────────────────────────────────────────────────────
+
+const CONFIDENCE_BORDER: Record<StepConfidence, string> = {
+  verified: "border-l-emerald-400",
+  inferred: "border-l-amber-400",
+  flagged: "border-l-red-400",
+};
+
+const CONFIDENCE_BADGE: Record<StepConfidence, { class: string; label: string; icon: typeof ShieldCheck }> = {
+  verified: {
+    class: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    label: "Verified",
+    icon: ShieldCheck,
+  },
+  inferred: {
+    class: "bg-amber-50 text-amber-700 border-amber-200",
+    label: "AI-Inferred",
+    icon: Sparkles,
+  },
+  flagged: {
+    class: "bg-red-50 text-red-700 border-red-200",
+    label: "Flagged",
+    icon: AlertTriangle,
+  },
+};
+
+const SEVERITY_STYLE: Record<string, string> = {
+  high: "bg-red-50 border-red-200 text-red-800",
+  medium: "bg-amber-50 border-amber-200 text-amber-800",
+  low: "bg-slate-50 border-slate-200 text-slate-700",
+};
+
+// ── Flag card ────────────────────────────────────────────────────────────────
+
+function FlagCard({ flag }: { flag: GapFlag }) {
+  return (
+    <div
+      className={`rounded-lg border p-3 text-sm ${SEVERITY_STYLE[flag.severity]}`}
+    >
+      <div className="flex items-start gap-2">
+        <AlertCircle size={14} className="shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-xs uppercase tracking-wide">
+              {flag.severity} — {flag.type.replace(/_/g, " ")}
+            </span>
+          </div>
+          <p className="leading-relaxed">{flag.issue}</p>
+          <p className="font-medium">
+            {flag.recommendation}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ── Timeline node ─────────────────────────────────────────────────────────────
 
@@ -57,6 +122,8 @@ function StepNode({
   step: RoadmapStepType;
   locked: boolean;
 }) {
+  const confidence = step.confidence ?? "verified";
+
   if (locked) {
     return (
       <div className="h-9 w-9 rounded-full bg-slate-100 border-2 border-slate-200 flex items-center justify-center">
@@ -64,166 +131,234 @@ function StepNode({
       </div>
     );
   }
-  if (step.status === 'completed') {
+
+  if (step.status === "completed") {
     return (
       <div className="h-9 w-9 rounded-full bg-brand-600 flex items-center justify-center shadow-brand-sm">
         <Check size={15} strokeWidth={3} className="text-white" />
       </div>
     );
   }
-  if (step.status === 'in_progress') {
+
+  if (step.status === "in_progress") {
     return (
       <div className="h-9 w-9 rounded-full border-2 border-brand-500 bg-white flex items-center justify-center">
         <div className="h-2.5 w-2.5 rounded-full bg-brand-500 animate-pulse" />
       </div>
     );
   }
-  // pending
+
+  // Pending — color the node ring by confidence
+  if (confidence === "flagged") {
+    return (
+      <div className="h-9 w-9 rounded-full border-2 border-red-400 bg-red-50 flex items-center justify-center">
+        <AlertTriangle size={13} className="text-red-500" />
+      </div>
+    );
+  }
+  if (confidence === "inferred") {
+    return (
+      <div className="h-9 w-9 rounded-full border-2 border-amber-400 bg-amber-50 flex items-center justify-center">
+        <Sparkles size={13} className="text-amber-500" />
+      </div>
+    );
+  }
+
   return (
     <div className="h-9 w-9 rounded-full border-2 border-slate-200 bg-white flex items-center justify-center">
-      <span className="text-xs font-bold text-slate-400 tabular-nums">{step.step_order}</span>
+      <span className="text-xs font-bold text-slate-400 tabular-nums">
+        {step.step_order}
+      </span>
     </div>
   );
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function RoadmapStep({ step, allSteps, isLast }: RoadmapStepProps) {
+export default function RoadmapStep({
+  step,
+  allSteps,
+  isLast,
+}: RoadmapStepProps) {
   const [expanded, setExpanded] = useState(false);
   const { updateStepStatus } = useRoadmapStore();
-  const locked = isLocked(step, allSteps);
-  const isCompleted = step.status === 'completed';
+  const { profile } = useProfileStore();
 
-  // Find blocking prereq titles for the lock message
+  const locked = isLocked(step, allSteps);
+  const isCompleted = step.status === "completed";
+  const confidence = step.confidence ?? "verified";
+  const confidenceInfo = CONFIDENCE_BADGE[confidence];
+  const ConfidenceIcon = confidenceInfo.icon;
+  const stepFlags = step.flags ?? [];
+
   const blockingTitles = (step.depends_on ?? [])
     .map((dep) => allSteps.find((s) => s.step_key === dep))
-    .filter((s) => s && s.status !== 'completed')
+    .filter((s) => s && s.status !== "completed")
     .map((s) => s!.title)
-    .slice(0, 1); // show at most one
+    .slice(0, 1);
 
   function handleCheck(e: React.MouseEvent) {
     e.stopPropagation();
-    if (locked) return;
-    updateStepStatus(step.id, nextStatus(step.status));
+    if (locked || !profile?.id) return;
+    updateStepStatus(step.id, profile.id, nextStatus(step.status));
   }
 
   return (
     <div className="flex gap-4">
-
-      {/* Left rail: node + connector line */}
+      {/* Left rail */}
       <div className="flex flex-col items-center shrink-0 pt-1">
         <StepNode step={step} locked={locked} />
         {!isLast && (
-          <div className={`w-0.5 flex-1 min-h-[32px] mt-1 transition-colors duration-300 ${
-            isCompleted ? 'bg-brand-200' : 'bg-slate-200'
-          }`} />
+          <div
+            className={`w-0.5 flex-1 min-h-[32px] mt-1 ${
+              isCompleted
+                ? "bg-brand-200"
+                : confidence === "flagged"
+                  ? "bg-red-200"
+                  : confidence === "inferred"
+                    ? "bg-amber-200"
+                    : "bg-slate-200"
+            }`}
+          />
         )}
       </div>
 
       {/* Card */}
-      <div className={`flex-1 pb-5 ${isLast ? 'pb-0' : ''}`}>
+      <div className={`flex-1 pb-5 ${isLast ? "pb-0" : ""}`}>
         <div
-          className={`card transition-all duration-200 overflow-hidden ${
+          className={`card transition-all overflow-hidden border-l-4 ${
+            CONFIDENCE_BORDER[confidence]
+          } ${
             locked
-              ? 'opacity-50 cursor-not-allowed'
+              ? "opacity-50 cursor-not-allowed"
               : isCompleted
-              ? 'border-emerald-200 bg-emerald-50/30'
-              : 'hover:shadow-card-hover hover:border-slate-300 cursor-pointer'
+                ? "border-l-emerald-400 bg-emerald-50/30"
+                : confidence === "flagged"
+                  ? "hover:shadow-card-hover cursor-pointer"
+                  : "hover:shadow-card-hover hover:border-slate-300 cursor-pointer"
           }`}
         >
-          {/* Header row */}
+          {/* Header */}
           <button
             type="button"
             onClick={locked ? undefined : () => setExpanded((e) => !e)}
             disabled={locked}
-            aria-expanded={expanded}
-            className="w-full text-left p-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-inset rounded-2xl"
+            className="w-full text-left p-5"
           >
             <div className="flex items-start gap-3">
-
-              {/* Checkbox area */}
+              {/* Checkbox */}
               <div
-                role="checkbox"
-                aria-checked={isCompleted}
-                aria-label={locked ? 'Step locked' : `Mark step ${isCompleted ? 'incomplete' : 'in progress'}`}
                 onClick={handleCheck}
-                onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') handleCheck(e as unknown as React.MouseEvent); }}
-                tabIndex={locked ? -1 : 0}
-                className={`mt-0.5 h-5 w-5 rounded border-2 flex items-center justify-center shrink-0 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
+                className={`mt-0.5 h-5 w-5 rounded border-2 flex items-center justify-center ${
                   locked
-                    ? 'border-slate-200 bg-slate-50 cursor-not-allowed'
+                    ? "border-slate-200 bg-slate-50"
                     : isCompleted
-                    ? 'border-brand-600 bg-brand-600 cursor-pointer'
-                    : step.status === 'in_progress'
-                    ? 'border-blue-400 bg-blue-50 cursor-pointer'
-                    : 'border-slate-300 hover:border-brand-400 cursor-pointer'
+                      ? "border-brand-600 bg-brand-600"
+                      : "border-slate-300 hover:border-brand-400"
                 }`}
               >
-                {isCompleted && <Check size={11} strokeWidth={3} className="text-white" />}
-                {step.status === 'in_progress' && <div className="h-2 w-2 rounded-full bg-blue-500" />}
+                {isCompleted && <Check size={11} className="text-white" />}
+                {step.status === "in_progress" && (
+                  <div className="h-2 w-2 rounded-full bg-blue-500" />
+                )}
               </div>
 
-              {/* Title + meta */}
+              {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`font-heading font-semibold text-sm leading-snug ${
-                    isCompleted ? 'line-through text-slate-400' : 'text-slate-900'
-                  }`}>
+                  <span
+                    className={`font-heading font-semibold text-sm ${
+                      isCompleted
+                        ? "line-through text-slate-400"
+                        : "text-slate-900"
+                    }`}
+                  >
                     {step.title}
                   </span>
                   <span className={STATUS_BADGE[step.status]}>
                     {STATUS_LABEL[step.status]}
                   </span>
+
+                  {/* Confidence badge */}
+                  <span
+                    className={`inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded border ${confidenceInfo.class}`}
+                  >
+                    <ConfidenceIcon size={10} />
+                    {confidenceInfo.label}
+                  </span>
                 </div>
 
-                {/* Lock message */}
                 {locked && blockingTitles.length > 0 && (
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <Lock size={11} className="text-slate-400 shrink-0" />
-                    <span className="text-xs text-slate-400">
-                      Complete &ldquo;{blockingTitles[0]}&rdquo; first
-                    </span>
-                  </div>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Complete &quot;{blockingTitles[0]}&quot; first
+                  </p>
                 )}
 
-                {/* Description */}
                 {!locked && step.description && (
-                  <p className="text-sm text-slate-500 mt-1 leading-relaxed line-clamp-2">
+                  <p className="text-sm text-slate-500 mt-1 line-clamp-2">
                     {step.description}
                   </p>
                 )}
 
-                {/* Meta chips */}
-                {!locked && (step.estimated_timeline || step.estimated_cost) && (
-                  <div className="flex items-center gap-3 mt-2">
-                    {step.estimated_timeline && (
-                      <span className="flex items-center gap-1 text-xs text-slate-400">
-                        <Clock size={11} />
-                        {step.estimated_timeline}
-                      </span>
-                    )}
-                    {step.estimated_cost && (
-                      <span className="flex items-center gap-1 text-xs text-slate-400">
-                        <DollarSign size={11} />
-                        {step.estimated_cost}
-                      </span>
-                    )}
+                {!locked &&
+                  (step.estimated_timeline || step.estimated_cost) && (
+                    <div className="flex gap-3 mt-2 text-xs text-slate-400">
+                      {step.estimated_timeline && (
+                        <span className="flex items-center gap-1">
+                          <span>&#9201;</span> {step.estimated_timeline}
+                        </span>
+                      )}
+                      {step.estimated_cost && (
+                        <span className="flex items-center gap-1">
+                          <span>&#128176;</span> {step.estimated_cost}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                {/* Inline flag summary when collapsed */}
+                {!expanded && stepFlags.length > 0 && (
+                  <div className="mt-2 flex items-center gap-1.5 text-xs">
+                    <AlertTriangle size={12} className={
+                      stepFlags.some((f) => f.severity === "high")
+                        ? "text-red-500"
+                        : "text-amber-500"
+                    } />
+                    <span className={
+                      stepFlags.some((f) => f.severity === "high")
+                        ? "text-red-600 font-medium"
+                        : "text-amber-600 font-medium"
+                    }>
+                      {stepFlags.length} issue{stepFlags.length > 1 ? "s" : ""} detected
+                    </span>
                   </div>
                 )}
               </div>
 
-              {/* Expand chevron */}
+              {/* Chevron */}
               {!locked && (
-                <div className="shrink-0 text-slate-400 mt-0.5">
-                  {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                <div className="text-slate-400">
+                  {expanded ? (
+                    <ChevronUp size={16} />
+                  ) : (
+                    <ChevronDown size={16} />
+                  )}
                 </div>
               )}
             </div>
           </button>
 
-          {/* Expanded detail */}
+          {/* Expanded: flags + step detail */}
           {expanded && !locked && (
             <div className="border-t border-slate-100">
+              {/* Flags section */}
+              {stepFlags.length > 0 && (
+                <div className="px-5 pt-4 space-y-2">
+                  {stepFlags.map((flag, i) => (
+                    <FlagCard key={`${flag.type}-${i}`} flag={flag} />
+                  ))}
+                </div>
+              )}
               <StepDetail step={step} />
             </div>
           )}

@@ -9,40 +9,48 @@ import type {
   IntakeAnswers,
   CreateProfileDTO,
   UpdateProfileDTO,
-  BusinessType,
 } from '@/types/profile'
 import { CLUSTERS } from '@/lib/clusters'
-import type { ClusterID } from '@/lib/clusters'
-
-// TODO: import { ClaudeClient } from '@/lib/claude/client'
-// TODO: import { ProfileResponseSchema } from '@/lib/claude/schemas'
+import { classifyBusiness } from '@/lib/classifier'
 
 export const ProfileService = {
 
   /**
    * Called after the user completes the 8-question intake wizard.
-   * 1. Sends raw answers to Claude → classifies business type, sector, name
-   * 2. Merges Claude output with intake answers
+   * 1. Classifies business deterministically from answers (no Claude API needed)
+   * 2. Merges cluster info with intake answers
    * 3. Upserts into the profiles table
    */
   async createFromIntake(user_id: string, answers: IntakeAnswers): Promise<Profile> {
-    // Step 1: Call Claude to classify the business
-    // TODO: Uncomment when Claude client is wired up
-    // const rawJson = await ClaudeClient.complete(buildProfilePrompt(answers as Record<string, unknown>))
-    // const claudeResult = ProfileResponseSchema.parse(JSON.parse(rawJson))
-    // const { business_type, industry_sector, business_name, business_description, cluster_id: claudeClusterId } = claudeResult
+    console.log(`[ProfileService.createFromIntake] START user_id=${user_id} business_idea="${answers.business_idea?.slice(0, 60)}"`)
 
-    // Step 1b: Stub cluster until Claude is live — default to C9
-    const clusterId: ClusterID = 'C9'                    // TODO: replace with claudeClusterId
+    // Step 1: Classify business deterministically from intake answers (no Claude API needed)
+    const clusterId = classifyBusiness(answers)
     const clusterMeta = CLUSTERS[clusterId]
+    console.log(`[ProfileService.createFromIntake] Classified as cluster=${clusterId} (${clusterMeta.label})`)
 
-    // Step 2: Build the profile DTO (using stubs until Claude is live)
+    // Step 2: Derive business_type + industry_sector from cluster (no Claude needed)
+    const CLUSTER_TO_TYPE: Record<string, 'food' | 'freelance' | 'daycare' | 'retail' | 'personal_care' | 'other'> = {
+      C1: 'food', C2: 'freelance', C3: 'daycare',
+      C4: 'other', C5: 'retail', C6: 'food',
+      C7: 'other', C8: 'personal_care', C9: 'other',
+    }
+    const CLUSTER_TO_SECTOR: Record<string, string> = {
+      C1: 'home-based food', C2: 'consulting & freelance', C3: 'regulated childcare',
+      C4: 'regulated profession', C5: 'retail & e-commerce', C6: 'food service & hospitality',
+      C7: 'construction & trades', C8: 'personal services', C9: 'general',
+    }
+    const businessType = CLUSTER_TO_TYPE[clusterId] ?? 'other'
+    const industrySector = CLUSTER_TO_SECTOR[clusterId] ?? 'general'
+    console.log(`[ProfileService.createFromIntake] business_type=${businessType} sector=${industrySector}`)
+
+    // Step 3: Build the profile DTO
     const profileDTO: CreateProfileDTO = {
       user_id,
-      business_type: 'other' as BusinessType,            // TODO: replace with claudeResult.business_type
-      business_name: null,                                // TODO: replace with claudeResult.business_name
-      business_description: null,                         // TODO: replace with claudeResult.business_description
-      industry_sector: null,                              // TODO: replace with claudeResult.industry_sector
+      business_type: businessType,
+      business_name: null,
+      business_description: answers.business_idea,
+      industry_sector: industrySector,
       municipality: answers.location,
       borough: answers.borough ?? null,
       is_home_based: answers.is_home_based,

@@ -8,13 +8,14 @@ import RoadmapList from '@/components/roadmap/roadmap-list';
 
 export default function RoadmapPage() {
   const { profile, loadProfile } = useProfileStore();
-  const { steps, isLoading, generateRoadmap } = useRoadmapStore();
+  const { steps, isLoading, isGenerating, generateRoadmap } = useRoadmapStore();
 
   useEffect(() => {
     loadProfile();
   }, [loadProfile]);
 
   const hasRoadmap = steps.length > 0;
+  const showLoading = isLoading || isGenerating;
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -28,8 +29,8 @@ export default function RoadmapPage() {
           </p>
         </div>
 
-        {/* Generate button — only show when no roadmap exists */}
-        {!hasRoadmap && !isLoading && profile?.id && (
+        {/* Generate button — only show when no roadmap exists and not generating */}
+        {!hasRoadmap && !showLoading && profile?.id && (
           <button
             type="button"
             onClick={() => generateRoadmap(profile.id)}
@@ -40,7 +41,7 @@ export default function RoadmapPage() {
           </button>
         )}
 
-        {isLoading && (
+        {showLoading && (
           <div className="flex items-center gap-2 text-sm text-slate-500 shrink-0">
             <Loader2 size={15} className="animate-spin text-brand-500" />
             Generating…
@@ -49,7 +50,7 @@ export default function RoadmapPage() {
       </div>
 
       {/* No profile yet */}
-      {!profile?.intake_completed && !isLoading && (
+      {!profile?.intake_completed && !showLoading && (
         <div className="card p-10 text-center space-y-4">
           <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-slate-100 mx-auto">
             <Map size={24} className="text-slate-400" />
@@ -62,7 +63,7 @@ export default function RoadmapPage() {
       )}
 
       {/* Roadmap */}
-      {(hasRoadmap || isLoading) && <RoadmapList />}
+      {(hasRoadmap || showLoading) && <RoadmapList />}
 
     </div>
   );

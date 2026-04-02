@@ -180,7 +180,7 @@ export default function HomePage() {
           </nav>
           <div className="flex items-center gap-3">
             <Link href="/login" className="btn-ghost text-sm">Sign in</Link>
-            <Link href="/intake" className="btn-primary text-sm">Get started free</Link>
+            <Link href="/login" className="btn-primary text-sm">Get started free</Link>
           </div>
         </div>
       </header>
@@ -203,7 +203,7 @@ export default function HomePage() {
             that surprises every first-time entrepreneur — in plain language, in any language.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/intake" className="btn-primary btn-lg gap-2 group">
+            <Link href="/login" className="btn-primary btn-lg gap-2 group">
               Get my personalized roadmap
               <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
             </Link>
@@ -276,7 +276,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              href="/intake"
+              href="/login"
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-700 font-semibold px-7 py-3.5 rounded-xl hover:bg-brand-50 transition-colors text-sm"
             >
               Start now — takes 3 minutes

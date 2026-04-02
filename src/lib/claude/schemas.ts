@@ -1,33 +1,53 @@
 import { z } from 'zod';
 
-/**
- * Zod schemas for validating Claude API responses.
- */
+// ---------------------------------------------------------------------------
+// ClaudeRoadmapStep schema — must match ClaudeRoadmapStep in types/roadmap.ts
+// ---------------------------------------------------------------------------
 
-// Profile synthesis — Claude's response after the intake wizard
-export const ProfileResponseSchema = z.object({
-  business_name: z.string().nullable(),
-  business_description: z.string().nullable(),
-  industry_sector: z.string().nullable(),
+export const ClaudeRoadmapStepSchema = z.object({
+  step_order: z.number().int().min(1),
+  step_key: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  why_needed: z.string(),
+  estimated_cost: z.string(),
+  estimated_timeline: z.string(),
+  required_documents: z.array(z.string()),
+  government_url: z.string(),
+  source: z.string(),
+  depends_on: z.array(z.string()),
+});
+
+export const ClaudeRoadmapResponseSchema = z.array(ClaudeRoadmapStepSchema);
+
+export type ClaudeRoadmapStepParsed = z.infer<typeof ClaudeRoadmapStepSchema>;
+
+// ---------------------------------------------------------------------------
+// Profile classification schema — output of buildProfilePrompt
+// ---------------------------------------------------------------------------
+
+export const ProfileClassificationSchema = z.object({
   business_type: z.enum(['food', 'freelance', 'daycare', 'retail', 'personal_care', 'other']),
-  cluster_id: z.enum(['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9']),
+  industry_sector: z.string(),
+  is_home_based: z.boolean(),
+  serves_alcohol: z.boolean(),
+  is_regulated_profession: z.boolean(),
+  stage: z.enum(['idea', 'starting', 'operating']),
+  expected_revenue_cad: z.number().nullable(),
+  employee_count: z.number().nullable(),
+  location: z.string(),
+  age: z.number().nullable(),
+  is_newcomer: z.boolean(),
+  is_indigenous: z.boolean(),
+  is_woman: z.boolean(),
+  business_summary: z.string(),
 });
 
-export type ProfileResponse = z.infer<typeof ProfileResponseSchema>;
+export type ProfileClassification = z.infer<typeof ProfileClassificationSchema>;
 
-export const RoadmapStepSchema = z.object({
-  id: z.string(),
-  title_en: z.string(),
-  title_fr: z.string(),
-  description_en: z.string(),
-  description_fr: z.string(),
-  category: z.enum(['registration', 'permits', 'tax', 'banking', 'insurance', 'other']),
-  priority: z.number().int().min(1).max(100),
-  estimated_time_hours: z.number().nonnegative().optional(),
-  links: z.array(z.object({ label: z.string(), url: z.string().url() })).optional(),
-});
-
-export const RoadmapResponseSchema = z.array(RoadmapStepSchema);
+// ---------------------------------------------------------------------------
+// Funding / financial schemas (unchanged)
+// ---------------------------------------------------------------------------
 
 export const FundingMatchSchema = z.object({
   program_id: z.string(),
@@ -52,6 +72,59 @@ export const FinancialSnapshotSchema = z.object({
   watchOutFlags: z.array(z.string()).optional(),
 });
 
-export type RoadmapStep = z.infer<typeof RoadmapStepSchema>;
 export type FundingMatch = z.infer<typeof FundingMatchSchema>;
 export type FinancialSnapshot = z.infer<typeof FinancialSnapshotSchema>;
+
+// ---------------------------------------------------------------------------
+// Gap detection schema — Layer 2 adversarial review output
+// ---------------------------------------------------------------------------
+
+export const SuggestedStepSchema = z.object({
+  step_key: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  why_needed: z.string(),
+  estimated_cost: z.string(),
+  estimated_timeline: z.string(),
+  depends_on: z.array(z.string()),
+  government_url: z.string(),
+  source: z.string(),
+});
+
+export const GapFlagSchema = z.object({
+  type: z.enum(['missing_step', 'wrong_step', 'edge_case', 'verify_with_professional']),
+  severity: z.enum(['high', 'medium', 'low']),
+  related_step_key: z.string().nullable(),
+  issue: z.string().min(1),
+  recommendation: z.string().min(1),
+  suggested_step: SuggestedStepSchema.optional(),
+});
+
+export const GapDetectionResponseSchema = z.array(GapFlagSchema);
+
+export type GapFlagParsed = z.infer<typeof GapFlagSchema>;
+
+// ---------------------------------------------------------------------------
+// parseClaudeJSON — strips markdown fences Claude wraps around JSON output,
+// then JSON.parses. Claude often returns: ```json\n[...]\n```
+// ---------------------------------------------------------------------------
+
+export function parseClaudeJSON(text: string): unknown {
+  const cleaned = text
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```\s*$/, '')
+    .trim();
+
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    // Recover from truncated JSON array (stop_reason=max_tokens cuts mid-object).
+    // Find the last fully closed object in the array and close the array there.
+    const lastCompleteObject = cleaned.lastIndexOf('\n  }');
+    if (lastCompleteObject !== -1) {
+      const recovered = cleaned.slice(0, lastCompleteObject + 4) + '\n]';
+      return JSON.parse(recovered);
+    }
+    throw new Error(`JSON parse failed after recovery attempt: ${cleaned.slice(0, 200)}`);
+  }
+}
