@@ -1,65 +1,83 @@
 'use client';
 
-import { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import ExpenseInput from './expense-input';
-import TakeHomeBreakdown from './take-home-breakdown';
-import WatchOutFlags from './watch-out-flags';
-import Button from '@/components/ui/button';
-import type { FinancialSnapshot } from '@/types/financial';
+import { useMemo } from 'react';
+import Link from 'next/link';
+import { ArrowRight, Wallet } from 'lucide-react';
+import { useProfileStore } from '@/stores/profile-store';
+import { calculateTakeHome } from '@/lib/financial/tax-calculator';
+
+const EXPENSE_DEFAULTS: Record<string, number> = {
+  food: 390, freelance: 360, daycare: 215,
+  retail: 300, personal_care: 250, creative: 200, tech: 300, other: 200,
+};
+
+const fmt = (n: number) =>
+  new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
 
 export default function SnapshotCard() {
-  const [grossRevenue, setGrossRevenue] = useState<number>(0);
-  const [expenses, setExpenses] = useState<number>(0);
-  const [snapshot, setSnapshot] = useState<FinancialSnapshot | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const { profile } = useProfileStore();
+  const monthlyRevenue  = profile?.expected_monthly_revenue ?? 0;
+  const monthlyExpenses = EXPENSE_DEFAULTS[profile?.business_type ?? 'other'] ?? 200;
 
-  async function calculate() {
-    setIsLoading(true);
-    try {
-      const res = await fetch('/api/financial-snapshot', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ grossRevenue, expenses }),
-      });
-      const data = await res.json();
-      setSnapshot(data);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const taxes = useMemo(
+    () => calculateTakeHome(monthlyRevenue * 12, monthlyExpenses * 12),
+    [monthlyRevenue, monthlyExpenses],
+  );
+
+  const monthlyTakeHome = Math.max(0, taxes.estimatedTakeHome / 12 - monthlyExpenses);
+  const totalMonthlyTax = taxes.totalTax / 12;
+  const total = monthlyRevenue || 1;
+
+  const segments = [
+    { value: totalMonthlyTax, color: 'bg-red-400',    label: `Tax ${fmt(totalMonthlyTax)}/mo` },
+    { value: monthlyExpenses, color: 'bg-slate-300',  label: `Expenses ${fmt(monthlyExpenses)}/mo` },
+    { value: monthlyTakeHome, color: 'bg-brand-500',  label: `Keep ${fmt(monthlyTakeHome)}/mo` },
+  ];
+
+  if (!monthlyRevenue) return null;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Financial Snapshot</CardTitle>
-        <p className="text-sm text-gray-500 mt-1">
-          Estimate your take-home pay after taxes, QPP, and QPIP.
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <ExpenseInput
-            label="Gross Revenue (CAD)"
-            value={grossRevenue}
-            onChange={setGrossRevenue}
-          />
-          <ExpenseInput
-            label="Business Expenses (CAD)"
-            value={expenses}
-            onChange={setExpenses}
-          />
-        </div>
-        <Button onClick={calculate} isLoading={isLoading}>
-          Calculate
-        </Button>
-        {snapshot && (
-          <div className="space-y-4 pt-2">
-            <TakeHomeBreakdown snapshot={snapshot} />
-            <WatchOutFlags warnings={snapshot.watch_out_flags ?? []} />
+    <div className="card p-5 space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-brand-50">
+            <Wallet size={15} className="text-brand-600" />
           </div>
-        )}
-      </CardContent>
-    </Card>
+          <span className="font-heading font-semibold text-slate-900 text-sm">Financial Snapshot</span>
+        </div>
+        <Link href="/financial" className="text-xs font-medium text-brand-600 hover:text-brand-700 flex items-center gap-1 transition-colors">
+          Full breakdown <ArrowRight size={11} />
+        </Link>
+      </div>
+
+      {/* Take-home hero number */}
+      <div>
+        <p className="text-xs text-slate-500 mb-0.5">Estimated monthly take-home</p>
+        <p className="font-heading text-3xl font-bold text-slate-900 tabular-nums">{fmt(monthlyTakeHome)}</p>
+        <p className="text-xs text-slate-400 mt-0.5">after taxes, QPP &amp; ~{fmt(monthlyExpenses)} expenses</p>
+      </div>
+
+      {/* Mini waterfall bar */}
+      <div>
+        <div className="flex h-3 rounded-full overflow-hidden gap-px">
+          {segments.map((s, i) => (
+            <div
+              key={i}
+              className={`${s.color} transition-all duration-500 ease-out`}
+              style={{ width: `${Math.max(0, (s.value / total) * 100)}%` }}
+            />
+          ))}
+        </div>
+        <div className="flex items-center gap-4 mt-2 flex-wrap">
+          {segments.map((s, i) => (
+            <span key={i} className="flex items-center gap-1.5 text-xs text-slate-500">
+              <span className={`h-2 w-2 rounded-full ${s.color} shrink-0`} />
+              {s.label}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
