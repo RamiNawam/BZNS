@@ -1,118 +1,199 @@
 // ============================================================
-// FUNDING SERVICE — business logic for funding program matching
-// Orchestrates: fetch profile → load KB → run scorer → save matches
-// NOTE: Scoring is fully deterministic — no Claude involved here.
-// Claude is only called if the user clicks "explain this program."
+// FUNDING SERVICE — wires scorer to real JSON data
 // ============================================================
 
+import fs from 'fs'
+import path from 'path'
 import { ProfileRepository } from '@/repositories/profile.repository'
 import { FundingRepository } from '@/repositories/funding.repository'
 import { CacheRepository } from '@/repositories/cache.repository'
-import type { FundingMatch, CreateFundingMatchDTO, UpdateFundingMatchDTO } from '@/types/funding'
+import { scorePrograms } from '@/lib/funding/scorer'
+import { askClaude } from '@/lib/claude/client'
+import { buildSystemPrompt } from '@/lib/claude/prompts'
+import type { FundingMatch, FundingProgramJSON, CreateFundingMatchDTO, UpdateFundingMatchDTO, ProgramType } from '@/types/funding'
 
-// TODO: import { FundingScorer } from '@/lib/funding/scorer'
-// TODO: import { KnowledgeBaseLoader } from '@/lib/knowledge-base/loader'
-// TODO: import { ClaudeClient } from '@/lib/claude/client'
+// ── Max numeric amounts per program (for total_potential_funding) ─────────────
+const PROGRAM_MAX_AMOUNTS: Record<string, number> = {
+  bdc:                    100_000,
+  futurpreneur:            75_000,
+  pme_mtl:                 20_000,
+  sta:                     31_200,
+  irap:                    50_000,
+  fli:                     50_000,
+  investissement_quebec:  150_000,
+  canada_summer_jobs:      20_000,
+  demographic_programs:    15_000,
+}
+
+const FUNDING_FILES = [
+  'bdc', 'futurpreneur', 'pme_mtl', 'sta', 'irap', 'fli',
+  'investissement_quebec', 'canada_summer_jobs', 'demographic_programs',
+]
+
+// ── JSON → FundingProgramJSON adapter ────────────────────────────────────────
+
+function extractAmountDescription(raw: Record<string, unknown>): string {
+  const amount = raw.amount as Record<string, unknown> | undefined
+  if (!amount) return 'Varies — see program details'
+  if (typeof amount.maximum === 'number') return `Up to $${amount.maximum.toLocaleString('en-CA')}`
+  if (typeof amount.micro_loan_max === 'number') return `Up to $${amount.micro_loan_max.toLocaleString('en-CA')}`
+  if (typeof amount.typical_maximum === 'number') return `Up to $${amount.typical_maximum.toLocaleString('en-CA')}`
+  if (typeof amount.total === 'number') return `Up to $${amount.total.toLocaleString('en-CA')}`
+  if (typeof amount.total_potential === 'string') return amount.total_potential
+  return 'Varies — see program details'
+}
+
+function extractUrl(raw: Record<string, unknown>): string {
+  if (typeof raw.application_url === 'string') return raw.application_url
+  const meta = raw._meta as Record<string, unknown> | undefined
+  const urls = meta?.verify_urls as Record<string, string> | undefined
+  return urls?.apply ?? urls?.main ?? ''
+}
+
+function extractEligibility(raw: Record<string, unknown>): FundingProgramJSON['eligibility'] {
+  const elig = (raw.eligibility ?? {}) as Record<string, unknown>
+  const criteria = (elig.criteria ?? {}) as Record<string, unknown>
+
+  // Age — handle both min_age and minimum patterns
+  const ageCriteria = (criteria.age ?? {}) as Record<string, unknown>
+  const ageMin = (ageCriteria.min_age ?? ageCriteria.minimum) as number | undefined
+  const rawMax = ageCriteria.max_age ?? ageCriteria.maximum
+  const ageMax = typeof rawMax === 'number' ? rawMax : undefined
+
+  // Immigration status
+  const immCriteria = (criteria.immigration_status ?? {}) as Record<string, unknown>
+  const immigrationStatus = (immCriteria.eligible ?? []) as string[]
+
+  // Location — flag Montreal-specific programs
+  const locationRequired = raw.location_required as string | undefined
+  const locCriteria = (criteria.location ?? {}) as Record<string, unknown>
+  const locEligible = (locCriteria.eligible ?? locCriteria.detail ?? '') as string
+  const isMontreal =
+    locationRequired?.toLowerCase().includes('montréal') ||
+    locationRequired?.toLowerCase().includes('montreal') ||
+    locEligible.toLowerCase().includes('montréal') ||
+    locEligible.toLowerCase().includes('montreal') ||
+    raw.program_key === 'pme_mtl' ||
+    raw.program_key === 'fli'
+  const locations = isMontreal ? ['montreal', 'montréal'] : []
+
+  // Demographics
+  const demographics: string[] = []
+  if (raw.program_key === 'demographic_programs') {
+    demographics.push('immigrant', 'newcomer', 'woman', 'youth')
+  }
+
+  return {
+    ...(ageMin !== undefined && { age_min: ageMin }),
+    ...(ageMax !== undefined && { age_max: ageMax }),
+    ...(locations.length > 0 && { locations }),
+    ...(immigrationStatus.length > 0 && { immigration_status: immigrationStatus }),
+    ...(demographics.length > 0 && { demographics }),
+  }
+}
+
+function extractScoringWeights(raw: Record<string, unknown>): FundingProgramJSON['scoring_weights'] {
+  const elig = (raw.eligibility ?? {}) as Record<string, unknown>
+  const sw = (elig.scoring_weights ?? {}) as Record<string, number>
+
+  return {
+    age:           sw.age ?? 0.2,
+    location:      sw.location_montreal ?? sw.location ?? 0.2,
+    immigration:   sw.immigration_status ?? 0.2,
+    business_type: sw.business_type ?? sw.business_type_tech ?? sw.sector ?? 0.2,
+    demographics:  sw.demographics ?? sw.immigration_status_immigrant ?? 0.2,
+  }
+}
+
+function adaptProgram(raw: Record<string, unknown>): FundingProgramJSON {
+  const rawType = raw.type as string
+  const type: ProgramType =
+    rawType === 'loan' ? 'loan'
+    : rawType === 'grant' ? 'grant'
+    : rawType === 'tax_credit' ? 'tax_credit'
+    : rawType === 'mentorship' ? 'mentorship'
+    : 'loan' // multiple / unknown → default to loan
+
+  return {
+    key: raw.program_key as string,
+    name: (raw.program_name_en ?? raw.title_en ?? raw.program_key) as string,
+    type,
+    amount_description: extractAmountDescription(raw),
+    summary: (raw.plain_language_summary ?? '') as string,
+    application_url: extractUrl(raw),
+    source_url: extractUrl(raw),
+    eligibility: extractEligibility(raw),
+    scoring_weights: extractScoringWeights(raw),
+  }
+}
+
+function loadFundingPrograms(): FundingProgramJSON[] {
+  const dataDir = path.join(process.cwd(), 'data', 'funding')
+  return FUNDING_FILES.map((file) => {
+    const raw = JSON.parse(fs.readFileSync(path.join(dataDir, `${file}.json`), 'utf-8'))
+    return adaptProgram(raw)
+  })
+}
+
+function computeTotalPotential(matches: CreateFundingMatchDTO[]): string {
+  const total = matches
+    .filter((m) => m.match_score >= 50)
+    .reduce((sum, m) => sum + (PROGRAM_MAX_AMOUNTS[m.program_key] ?? 0), 0)
+  if (total === 0) return 'Funding available'
+  const thousands = Math.round(total / 1000)
+  return `$${thousands}K+`
+}
+
+// ── Service ───────────────────────────────────────────────────────────────────
 
 export const FundingService = {
 
-  /**
-   * Run the deterministic funding scorer for a user.
-   * 1. Fetch profile
-   * 2. Check cache
-   * 3. Load all funding JSON files from /data/funding/
-   * 4. Score each program against the profile (0-100)
-   * 5. Filter out score = 0, sort descending
-   * 6. Save to DB + cache
-   * 7. Return matches with total_potential_funding
-   */
   async scoreForProfile(profile_id: string): Promise<{
     matches: FundingMatch[]
     total_potential_funding: string
   }> {
     const cacheKey = `funding:${profile_id}`
-
-    // Check cache first
     const cached = await CacheRepository.get<{ matches: FundingMatch[]; total_potential_funding: string }>(cacheKey)
     if (cached) return cached
 
-    // Fetch the user's profile
     const profile = await ProfileRepository.getById(profile_id)
     if (!profile) throw new Error(`FundingService.scoreForProfile: Profile not found ${profile_id}`)
 
-    // TODO: Load all funding programs from /data/funding/*.json
-    // const programs = KnowledgeBaseLoader.loadFundingPrograms()
+    const programs = loadFundingPrograms()
+    const scored = scorePrograms(programs, profile, profile_id)
+    const filtered = scored.filter((m) => m.match_score > 0)
 
-    // TODO: Score each program deterministically
-    // const scoredMatches = FundingScorer.scoreAll(profile, programs)
-    // const filtered = scoredMatches.filter(m => m.match_score > 0)
-
-    // TODO: Map scorer output → DB DTOs
-    // const matchDTOs: CreateFundingMatchDTO[] = filtered.map(m => ({
-    //   profile_id,
-    //   program_key: m.program_key,
-    //   program_name: m.program_name,
-    //   program_type: m.program_type,
-    //   amount_description: m.amount_description,
-    //   match_score: m.match_score,
-    //   eligibility_details: m.eligibility_details,
-    //   summary: m.summary,
-    //   application_url: m.application_url,
-    //   source_url: m.source_url,
-    //   is_bookmarked: false,
-    //   is_dismissed: false,
-    // }))
-
-    // STUB until scorer is wired
-    const matchDTOs: CreateFundingMatchDTO[] = []
-
-    // Save to DB
-    const savedMatches = matchDTOs.length > 0
-      ? await FundingRepository.batchUpsert(matchDTOs)
+    const savedMatches = filtered.length > 0
+      ? await FundingRepository.batchUpsert(filtered)
       : []
 
-    // Calculate total potential funding (for the "$95,000+ available" demo moment)
-    const total_potential_funding = '$0'
-    // TODO: replace with real calc from savedMatches
-
+    const total_potential_funding = computeTotalPotential(filtered)
     const result = { matches: savedMatches, total_potential_funding }
     await CacheRepository.set(cacheKey, result)
-
     return result
   },
 
-  /**
-   * Fetch previously scored matches (no rescoring).
-   */
   async getByProfileId(profile_id: string): Promise<FundingMatch[]> {
     return FundingRepository.getByProfileId(profile_id)
   },
 
-  /**
-   * Ask Claude to explain a specific program in plain language.
-   * Only called when user clicks "tell me more" on a funding card.
-   */
   async explainProgram(profile_id: string, program_key: string): Promise<string> {
     const profile = await ProfileRepository.getById(profile_id)
     if (!profile) throw new Error(`FundingService.explainProgram: Profile not found`)
 
-    // TODO: Load the specific program JSON
-    // const program = KnowledgeBaseLoader.loadFundingProgram(program_key)
+    const programs = loadFundingPrograms()
+    const program = programs.find((p) => p.key === program_key)
 
-    // TODO: Call Claude to explain it in the user's language
-    // const explanation = await ClaudeClient.explainFundingProgram(profile, program)
-    // return explanation
-
-    return `Explanation for ${program_key} — Claude integration pending`
+    const systemPrompt = buildSystemPrompt({ profileContext: profile })
+    const explanation = await askClaude(
+      systemPrompt,
+      `Explain the "${program?.name ?? program_key}" funding program to this person in 2-3 plain sentences. Focus on why it's relevant to them and what they need to do next. Be direct and practical. User profile: ${JSON.stringify({ business_type: profile.business_type, city: profile.municipality, age: profile.age, immigration_status: profile.immigration_status })}`,
+      'claude-sonnet-4-6'
+    )
+    return explanation
   },
 
-  /**
-   * Bookmark or dismiss a funding match.
-   */
-  async updateMatch(
-    match_id: string,
-    update: UpdateFundingMatchDTO
-  ): Promise<FundingMatch> {
+  async updateMatch(match_id: string, update: UpdateFundingMatchDTO): Promise<FundingMatch> {
     return FundingRepository.update(match_id, update)
   },
 }

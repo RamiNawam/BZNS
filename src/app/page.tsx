@@ -9,7 +9,6 @@ import {
   ArrowRight,
   ChevronRight,
   TrendingUp,
-  Shield,
   Zap,
   type LucideIcon,
 } from 'lucide-react';
@@ -61,16 +60,9 @@ const stats = [
 
 const smallFeatures: { icon: LucideIcon; label: string; description: string; color: string; bg: string }[] = [
   {
-    icon: Shield,
-    label: 'Compliance Guide',
-    description: 'Bill 96, MAPAQ, sector permits — all in plain language, linked to official sources.',
-    color: 'text-amber-600',
-    bg: 'bg-amber-50',
-  },
-  {
     icon: MessageSquare,
     label: 'AI Assistant',
-    description: 'Ask anything. Grounded in official KB. Cites sources. Refers professionals when out of scope.',
+    description: 'Ask anything about permits, taxes, or Bill 96. Grounded in official KB. Cites sources.',
     color: 'text-violet-600',
     bg: 'bg-violet-50',
   },

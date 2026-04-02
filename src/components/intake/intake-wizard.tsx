@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import IntakeProgress from './intake-progress';
 import QuestionCard from './question-card';
@@ -10,7 +10,24 @@ const STEPS = ['Your Business', 'Location', 'Finances', 'About You'];
 
 export default function IntakeWizard() {
   const [currentStep, setCurrentStep] = useState(0);
-  const { intakeForm, updateIntakeField, submitIntake, isLoading, error } = useProfileStore();
+  const { profile, intakeForm, updateIntakeField, submitIntake, isLoading, error } = useProfileStore();
+
+  // Pre-populate form from existing profile when editing
+  useEffect(() => {
+    if (!profile?.intake_completed) return;
+    if (intakeForm.business_idea) return; // already populated (e.g. partial save)
+
+    updateIntakeField('business_idea', profile.business_description ?? '');
+    updateIntakeField('location', profile.municipality ?? 'montreal');
+    updateIntakeField('borough', profile.borough ?? '');
+    updateIntakeField('is_home_based', profile.is_home_based ?? true);
+    updateIntakeField('expected_monthly_revenue', profile.expected_monthly_revenue ?? null);
+    updateIntakeField('has_partners', profile.has_partners ?? false);
+    updateIntakeField('age', profile.age ?? null);
+    if (profile.immigration_status) updateIntakeField('immigration_status', profile.immigration_status);
+    if (profile.languages_spoken?.length) updateIntakeField('languages', profile.languages_spoken);
+    updateIntakeField('preferred_language', profile.preferred_language ?? 'en');
+  }, [profile]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleNext() {
     if (currentStep < STEPS.length - 1) {

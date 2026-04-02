@@ -141,7 +141,7 @@ export default function DashboardPage() {
             )}
           </div>
         </div>
-        <Link href="/intake" className="text-xs font-medium text-brand-600 hover:text-brand-700 transition-colors">
+        <Link href="/profile" className="text-xs font-medium text-brand-600 hover:text-brand-700 transition-colors">
           Edit profile
         </Link>
       </div>
