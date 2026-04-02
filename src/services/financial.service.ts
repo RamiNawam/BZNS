@@ -13,6 +13,7 @@ import { getExpenseDefaults } from '@/lib/financial/expense-defaults'
 import { getDeductionSummary } from '@/lib/financial/deductions'
 import { generateScenarios, getBreakEvenResult, calculatePricing, calculateFundingImpact } from '@/lib/financial/projections'
 import type { ClusterID } from '@/lib/clusters'
+import { getClusterQuestions } from '@/lib/financial/cluster-questions'
 
 // TODO: import { ClaudeClient } from '@/lib/claude/client'
 // TODO: import { FinancialInsightSchema } from '@/lib/claude/schemas'
@@ -32,14 +33,71 @@ export const FinancialService = {
    * 7. Return full snapshot
    */
   async generate(input: SnapshotInput): Promise<FinancialSnapshot> {
-    const { profile_id, monthly_expenses, expense_categories, price_per_unit, units_per_month } = input
+    const {
+      profile_id,
+      monthly_expenses,
+      expense_categories,
+      price_per_unit,
+      units_per_month,
+      questionnaire_answers,
+    } = input
 
     // Step 1: Fetch profile
     let profile = await ProfileRepository.getById(profile_id)
     if (!profile) throw new Error(`FinancialService.generate: Profile not found ${profile_id}`)
 
-    // Step 2: Update profile with any new financial inputs
-    if (monthly_expenses !== undefined || expense_categories !== undefined) {
+    // Step 2: Update profile with cluster questionnaire or direct financial inputs.
+    if (questionnaire_answers && profile.cluster_id) {
+      const normalizedAnswers = Object.fromEntries(
+        Object.entries(questionnaire_answers).map(([k, v]) => {
+          if (v === 'true') return [k, true]
+          if (v === 'false') return [k, false]
+          return [k, v]
+        }),
+      ) as Record<string, string | number | boolean>
+
+      const clusterId = profile.cluster_id as ClusterID
+      const computed = getClusterQuestions(clusterId).computeFinancials(normalizedAnswers)
+
+      const defaults = getExpenseDefaults(clusterId)
+      const mergedExpenseCategories: Record<string, number> = Object.fromEntries(
+        defaults.categories.map((c) => [c.key, c.amount]),
+      )
+      Object.entries(computed.expenseOverrides).forEach(([k, v]) => {
+        mergedExpenseCategories[k] = Math.max(0, Number(v) || 0)
+      })
+
+      const inferredPrice =
+        Number(
+          normalizedAnswers.price_per_item ??
+          normalizedAnswers.price_per_service ??
+          normalizedAnswers.avg_product_price ??
+          normalizedAnswers.fee_per_session ??
+          normalizedAnswers.rate_amount ??
+          normalizedAnswers.daily_rate ??
+          0,
+        ) || null
+
+      const inferredUnits =
+        Number(
+          normalizedAnswers.items_per_week ??
+          normalizedAnswers.units_per_month ??
+          normalizedAnswers.sessions_per_week ??
+          normalizedAnswers.clients_per_week ??
+          normalizedAnswers.jobs_per_month ??
+          0,
+        ) || null
+
+      profile = await ProfileRepository.update(profile_id, {
+        expected_monthly_revenue: computed.monthlyRevenue,
+        monthly_expenses: Object.values(mergedExpenseCategories).reduce((sum, n) => sum + n, 0),
+        expense_categories: mergedExpenseCategories,
+        price_per_unit: inferredPrice ?? profile.price_per_unit ?? undefined,
+        units_per_month: inferredUnits ?? profile.units_per_month ?? undefined,
+        financial_questionnaire_completed: true,
+        financial_questionnaire_answers: normalizedAnswers,
+      })
+    } else if (monthly_expenses !== undefined || expense_categories !== undefined) {
       profile = await ProfileRepository.update(profile_id, {
         monthly_expenses: monthly_expenses ?? profile.monthly_expenses ?? undefined,
         expense_categories: expense_categories ?? profile.expense_categories ?? undefined,

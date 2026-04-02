@@ -593,8 +593,8 @@ const C8_QUESTIONS: ClusterQuestionSet = {
 
 // ── C9: General / unknown ──────────────────────────────────────────────────
 const C9_QUESTIONS: ClusterQuestionSet = {
-  title: 'Your Business',
-  description: 'Tell us the basics so we can estimate your finances.',
+  title: 'General Micro-Business',
+  description: 'Tell us the basics so we can estimate your finances accurately.',
   questions: [
     {
       key: 'expected_monthly_revenue',

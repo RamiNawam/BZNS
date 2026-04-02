@@ -28,7 +28,14 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { profile_id, monthly_expenses, expense_categories, price_per_unit, units_per_month } = body
+    const {
+      profile_id,
+      monthly_expenses,
+      expense_categories,
+      price_per_unit,
+      units_per_month,
+      questionnaire_answers,
+    } = body
 
     if (!profile_id) return NextResponse.json({ error: 'profile_id required' }, { status: 400 })
 
@@ -38,6 +45,7 @@ export async function POST(req: NextRequest) {
       expense_categories,
       price_per_unit,
       units_per_month,
+      questionnaire_answers,
     })
 
     return NextResponse.json({ snapshot }, { status: 201 })
@@ -50,7 +58,14 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json()
-    const { profile_id, monthly_expenses, expense_categories, price_per_unit, units_per_month } = body
+    const {
+      profile_id,
+      monthly_expenses,
+      expense_categories,
+      price_per_unit,
+      units_per_month,
+      questionnaire_answers,
+    } = body
 
     if (!profile_id) return NextResponse.json({ error: 'profile_id required' }, { status: 400 })
 
@@ -60,6 +75,7 @@ export async function PUT(req: NextRequest) {
       expense_categories,
       price_per_unit,
       units_per_month,
+      questionnaire_answers,
     })
 
     return NextResponse.json({ snapshot })

@@ -73,10 +73,15 @@ export interface Profile {
   cluster_id: ClusterID | null
   cluster_label: string | null
   cluster_complexity: ClusterComplexity | null
+
+  // Financial questionnaire (cluster-specific, persisted per account)
+  financial_questionnaire_completed?: boolean
+  financial_questionnaire_answers?: Record<string, string | number | boolean> | null
 }
 
-// Raw answers from the 8-question intake wizard (sent from the frontend)
+// Raw answers from the intake wizard (sent from the frontend)
 export interface IntakeAnswers {
+  business_category: string          // structured category for C1-C9 classification
   business_idea: string
   location: string
   borough?: string

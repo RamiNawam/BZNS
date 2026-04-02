@@ -19,7 +19,6 @@ import {
   BarChart3,
   Receipt,
   Banknote,
-  SlidersHorizontal,
   ChevronLeft,
   Edit3,
 } from 'lucide-react';
@@ -30,7 +29,7 @@ import { generateScenarios, getBreakEvenResult, calculatePricing, calculateFundi
 import { getDeductionSummary } from '@/lib/financial/deductions';
 import { getClusterQuestions } from '@/lib/financial/cluster-questions';
 import type { FinancialQuestion } from '@/lib/financial/cluster-questions';
-import type { ClusterID } from '@/lib/clusters';
+import { CLUSTERS, type ClusterID } from '@/lib/clusters';
 import type { ExpenseCategory } from '@/lib/financial/expense-defaults';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -42,6 +41,30 @@ const fmtPct = (n: number) => `${(n * 100).toFixed(1)}%`;
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const GST_THRESHOLD = 30_000;
+
+// ── Page section headings (Layout A) ─────────────────────────────────────────
+
+function PageSection({
+  kicker,
+  title,
+  description,
+  id,
+}: {
+  kicker: string;
+  title: string;
+  description?: string;
+  id?: string;
+}) {
+  return (
+    <div className="space-y-1 pt-1">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">{kicker}</p>
+      <h2 id={id} className="font-heading text-lg font-semibold text-slate-900">
+        {title}
+      </h2>
+      {description ? <p className="text-xs text-slate-500 max-w-2xl leading-relaxed">{description}</p> : null}
+    </div>
+  );
+}
 
 // ── Section toggle wrapper ────────────────────────────────────────────────────
 
@@ -823,10 +846,12 @@ function QuestionInput({
 function FinancialQuestionnaire({
   clusterId,
   clusterLabel,
+  initialAnswers,
   onComplete,
 }: {
   clusterId: ClusterID;
   clusterLabel: string;
+  initialAnswers?: Record<string, string | number | boolean>;
   onComplete: (answers: Record<string, string | number | boolean>) => void;
 }) {
   const questionSet = useMemo(() => getClusterQuestions(clusterId), [clusterId]);
@@ -839,7 +864,7 @@ function FinancialQuestionnaire({
     questions.forEach((q) => {
       init[q.key] = q.defaultValue ?? (q.type === 'currency' || q.type === 'number' ? 0 : '');
     });
-    return init;
+    return { ...init, ...(initialAnswers ?? {}) };
   });
 
   const question = questions[currentStep];
@@ -997,30 +1022,24 @@ export default function FinancialPage() {
   const [monthlyRevenue, setMonthlyRevenue] = useState(defaultRevenue);
   const [expenseCategories, setExpenseCategories] = useState<ExpenseCategory[]>(expenseProfile.categories);
   const [questionnaireComplete, setQuestionnaireComplete] = useState(false);
-
-  // ── Financial questionnaire gate ──────────────────────────────────────────
-  // Key stored per cluster so changing business type re-asks questions
-  const STORAGE_KEY = `bzns-fin-answers-${clusterId}`;
-
-  // On mount, check if we already have saved answers for this cluster
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setQuestionnaireComplete(true);
-    } catch {
-      // localStorage unavailable (SSR / private mode)
-    }
-  }, [STORAGE_KEY]);
+  const [questionnaireAnswers, setQuestionnaireAnswers] = useState<Record<string, string | number | boolean>>({});
+  const [isSubmittingQuestionnaire, setIsSubmittingQuestionnaire] = useState(false);
 
   // Called when user finishes (or skips) the questionnaire
   const handleQuestionnaireComplete = useCallback(
-    (answers: Record<string, string | number | boolean>) => {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
-      } catch { /* ignore */ }
+    async (answers: Record<string, string | number | boolean>) => {
+      if (!profile?.id) return;
+      setIsSubmittingQuestionnaire(true);
+      const normalizedAnswers = Object.fromEntries(
+        Object.entries(answers).map(([k, v]) => {
+          if (v === 'true') return [k, true];
+          if (v === 'false') return [k, false];
+          return [k, v];
+        }),
+      ) as Record<string, string | number | boolean>;
 
-      // Apply computed revenue + expense overrides
-      const computed = questionSet.computeFinancials(answers);
+      // Apply computed revenue + expense overrides in UI immediately
+      const computed = questionSet.computeFinancials(normalizedAnswers);
       setMonthlyRevenue(computed.monthlyRevenue);
       setExpenseCategories((prev) =>
         prev.map((cat) =>
@@ -1029,47 +1048,52 @@ export default function FinancialPage() {
             : cat,
         ),
       );
-      setQuestionnaireComplete(true);
+
+      try {
+        await fetch('/api/financial-snapshot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            profile_id: profile.id,
+            questionnaire_answers: normalizedAnswers,
+          }),
+        });
+        await loadProfile();
+        setQuestionnaireAnswers(normalizedAnswers);
+        setQuestionnaireComplete(true);
+      } finally {
+        setIsSubmittingQuestionnaire(false);
+      }
     },
-    [STORAGE_KEY, questionSet],
+    [profile?.id, questionSet, loadProfile],
   );
 
   const handleResetQuestionnaire = () => {
-    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
     setQuestionnaireComplete(false);
   };
 
   const monthlyExpenses = expenseCategories.reduce((sum, c) => sum + c.amount, 0);
 
-  // Sync with profile / cluster once loaded (only if questionnaire not done yet)
+  // Sync with profile once loaded
   useEffect(() => {
-    if (profile?.expected_monthly_revenue && !questionnaireComplete) {
-      setMonthlyRevenue(profile.expected_monthly_revenue);
+    if (!profile) return;
+    const existingAnswers = profile.financial_questionnaire_answers ?? null;
+    if (profile.financial_questionnaire_completed && existingAnswers) {
+      const computed = questionSet.computeFinancials(existingAnswers);
+      setQuestionnaireAnswers(existingAnswers);
+      setMonthlyRevenue(profile.expected_monthly_revenue ?? computed.monthlyRevenue);
+      setExpenseCategories(
+        expenseProfile.categories.map((cat) => ({
+          ...cat,
+          amount: profile.expense_categories?.[cat.key] ?? computed.expenseOverrides[cat.key] ?? cat.amount,
+        })),
+      );
+      setQuestionnaireComplete(true);
+      return;
     }
-  }, [profile?.expected_monthly_revenue, questionnaireComplete]);
-
-  useEffect(() => {
-    // Apply saved questionnaire answers on cluster change
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const answers = JSON.parse(saved) as Record<string, string | number | boolean>;
-        const computed = questionSet.computeFinancials(answers);
-        setMonthlyRevenue(computed.monthlyRevenue);
-        setExpenseCategories(
-          expenseProfile.categories.map((cat) =>
-            computed.expenseOverrides[cat.key] !== undefined
-              ? { ...cat, amount: computed.expenseOverrides[cat.key] }
-              : cat,
-          ),
-        );
-      } else {
-        setExpenseCategories(expenseProfile.categories);
-      }
-    } catch {
-      setExpenseCategories(expenseProfile.categories);
-    }
-  }, [expenseProfile, questionSet, STORAGE_KEY]);
+    setExpenseCategories(expenseProfile.categories);
+    setQuestionnaireComplete(false);
+  }, [profile, expenseProfile, questionSet]);
 
   // All calculations are deterministic — no API needed for live updates
   const taxes = useMemo(
@@ -1096,25 +1120,31 @@ export default function FinancialPage() {
   // ── Gate: show questionnaire until complete ──────────────────────────────
   if (!questionnaireComplete) {
     return (
-      <FinancialQuestionnaire
-        clusterId={clusterId}
-        clusterLabel={questionSet.title}
-        onComplete={handleQuestionnaireComplete}
-      />
+      <div>
+        <FinancialQuestionnaire
+          clusterId={clusterId}
+          clusterLabel={CLUSTERS[clusterId]?.label ?? 'General micro-business'}
+          initialAnswers={questionnaireAnswers}
+          onComplete={handleQuestionnaireComplete}
+        />
+        {isSubmittingQuestionnaire && (
+          <p className="text-center text-sm text-slate-500 -mt-6">Saving your financial setup...</p>
+        )}
+      </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-5">
+    <div className="max-w-3xl mx-auto space-y-8">
 
-      {/* Header */}
-      <div className="flex items-start justify-between">
+      {/* Page header */}
+      <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="page-title">Financial Snapshot</h1>
           <p className="page-subtitle">Your personal CFO dashboard — estimated taxes, take-home, and what to watch for. Updated live.</p>
           <div className="inline-flex items-center gap-1.5 mt-2 text-xs font-medium text-brand-700 bg-brand-50 border border-brand-200 rounded-full px-3 py-1">
             <Calculator size={11} />
-            Business type: <strong className="ml-0.5">{questionSet.title}</strong>
+            Business type: <strong className="ml-0.5">{CLUSTERS[clusterId]?.label ?? 'General micro-business'}</strong>
           </div>
         </div>
         <button
@@ -1128,251 +1158,246 @@ export default function FinancialPage() {
         </button>
       </div>
 
-      {/* ════════════════════════════════════════════════════════════════════ */}
-      {/* ZONE 1: THE SNAPSHOT — hero card                                   */}
-      {/* ════════════════════════════════════════════════════════════════════ */}
-
-      <div className="rounded-2xl bg-gradient-to-br from-brand-600 to-brand-700 p-6 text-white">
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <p className="text-brand-200 text-sm font-medium mb-1">Estimated monthly take-home</p>
-            <div className="font-heading text-5xl font-bold tabular-nums">{fmt(monthlyTakeHome)}</div>
-            <p className="text-brand-200 text-sm mt-1">
-              {fmtPct(1 - effectiveRate)} of {fmt(monthlyRevenue)} revenue · effective rate {fmtPct(effectiveRate)}
-            </p>
+      {/* ── 1. Financial insight ─────────────────────────────────────────── */}
+      <section className="space-y-3" aria-labelledby="fin-section-insight">
+        <PageSection
+          kicker="1 · Financial insight"
+          title="Your money story"
+          description="Estimated take-home after taxes and expenses, with a quick visual of where each dollar goes."
+          id="fin-section-insight"
+        />
+        <div className="rounded-2xl bg-gradient-to-br from-brand-600 to-brand-700 p-6 text-white shadow-lg shadow-brand-900/10">
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <p className="text-brand-200 text-sm font-medium mb-1">Estimated monthly take-home</p>
+              <div className="font-heading text-5xl font-bold tabular-nums">{fmt(monthlyTakeHome)}</div>
+              <p className="text-brand-200 text-sm mt-1">
+                {fmtPct(1 - effectiveRate)} of {fmt(monthlyRevenue)} revenue · effective rate {fmtPct(effectiveRate)}
+              </p>
+            </div>
+            <div className="bg-white/10 rounded-xl p-3">
+              <Wallet size={24} className="text-white" />
+            </div>
           </div>
-          <div className="bg-white/10 rounded-xl p-3">
-            <Wallet size={24} className="text-white" />
+          <div className="bg-white/10 rounded-xl p-4">
+            <WaterfallBar grossMonthly={monthlyRevenue} taxes={taxes} monthlyExpenses={monthlyExpenses} />
           </div>
         </div>
-        <div className="bg-white/10 rounded-xl p-4">
-          <WaterfallBar grossMonthly={monthlyRevenue} taxes={taxes} monthlyExpenses={monthlyExpenses} />
-        </div>
-      </div>
+      </section>
 
-      {/* ════════════════════════════════════════════════════════════════════ */}
-      {/* ZONE 2: THE BREAKDOWN — inputs + stat cards + expense donut        */}
-      {/* ════════════════════════════════════════════════════════════════════ */}
-
-      {/* Adjust your numbers */}
-      <div className="card p-5 space-y-4">
-        <h3 className="font-heading font-semibold text-slate-900 text-sm">Adjust your numbers</h3>
+      {/* ── 2. At a glance ───────────────────────────────────────────────── */}
+      <section className="space-y-3" aria-labelledby="fin-section-glance">
+        <PageSection
+          kicker="2 · At a glance"
+          title="Key numbers"
+          description="Revenue, tax load, expenses, and what you keep — all on one row."
+          id="fin-section-glance"
+        />
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="revenue" className="label">Monthly revenue</label>
-            <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">$</span>
-              <input
-                id="revenue"
-                type="number"
-                min={0}
-                inputMode="numeric"
-                value={monthlyRevenue || ''}
-                onChange={(e) => setMonthlyRevenue(Number(e.target.value) || 0)}
-                placeholder="e.g. 3000"
-                className="input pl-7"
-              />
-            </div>
-            <p className="text-xs text-slate-400 mt-1">{fmt(monthlyRevenue * 12)}/year</p>
-          </div>
-          <div>
-            <label className="label">Monthly expenses (total)</label>
-            <div className="font-heading text-xl font-bold text-slate-900 tabular-nums">
-              {fmt(monthlyExpenses)}<span className="text-xs font-normal text-slate-400 ml-1">from {expenseCategories.length} categories</span>
-            </div>
-            <p className="text-xs text-slate-400 mt-1 leading-snug">{expenseProfile.hint}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* 4 stat cards */}
-      <div className="grid grid-cols-2 gap-4">
-        {[
-          { label: 'Gross Revenue', value: fmt(monthlyRevenue), sub: `${fmt(monthlyRevenue * 12)}/year`, icon: TrendingUp, color: 'text-brand-600', bg: 'bg-brand-50' },
-          { label: 'Tax Burden', value: fmt(taxes.totalTax / 12), sub: `${fmtPct(taxes.effectiveTaxRate)} effective rate`, icon: DollarSign, color: 'text-red-600', bg: 'bg-red-50' },
-          { label: 'Business Expenses', value: fmt(monthlyExpenses), sub: `${fmt(monthlyExpenses * 12)}/year`, icon: PiggyBank, color: 'text-slate-600', bg: 'bg-slate-100' },
-          { label: 'Monthly Take-Home', value: fmt(monthlyTakeHome), sub: `${fmtPct(monthlyRevenue > 0 ? monthlyTakeHome / monthlyRevenue : 0)} of revenue`, icon: Wallet, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-        ].map((card) => (
-          <div key={card.label} className="card p-5">
-            <div className={`inline-flex items-center justify-center h-9 w-9 rounded-xl ${card.bg} mb-3`}>
-              <card.icon size={17} className={card.color} />
-            </div>
-            <p className="text-xs text-slate-500 font-medium">{card.label}</p>
-            <p className="font-heading text-2xl font-bold text-slate-900 tabular-nums mt-0.5">{card.value}</p>
-            <p className="text-xs text-slate-400 mt-0.5">{card.sub}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Expense breakdown donut (expandable) */}
-      <Expandable
-        icon={PiggyBank}
-        iconBg="bg-slate-100"
-        iconColor="text-slate-600"
-        title="Expense Breakdown"
-        subtitle={`${expenseCategories.length} categories pre-filled for your business type — edit any amount`}
-      >
-        <div className="p-5 space-y-5">
-          <ExpenseDonut categories={expenseCategories} total={monthlyExpenses} />
-          {/* Editable category list */}
-          <div className="space-y-2">
-            {expenseCategories.map((cat) => (
-              <div key={cat.key} className="flex items-center gap-3 py-1">
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm text-slate-700">{cat.label}</p>
-                  <p className="text-[10px] text-slate-400">{cat.description}</p>
-                </div>
-                <div className="relative w-24 shrink-0">
-                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">$</span>
-                  <input
-                    type="number"
-                    min={0}
-                    value={cat.amount || ''}
-                    onChange={(e) => updateExpense(cat.key, Number(e.target.value) || 0)}
-                    className="input py-1.5 pl-6 text-xs text-right tabular-nums"
-                  />
-                </div>
+          {[
+            { label: 'Gross Revenue', value: fmt(monthlyRevenue), sub: `${fmt(monthlyRevenue * 12)}/year`, icon: TrendingUp, color: 'text-brand-600', bg: 'bg-brand-50' },
+            { label: 'Tax Burden', value: fmt(taxes.totalTax / 12), sub: `${fmtPct(taxes.effectiveTaxRate)} effective rate`, icon: DollarSign, color: 'text-red-600', bg: 'bg-red-50' },
+            { label: 'Business Expenses', value: fmt(monthlyExpenses), sub: `${fmt(monthlyExpenses * 12)}/year`, icon: PiggyBank, color: 'text-slate-600', bg: 'bg-slate-100' },
+            { label: 'Monthly Take-Home', value: fmt(monthlyTakeHome), sub: `${fmtPct(monthlyRevenue > 0 ? monthlyTakeHome / monthlyRevenue : 0)} of revenue`, icon: Wallet, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          ].map((card) => (
+            <div key={card.label} className="card p-5">
+              <div className={`inline-flex items-center justify-center h-9 w-9 rounded-xl ${card.bg} mb-3`}>
+                <card.icon size={17} className={card.color} />
               </div>
-            ))}
-          </div>
+              <p className="text-xs text-slate-500 font-medium">{card.label}</p>
+              <p className="font-heading text-2xl font-bold text-slate-900 tabular-nums mt-0.5">{card.value}</p>
+              <p className="text-xs text-slate-400 mt-0.5">{card.sub}</p>
+            </div>
+          ))}
         </div>
-      </Expandable>
+      </section>
 
-      {/* Detailed tax breakdown (expandable) */}
-      <Expandable
-        icon={Calculator}
-        iconBg="bg-orange-50"
-        iconColor="text-orange-600"
-        title="Detailed Tax Breakdown"
-        subtitle="Federal + QC income tax, QPP, QPIP — 2026 rates"
-      >
-        <table className="w-full text-sm">
-          <tbody>
-            {[
-              { label: 'Gross Revenue', value: monthlyRevenue, note: '/month' },
-              { label: 'Business Expenses', value: -monthlyExpenses, note: '/month', dimmed: true },
-              { label: 'Net Business Income', value: taxes.netBusinessIncome / 12, note: '/month', bold: true },
-              { label: 'Federal Income Tax', value: -(taxes.federalTax / 12), note: '/month', red: true },
-              { label: 'Quebec Income Tax', value: -(taxes.quebecTax / 12), note: '/month', red: true },
-              { label: 'QPP Contributions', value: -(taxes.qpp / 12), note: '/month', amber: true },
-              { label: 'QPIP Premium', value: -(taxes.qpip / 12), note: '/month', amber: true },
-              { label: 'Monthly Take-Home', value: monthlyTakeHome, note: '/month', bold: true, brand: true },
-            ].map((row) => (
-              <tr key={row.label} className={`border-b border-slate-50 ${row.bold ? 'bg-slate-50' : ''}`}>
-                <td className={`px-5 py-3 text-sm ${row.bold ? 'font-semibold text-slate-900' : row.dimmed ? 'text-slate-400' : 'text-slate-600'}`}>{row.label}</td>
-                <td className={`px-5 py-3 text-right tabular-nums font-medium ${
-                  row.brand ? 'text-brand-700 font-bold' :
-                  row.red ? 'text-red-600' :
-                  row.amber ? 'text-amber-600' :
-                  row.bold ? 'text-slate-900 font-semibold' :
-                  row.value < 0 ? 'text-slate-500' : 'text-slate-900'
-                }`}>
-                  {fmt(row.value)}<span className="text-xs text-slate-400 font-normal">{row.note}</span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Expandable>
-
-      {/* QPP Shock */}
-      {taxes.qpp > 0 && <QPPShock qppMonthly={taxes.qpp / 12} />}
-
-      {/* ════════════════════════════════════════════════════════════════════ */}
-      {/* ZONE 3: WHERE AM I GOING — projections, scenarios, break-even      */}
-      {/* ════════════════════════════════════════════════════════════════════ */}
-
-      {monthlyRevenue > 0 && (
-        <div className="card p-5">
-          <ProjectionChart monthlyRevenue={monthlyRevenue} monthlyTakeHome={monthlyTakeHome} />
-        </div>
-      )}
-
-      {/* Scenario comparison */}
-      {monthlyRevenue > 0 && (
+      {/* ── 3. Tax section ────────────────────────────────────────────────── */}
+      <section className="space-y-3" aria-labelledby="fin-section-tax">
+        <PageSection
+          kicker="3 · Taxes"
+          title="Tax breakdown"
+          description="Federal and Québec income tax, QPP, and QPIP — estimated from your net business income (2026 assumptions)."
+          id="fin-section-tax"
+        />
         <Expandable
-          icon={BarChart3}
-          iconBg="bg-brand-50"
-          iconColor="text-brand-600"
-          title="Revenue Scenarios"
-          subtitle="What if you earn more or less than expected?"
+          icon={Calculator}
+          iconBg="bg-orange-50"
+          iconColor="text-orange-600"
+          title="Detailed tax breakdown"
+          subtitle="Federal + QC income tax, QPP, QPIP — 2026 rates"
           defaultOpen
         >
-          <ScenarioComparison monthlyRevenue={monthlyRevenue} monthlyExpenses={monthlyExpenses} />
+          <table className="w-full text-sm">
+            <tbody>
+              {[
+                { label: 'Gross Revenue', value: monthlyRevenue, note: '/month' },
+                { label: 'Business Expenses', value: -monthlyExpenses, note: '/month', dimmed: true },
+                { label: 'Net Business Income', value: taxes.netBusinessIncome / 12, note: '/month', bold: true },
+                { label: 'Federal Income Tax', value: -(taxes.federalTax / 12), note: '/month', red: true },
+                { label: 'Quebec Income Tax', value: -(taxes.quebecTax / 12), note: '/month', red: true },
+                { label: 'QPP Contributions', value: -(taxes.qpp / 12), note: '/month', amber: true },
+                { label: 'QPIP Premium', value: -(taxes.qpip / 12), note: '/month', amber: true },
+                { label: 'Monthly Take-Home', value: monthlyTakeHome, note: '/month', bold: true, brand: true },
+              ].map((row) => (
+                <tr key={row.label} className={`border-b border-slate-50 ${row.bold ? 'bg-slate-50' : ''}`}>
+                  <td className={`px-5 py-3 text-sm ${row.bold ? 'font-semibold text-slate-900' : row.dimmed ? 'text-slate-400' : 'text-slate-600'}`}>{row.label}</td>
+                  <td className={`px-5 py-3 text-right tabular-nums font-medium ${
+                    row.brand ? 'text-brand-700 font-bold' :
+                    row.red ? 'text-red-600' :
+                    row.amber ? 'text-amber-600' :
+                    row.bold ? 'text-slate-900 font-semibold' :
+                    row.value < 0 ? 'text-slate-500' : 'text-slate-900'
+                  }`}>
+                    {fmt(row.value)}<span className="text-xs text-slate-400 font-normal">{row.note}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </Expandable>
+        {taxes.qpp > 0 && <QPPShock qppMonthly={taxes.qpp / 12} />}
+      </section>
+
+      {/* ── 4. Charts & outlook ──────────────────────────────────────────── */}
+      {monthlyRevenue > 0 && (
+        <section className="space-y-3" aria-labelledby="fin-section-charts">
+          <PageSection
+            kicker="4 · Outlook"
+            title="Charts & scenarios"
+            description="See how revenue compounds over the year and how different income levels affect your take-home."
+            id="fin-section-charts"
+          />
+          <div className="card p-5">
+            <ProjectionChart monthlyRevenue={monthlyRevenue} monthlyTakeHome={monthlyTakeHome} />
+          </div>
+          <Expandable
+            icon={BarChart3}
+            iconBg="bg-brand-50"
+            iconColor="text-brand-600"
+            title="Revenue scenarios"
+            subtitle="What if you earn more or less than expected?"
+            defaultOpen
+          >
+            <ScenarioComparison monthlyRevenue={monthlyRevenue} monthlyExpenses={monthlyExpenses} />
+          </Expandable>
+        </section>
       )}
 
-      {/* Break-even */}
-      {monthlyRevenue > 0 && <BreakEvenCard monthlyRevenue={monthlyRevenue} monthlyExpenses={monthlyExpenses} />}
-
-      {/* Pricing calculator */}
-      <Expandable
-        icon={SlidersHorizontal}
-        iconBg="bg-violet-50"
-        iconColor="text-violet-600"
-        title="Pricing Calculator"
-        subtitle="&quot;If I charge $X and sell Y, what do I keep?&quot;"
-      >
-        <PricingSlider
-          monthlyExpenses={monthlyExpenses}
-          defaultPrice={profile?.price_per_unit ?? 25}
-          defaultUnits={profile?.units_per_month ?? 80}
+      {/* ── 5. Operations (expenses + break-even) ────────────────────────── */}
+      <section className="space-y-3" aria-labelledby="fin-section-ops">
+        <PageSection
+          kicker="5 · Operations"
+          title="Expenses & break-even"
+          description="Adjust category amounts to match your reality, then see how close you are to covering costs and taxes."
+          id="fin-section-ops"
         />
-      </Expandable>
-
-      {/* Tax calendar */}
-      <Expandable
-        icon={Calendar}
-        iconBg="bg-blue-50"
-        iconColor="text-blue-600"
-        title="2026 Tax Calendar"
-        subtitle="Installment dates and estimated amounts"
-      >
-        <TaxCalendar quarterlyInstallment={quarterlyInstallment} />
-      </Expandable>
-
-      {/* Deduction tracker */}
-      <Expandable
-        icon={Receipt}
-        iconBg="bg-emerald-50"
-        iconColor="text-emerald-600"
-        title="Common Deductions"
-        subtitle={`Pre-loaded for your business type — track what you can write off`}
-      >
-        <DeductionTracker clusterId={clusterId} />
-      </Expandable>
-
-      {/* ════════════════════════════════════════════════════════════════════ */}
-      {/* ZONE 4: WHAT SHOULD I DO — flags + funding impact                  */}
-      {/* ════════════════════════════════════════════════════════════════════ */}
-
-      {flags.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="font-heading font-semibold text-slate-900 text-sm">Watch-outs for your situation</h3>
-          {flags.map((flag, i) => {
-            const Icon = flag.icon;
-            const styles = {
-              warning: { card: 'border-amber-200 bg-amber-50', icon: 'bg-amber-100 text-amber-600', title: 'text-amber-900', body: 'text-amber-800' },
-              info: { card: 'border-blue-200 bg-blue-50', icon: 'bg-blue-100 text-blue-600', title: 'text-blue-900', body: 'text-blue-800' },
-              tip: { card: 'border-brand-200 bg-brand-50', icon: 'bg-brand-100 text-brand-600', title: 'text-brand-900', body: 'text-brand-800' },
-            }[flag.type];
-            return (
-              <div key={i} className={`rounded-xl border ${styles.card} p-4 flex gap-3`}>
-                <div className={`inline-flex items-center justify-center h-8 w-8 rounded-lg ${styles.icon} shrink-0 mt-0.5`}>
-                  <Icon size={15} />
+        {monthlyRevenue > 0 && <BreakEvenCard monthlyRevenue={monthlyRevenue} monthlyExpenses={monthlyExpenses} />}
+        <Expandable
+          icon={PiggyBank}
+          iconBg="bg-slate-100"
+          iconColor="text-slate-600"
+          title="Expense breakdown"
+          subtitle={`${expenseCategories.length} categories — edit any amount`}
+          defaultOpen
+        >
+          <div className="p-5 space-y-5">
+            <ExpenseDonut categories={expenseCategories} total={monthlyExpenses} />
+            <div className="space-y-2">
+              {expenseCategories.map((cat) => (
+                <div key={cat.key} className="flex items-center gap-3 py-1">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-slate-700">{cat.label}</p>
+                    <p className="text-[10px] text-slate-400">{cat.description}</p>
+                  </div>
+                  <div className="relative w-24 shrink-0">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">$</span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={cat.amount || ''}
+                      onChange={(e) => updateExpense(cat.key, Number(e.target.value) || 0)}
+                      className="input py-1.5 pl-6 text-xs text-right tabular-nums"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <p className={`text-sm font-semibold ${styles.title}`}>{flag.title}</p>
-                  <p className={`text-sm ${styles.body} mt-0.5 leading-relaxed`}>{flag.detail}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+              ))}
+            </div>
+          </div>
+        </Expandable>
+      </section>
 
-      {/* Funding impact */}
-      <FundingImpactCard monthlyExpenses={monthlyExpenses} monthlyTakeHome={monthlyTakeHome} />
+      {/* ── 6. Planning (calendar) ───────────────────────────────────────── */}
+      <section className="space-y-3" aria-labelledby="fin-section-planning">
+        <PageSection
+          kicker="6 · Planning"
+          title="Tax calendar"
+          description="Key dates for installments and filing — use this as a reminder, not personalized advice."
+          id="fin-section-planning"
+        />
+        <Expandable
+          icon={Calendar}
+          iconBg="bg-blue-50"
+          iconColor="text-blue-600"
+          title="2026 tax calendar"
+          subtitle="Installment dates and estimated amounts"
+        >
+          <TaxCalendar quarterlyInstallment={quarterlyInstallment} />
+        </Expandable>
+      </section>
+
+      {/* ── 7. Deductions ──────────────────────────────────────────────────── */}
+      <section className="space-y-3" aria-labelledby="fin-section-deductions">
+        <PageSection
+          kicker="7 · Deductions"
+          title="Common write-offs"
+          description="Typical deductible costs for your business type — rough savings use a marginal rate estimate."
+          id="fin-section-deductions"
+        />
+        <Expandable
+          icon={Receipt}
+          iconBg="bg-emerald-50"
+          iconColor="text-emerald-600"
+          title="Deduction tracker"
+          subtitle="Pre-loaded for your business type"
+        >
+          <DeductionTracker clusterId={clusterId} />
+        </Expandable>
+      </section>
+
+      {/* ── 8. Risks & funding ─────────────────────────────────────────────── */}
+      <section className="space-y-3" aria-labelledby="fin-section-risks">
+        <PageSection
+          kicker="8 · Next steps"
+          title="Watch-outs & funding"
+          description="Flags tailored to your numbers, plus how matched funding could extend your runway."
+          id="fin-section-risks"
+        />
+        {flags.length > 0 && (
+          <div className="space-y-3">
+            {flags.map((flag, i) => {
+              const Icon = flag.icon;
+              const styles = {
+                warning: { card: 'border-amber-200 bg-amber-50', icon: 'bg-amber-100 text-amber-600', title: 'text-amber-900', body: 'text-amber-800' },
+                info: { card: 'border-blue-200 bg-blue-50', icon: 'bg-blue-100 text-blue-600', title: 'text-blue-900', body: 'text-blue-800' },
+                tip: { card: 'border-brand-200 bg-brand-50', icon: 'bg-brand-100 text-brand-600', title: 'text-brand-900', body: 'text-brand-800' },
+              }[flag.type];
+              return (
+                <div key={i} className={`rounded-xl border ${styles.card} p-4 flex gap-3`}>
+                  <div className={`inline-flex items-center justify-center h-8 w-8 rounded-lg ${styles.icon} shrink-0 mt-0.5`}>
+                    <Icon size={15} />
+                  </div>
+                  <div>
+                    <p className={`text-sm font-semibold ${styles.title}`}>{flag.title}</p>
+                    <p className={`text-sm ${styles.body} mt-0.5 leading-relaxed`}>{flag.detail}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        <FundingImpactCard monthlyExpenses={monthlyExpenses} monthlyTakeHome={monthlyTakeHome} />
+      </section>
 
     </div>
   );

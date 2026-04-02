@@ -77,6 +77,7 @@ export interface SnapshotInput {
   expense_categories?: Record<string, number>
   price_per_unit?: number
   units_per_month?: number
+  questionnaire_answers?: Record<string, string | number | boolean>
 }
 
 // DTOs

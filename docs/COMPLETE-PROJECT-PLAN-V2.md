@@ -1354,16 +1354,21 @@ Pure math calculator. Cut this first if behind schedule.
 
 ---
 
-### Person C (Rami) — Remaining
+### Person C (Rami) — Current Status (Updated Apr 2, 2026)
 
-Wire Claude API calls in all 6 service files. The architecture is in place; just needs integration:
-- [ ] `profile.service.ts` — call `buildProfilePrompt()` from KB prompts, validate with Zod
-- [ ] `roadmap.service.ts` — call `buildRoadmapPrompt()`, validate steps, upsert to DB
-- [ ] `financial.service.ts` — call `buildFinancialInsightPrompt()` for watch-out flags
-- [ ] `assistant.service.ts` — call `buildAssistantPrompt()` with full context
-- [ ] `funding.service.ts` — complete deterministic scorer integration
-- [ ] `cache.service.ts` — seed Yara demo with pre-generated cached responses
-- [ ] Test all 3 personas (Yara, Marcus, Fatima) end-to-end
+**Implemented now (backend + integration):**
+- [x] Financial questionnaire persistence migration: `supabase/migrations/002_financial_questionnaire.sql`
+- [x] Profile/type support for questionnaire answers + completion state (`src/types/profile.ts`, `src/types/financial.ts`)
+- [x] API support for questionnaire payloads in `POST/PUT /api/financial-snapshot`
+- [x] Cluster-driven financial computation path in `financial.service.ts` (C1-C9 question set -> normalized outputs -> deterministic tax math)
+- [x] Profile persistence of inferred financial fields (expected revenue, expenses, category map, unit economics when derivable)
+- [x] Frontend financial page flow updated to questionnaire-first, with organized Layout A sections
+- [x] Business type label fix for fallback cluster (`C9: General Micro-Business`)
+
+**Still remaining (Rami):**
+- [ ] Final Claude prompt wiring cleanup across services (`profile.service.ts`, `roadmap.service.ts`, `assistant.service.ts`, `cache.service.ts`)
+- [ ] End-to-end validation on all 3 personas (Yara, Marcus, Fatima) with saved questionnaire answers
+- [ ] Apply migration `002_financial_questionnaire.sql` in shared/prod Supabase project
 
 ---
 

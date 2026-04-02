@@ -88,17 +88,71 @@ function ToggleChip({
   );
 }
 
+// ── Business category options ─────────────────────────────────────────────────
+
+const BUSINESS_CATEGORIES = [
+  { value: 'food_home',       label: 'Food & Cooking (from home)',     desc: 'Baking, catering, meal prep, jams, sauces — prepared at home', emoji: '🍰' },
+  { value: 'food_commercial', label: 'Restaurant / Food Service',      desc: 'Restaurant, café, food truck, catering company', emoji: '🍽️' },
+  { value: 'freelance',       label: 'Freelance & Consulting',         desc: 'Design, development, writing, coaching, tutoring, bookkeeping', emoji: '💻' },
+  { value: 'childcare',       label: 'Childcare',                      desc: 'Home daycare, nursery, babysitting service', emoji: '👶' },
+  { value: 'regulated',       label: 'Regulated Profession',           desc: 'Lawyer, notary, accountant, engineer, architect, therapist', emoji: '⚖️' },
+  { value: 'retail',          label: 'Retail & Products',              desc: 'Online store, Etsy shop, boutique, handmade goods, reselling', emoji: '🛍️' },
+  { value: 'trades',          label: 'Construction & Trades',          desc: 'Plumbing, electrical, carpentry, painting, renovations, HVAC', emoji: '🔨' },
+  { value: 'personal',        label: 'Personal Services',              desc: 'Hair, beauty, massage, fitness, cleaning, tattoo', emoji: '✂️' },
+  { value: 'other',           label: 'Other / Not sure',               desc: 'Something else — we\'ll figure it out together', emoji: '🔍' },
+];
+
 // ── Step cards ────────────────────────────────────────────────────────────────
 
 export default function QuestionCard({ step, intakeForm, updateField }: QuestionCardProps) {
   switch (step) {
 
-    // ── Step 0: Your Business ──────────────────────────────────────────────────
+    // ── Step 0: Business Type (for classification) ───────────────────────────
     case 0:
       return (
         <div className="card p-8 space-y-5">
           <div>
-            <h2 className="font-heading text-xl font-bold text-slate-900 mb-1">Your business idea</h2>
+            <h2 className="font-heading text-xl font-bold text-slate-900 mb-1">What type of business?</h2>
+            <p className="text-sm text-slate-500 leading-relaxed">
+              Pick the category that best describes what you want to do.
+              This helps us find the right permits, funding, and legal steps for you.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {BUSINESS_CATEGORIES.map((cat) => {
+              const selected = intakeForm.business_category === cat.value;
+              return (
+                <button
+                  key={cat.value}
+                  type="button"
+                  onClick={() => updateField('business_category', cat.value)}
+                  className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all duration-150 ${
+                    selected
+                      ? 'border-brand-400 bg-brand-50 shadow-inner-brand'
+                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                  }`}
+                >
+                  <span className="text-xl mt-0.5">{cat.emoji}</span>
+                  <div>
+                    <div className={`text-sm font-medium ${selected ? 'text-brand-900' : 'text-slate-800'}`}>
+                      {cat.label}
+                    </div>
+                    <div className="text-xs text-slate-500 mt-0.5">{cat.desc}</div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      );
+
+    // ── Step 1: Your Business Idea (free text for roadmap) ───────────────────
+    case 1:
+      return (
+        <div className="card p-8 space-y-5">
+          <div>
+            <h2 className="font-heading text-xl font-bold text-slate-900 mb-1">Tell us more</h2>
             <p className="text-sm text-slate-500 leading-relaxed">
               Describe what you want to build — no need to be formal. A sentence or two is perfect.
             </p>
@@ -121,8 +175,8 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
         </div>
       );
 
-    // ── Step 1: Location & Setup ───────────────────────────────────────────────
-    case 1:
+    // ── Step 2: Location & Setup ─────────────────────────────────────────────
+    case 2:
       return (
         <div className="card p-8 space-y-6">
           <div>
@@ -192,8 +246,8 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
         </div>
       );
 
-    // ── Step 2: Finances ───────────────────────────────────────────────────────
-    case 2:
+    // ── Step 3: Finances ───────────────────────────────────────────────────────
+    case 3:
       return (
         <div className="card p-8 space-y-6">
           <div>
@@ -253,8 +307,8 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
         </div>
       );
 
-    // ── Step 3: About You ──────────────────────────────────────────────────────
-    case 3:
+    // ── Step 4: About You ──────────────────────────────────────────────────────
+    case 4:
       return (
         <div className="card p-8 space-y-6">
           <div>
