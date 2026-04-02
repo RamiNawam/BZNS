@@ -4,6 +4,35 @@
 
 export type StepStatus = 'pending' | 'in_progress' | 'completed' | 'skipped'
 
+// ============================================================
+// GAP DETECTION — Layer 2 adversarial review output
+// ============================================================
+
+export type GapFlagType = 'missing_step' | 'wrong_step' | 'edge_case' | 'verify_with_professional'
+export type GapFlagSeverity = 'high' | 'medium' | 'low'
+export type StepConfidence = 'verified' | 'inferred' | 'flagged'
+
+export interface GapFlag {
+  type: GapFlagType
+  severity: GapFlagSeverity
+  /** step_key of the step this flag applies to, or null for missing steps */
+  related_step_key: string | null
+  issue: string
+  recommendation: string
+  /** For missing_step type: a suggested step to insert into the roadmap */
+  suggested_step?: {
+    step_key: string
+    title: string
+    description: string
+    why_needed: string
+    estimated_cost: string
+    estimated_timeline: string
+    depends_on: string[]
+    government_url: string
+    source: string
+  }
+}
+
 // Full DB row — 1:1 with roadmap_steps table
 export interface RoadmapStep {
   id: string
@@ -26,6 +55,10 @@ export interface RoadmapStep {
   status: StepStatus
   completed_at: string | null
   notes: string | null
+
+  // Layer 3 — enriched after gap detection
+  confidence?: StepConfidence
+  flags?: GapFlag[]
 }
 
 // Shape Claude returns per step (before inserting to DB)
@@ -44,7 +77,7 @@ export interface ClaudeRoadmapStep {
 }
 
 // DTOs
-export type CreateRoadmapStepDTO = Omit<RoadmapStep, 'id' | 'created_at' | 'updated_at'>
+export type CreateRoadmapStepDTO = Omit<RoadmapStep, 'id' | 'created_at' | 'updated_at' | 'confidence' | 'flags'>
 export type UpdateStepStatusDTO = {
   status: StepStatus
   completed_at?: string
@@ -54,6 +87,7 @@ export type UpdateStepStatusDTO = {
 // State shape for the roadmap Zustand store
 export interface RoadmapState {
   steps: RoadmapStep[]
+  flags: GapFlag[]
   isLoading: boolean
   error: string | null
 }

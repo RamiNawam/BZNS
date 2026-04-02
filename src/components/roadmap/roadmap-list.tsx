@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { Map, RefreshCw } from "lucide-react";
+import {
+  Map,
+  RefreshCw,
+  ShieldCheck,
+  Sparkles,
+  AlertTriangle,
+} from "lucide-react";
 import { useRoadmapStore } from "@/stores/roadmap-store";
 import { useProfileStore } from "@/stores/profile-store";
 import RoadmapStep from "./roadmap-step";
@@ -28,9 +34,76 @@ function StepSkeleton({ order }: { order: number }) {
   );
 }
 
+// ── Confidence legend ─────────────────────────────────────────────────────────
+function ConfidenceLegend({
+  verified,
+  flagged,
+  inferred,
+}: {
+  verified: number;
+  flagged: number;
+  inferred: number;
+}) {
+  return (
+    <div className="flex flex-wrap gap-4 text-xs">
+      <span className="inline-flex items-center gap-1.5 text-emerald-700">
+        <ShieldCheck size={13} />
+        {verified} verified
+      </span>
+      {flagged > 0 && (
+        <span className="inline-flex items-center gap-1.5 text-red-600 font-medium">
+          <AlertTriangle size={13} />
+          {flagged} flagged
+        </span>
+      )}
+      {inferred > 0 && (
+        <span className="inline-flex items-center gap-1.5 text-amber-600">
+          <Sparkles size={13} />
+          {inferred} AI-added
+        </span>
+      )}
+    </div>
+  );
+}
+
+// ── Flag summary banner ───────────────────────────────────────────────────────
+function FlagSummaryBanner({
+  highCount,
+  mediumCount,
+}: {
+  highCount: number;
+  mediumCount: number;
+}) {
+  if (highCount === 0 && mediumCount === 0) return null;
+
+  return (
+    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+      <div className="flex items-start gap-2.5">
+        <AlertTriangle size={16} className="shrink-0 text-red-500 mt-0.5" />
+        <div>
+          <p className="text-sm font-semibold text-red-800">
+            Adversarial review found {highCount + mediumCount} issue
+            {highCount + mediumCount > 1 ? "s" : ""}
+          </p>
+          <p className="text-xs text-red-600 mt-0.5">
+            {highCount > 0 && (
+              <span className="font-semibold">{highCount} high severity</span>
+            )}
+            {highCount > 0 && mediumCount > 0 && " + "}
+            {mediumCount > 0 && <span>{mediumCount} medium severity</span>}{" "}
+            &mdash; expand flagged steps (red border) for details and
+            recommendations.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function RoadmapList() {
-  const { steps, isLoading, loadRoadmap, generateRoadmap } = useRoadmapStore();
+  const { steps, flags, isLoading, loadRoadmap, generateRoadmap, regenerateRoadmap } =
+    useRoadmapStore();
   const { profile } = useProfileStore();
 
   const roadmapIsStale =
@@ -48,6 +121,15 @@ export default function RoadmapList() {
   const completed = steps.filter((s) => s.status === "completed").length;
   const progress =
     steps.length > 0 ? Math.round((completed / steps.length) * 100) : 0;
+
+  // Confidence stats
+  const verified = steps.filter((s) => s.confidence === "verified").length;
+  const flagged = steps.filter((s) => s.confidence === "flagged").length;
+  const inferred = steps.filter((s) => s.confidence === "inferred").length;
+
+  // Flag severity counts
+  const highFlags = flags.filter((f) => f.severity === "high").length;
+  const mediumFlags = flags.filter((f) => f.severity === "medium").length;
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (isLoading) {
@@ -100,7 +182,7 @@ export default function RoadmapList() {
             <span>Your settings changed since this roadmap was generated.</span>
           </div>
           <button
-            onClick={() => profile?.id && generateRoadmap(profile.id)}
+            onClick={() => profile?.id && regenerateRoadmap(profile.id)}
             disabled={isLoading}
             className="shrink-0 text-xs font-semibold text-amber-700 border border-amber-300 bg-white hover:bg-amber-50 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50"
           >
@@ -109,12 +191,20 @@ export default function RoadmapList() {
         </div>
       )}
 
-      {/* Progress */}
-      <div className="card p-5">
+      {/* Flag summary banner — shown when adversarial review found issues */}
+      <FlagSummaryBanner highCount={highFlags} mediumCount={mediumFlags} />
+
+      {/* Progress + confidence legend */}
+      <div className="card p-5 space-y-3">
         <ProgressBar
           value={progress}
           label={`${completed} of ${steps.length} steps completed`}
           showValue
+        />
+        <ConfidenceLegend
+          verified={verified}
+          flagged={flagged}
+          inferred={inferred}
         />
       </div>
 

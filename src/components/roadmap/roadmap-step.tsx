@@ -4,14 +4,18 @@ import { useState } from "react";
 import {
   Check,
   Lock,
-  Clock,
-  DollarSign,
   ChevronDown,
   ChevronUp,
+  AlertTriangle,
+  ShieldCheck,
+  Sparkles,
+  AlertCircle,
 } from "lucide-react";
 import type {
   RoadmapStep as RoadmapStepType,
   StepStatus,
+  StepConfidence,
+  GapFlag,
 } from "@/types/roadmap";
 import { useRoadmapStore } from "@/stores/roadmap-store";
 import { useProfileStore } from "@/stores/profile-store";
@@ -52,6 +56,63 @@ const STATUS_LABEL: Record<StepStatus, string> = {
   skipped: "Skipped",
 };
 
+// ── Confidence styling ───────────────────────────────────────────────────────
+
+const CONFIDENCE_BORDER: Record<StepConfidence, string> = {
+  verified: "border-l-emerald-400",
+  inferred: "border-l-amber-400",
+  flagged: "border-l-red-400",
+};
+
+const CONFIDENCE_BADGE: Record<StepConfidence, { class: string; label: string; icon: typeof ShieldCheck }> = {
+  verified: {
+    class: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    label: "Verified",
+    icon: ShieldCheck,
+  },
+  inferred: {
+    class: "bg-amber-50 text-amber-700 border-amber-200",
+    label: "AI-Inferred",
+    icon: Sparkles,
+  },
+  flagged: {
+    class: "bg-red-50 text-red-700 border-red-200",
+    label: "Flagged",
+    icon: AlertTriangle,
+  },
+};
+
+const SEVERITY_STYLE: Record<string, string> = {
+  high: "bg-red-50 border-red-200 text-red-800",
+  medium: "bg-amber-50 border-amber-200 text-amber-800",
+  low: "bg-slate-50 border-slate-200 text-slate-700",
+};
+
+// ── Flag card ────────────────────────────────────────────────────────────────
+
+function FlagCard({ flag }: { flag: GapFlag }) {
+  return (
+    <div
+      className={`rounded-lg border p-3 text-sm ${SEVERITY_STYLE[flag.severity]}`}
+    >
+      <div className="flex items-start gap-2">
+        <AlertCircle size={14} className="shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-xs uppercase tracking-wide">
+              {flag.severity} — {flag.type.replace(/_/g, " ")}
+            </span>
+          </div>
+          <p className="leading-relaxed">{flag.issue}</p>
+          <p className="font-medium">
+            {flag.recommendation}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Timeline node ─────────────────────────────────────────────────────────────
 
 function StepNode({
@@ -61,6 +122,8 @@ function StepNode({
   step: RoadmapStepType;
   locked: boolean;
 }) {
+  const confidence = step.confidence ?? "verified";
+
   if (locked) {
     return (
       <div className="h-9 w-9 rounded-full bg-slate-100 border-2 border-slate-200 flex items-center justify-center">
@@ -68,6 +131,7 @@ function StepNode({
       </div>
     );
   }
+
   if (step.status === "completed") {
     return (
       <div className="h-9 w-9 rounded-full bg-brand-600 flex items-center justify-center shadow-brand-sm">
@@ -75,6 +139,7 @@ function StepNode({
       </div>
     );
   }
+
   if (step.status === "in_progress") {
     return (
       <div className="h-9 w-9 rounded-full border-2 border-brand-500 bg-white flex items-center justify-center">
@@ -82,6 +147,23 @@ function StepNode({
       </div>
     );
   }
+
+  // Pending — color the node ring by confidence
+  if (confidence === "flagged") {
+    return (
+      <div className="h-9 w-9 rounded-full border-2 border-red-400 bg-red-50 flex items-center justify-center">
+        <AlertTriangle size={13} className="text-red-500" />
+      </div>
+    );
+  }
+  if (confidence === "inferred") {
+    return (
+      <div className="h-9 w-9 rounded-full border-2 border-amber-400 bg-amber-50 flex items-center justify-center">
+        <Sparkles size={13} className="text-amber-500" />
+      </div>
+    );
+  }
+
   return (
     <div className="h-9 w-9 rounded-full border-2 border-slate-200 bg-white flex items-center justify-center">
       <span className="text-xs font-bold text-slate-400 tabular-nums">
@@ -104,6 +186,10 @@ export default function RoadmapStep({
 
   const locked = isLocked(step, allSteps);
   const isCompleted = step.status === "completed";
+  const confidence = step.confidence ?? "verified";
+  const confidenceInfo = CONFIDENCE_BADGE[confidence];
+  const ConfidenceIcon = confidenceInfo.icon;
+  const stepFlags = step.flags ?? [];
 
   const blockingTitles = (step.depends_on ?? [])
     .map((dep) => allSteps.find((s) => s.step_key === dep))
@@ -125,7 +211,13 @@ export default function RoadmapStep({
         {!isLast && (
           <div
             className={`w-0.5 flex-1 min-h-[32px] mt-1 ${
-              isCompleted ? "bg-brand-200" : "bg-slate-200"
+              isCompleted
+                ? "bg-brand-200"
+                : confidence === "flagged"
+                  ? "bg-red-200"
+                  : confidence === "inferred"
+                    ? "bg-amber-200"
+                    : "bg-slate-200"
             }`}
           />
         )}
@@ -134,12 +226,16 @@ export default function RoadmapStep({
       {/* Card */}
       <div className={`flex-1 pb-5 ${isLast ? "pb-0" : ""}`}>
         <div
-          className={`card transition-all overflow-hidden ${
+          className={`card transition-all overflow-hidden border-l-4 ${
+            CONFIDENCE_BORDER[confidence]
+          } ${
             locked
               ? "opacity-50 cursor-not-allowed"
               : isCompleted
-                ? "border-emerald-200 bg-emerald-50/30"
-                : "hover:shadow-card-hover hover:border-slate-300 cursor-pointer"
+                ? "border-l-emerald-400 bg-emerald-50/30"
+                : confidence === "flagged"
+                  ? "hover:shadow-card-hover cursor-pointer"
+                  : "hover:shadow-card-hover hover:border-slate-300 cursor-pointer"
           }`}
         >
           {/* Header */}
@@ -182,11 +278,19 @@ export default function RoadmapStep({
                   <span className={STATUS_BADGE[step.status]}>
                     {STATUS_LABEL[step.status]}
                   </span>
+
+                  {/* Confidence badge */}
+                  <span
+                    className={`inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded border ${confidenceInfo.class}`}
+                  >
+                    <ConfidenceIcon size={10} />
+                    {confidenceInfo.label}
+                  </span>
                 </div>
 
                 {locked && blockingTitles.length > 0 && (
                   <p className="text-xs text-slate-400 mt-1">
-                    Complete "{blockingTitles[0]}" first
+                    Complete &quot;{blockingTitles[0]}&quot; first
                   </p>
                 )}
 
@@ -200,13 +304,35 @@ export default function RoadmapStep({
                   (step.estimated_timeline || step.estimated_cost) && (
                     <div className="flex gap-3 mt-2 text-xs text-slate-400">
                       {step.estimated_timeline && (
-                        <span>⏱ {step.estimated_timeline}</span>
+                        <span className="flex items-center gap-1">
+                          <span>&#9201;</span> {step.estimated_timeline}
+                        </span>
                       )}
                       {step.estimated_cost && (
-                        <span>💰 {step.estimated_cost}</span>
+                        <span className="flex items-center gap-1">
+                          <span>&#128176;</span> {step.estimated_cost}
+                        </span>
                       )}
                     </div>
                   )}
+
+                {/* Inline flag summary when collapsed */}
+                {!expanded && stepFlags.length > 0 && (
+                  <div className="mt-2 flex items-center gap-1.5 text-xs">
+                    <AlertTriangle size={12} className={
+                      stepFlags.some((f) => f.severity === "high")
+                        ? "text-red-500"
+                        : "text-amber-500"
+                    } />
+                    <span className={
+                      stepFlags.some((f) => f.severity === "high")
+                        ? "text-red-600 font-medium"
+                        : "text-amber-600 font-medium"
+                    }>
+                      {stepFlags.length} issue{stepFlags.length > 1 ? "s" : ""} detected
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Chevron */}
@@ -222,9 +348,17 @@ export default function RoadmapStep({
             </div>
           </button>
 
-          {/* Expanded */}
+          {/* Expanded: flags + step detail */}
           {expanded && !locked && (
             <div className="border-t border-slate-100">
+              {/* Flags section */}
+              {stepFlags.length > 0 && (
+                <div className="px-5 pt-4 space-y-2">
+                  {stepFlags.map((flag, i) => (
+                    <FlagCard key={`${flag.type}-${i}`} flag={flag} />
+                  ))}
+                </div>
+              )}
               <StepDetail step={step} />
             </div>
           )}

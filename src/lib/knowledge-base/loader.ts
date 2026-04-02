@@ -365,6 +365,44 @@ export function bustKBCache(): void {
 }
 
 // ---------------------------------------------------------------------------
+// Utility: serialize ALL KB documents for Layer 2 adversarial review.
+// Returns every non-funding document with full detail — the gap detector
+// needs complete eligibility criteria, common mistakes, and enforcement info
+// to catch edge cases the pattern matcher missed.
+// ---------------------------------------------------------------------------
+
+const ALL_NON_FUNDING_KEYS: KBFileKey[] = [
+  "business_structures.json",
+  "financial_constants.json",
+  "registration/req.json",
+  "registration/revenu_quebec.json",
+  "registration/cra.json",
+  "permits/mapaq.json",
+  "permits/famille.json",
+  "permits/municipal_montreal.json",
+  "permits/professional_orders.json",
+  "permits/racj.json",
+  "tax/gst_qst.json",
+  "tax/qpp.json",
+  "tax/deductions.json",
+  "tax/installments.json",
+  "compliance/bill96.json",
+  "compliance/signage.json",
+];
+
+export function serializeFullKB(kb: KnowledgeBase): string {
+  const docs: Array<KBDocument | FundingProgram> = [];
+  for (const key of ALL_NON_FUNDING_KEYS) {
+    const doc = kb.getByKey(key);
+    if (doc) docs.push(doc);
+  }
+  // Full detail: strip only _meta (file-level metadata), keep everything else
+  // including eligibility, common_mistakes, enforcement, etc.
+  const cleaned = docs.map(({ _meta, ...rest }) => rest);
+  return JSON.stringify(cleaned, null, 2);
+}
+
+// ---------------------------------------------------------------------------
 // Utility: serialize selected KB documents to a JSON string for prompt injection
 // Strips the _meta block to save tokens — Claude doesn't need file metadata
 // ---------------------------------------------------------------------------
@@ -374,4 +412,64 @@ export function serializeForPrompt(
 ): string {
   const cleaned = docs.map(({ _meta, ...rest }) => rest);
   return JSON.stringify(cleaned, null, 2);
+}
+
+// ---------------------------------------------------------------------------
+// Utility: slim serializer for the roadmap prompt — extracts only the fields
+// Claude needs to generate step keys, titles, costs, timelines, and URLs.
+// Strips verbose arrays (steps, common_mistakes, what_you_need, etc.) that
+// balloon the prompt to 90K+ chars. Reduces input tokens by ~80%.
+// ---------------------------------------------------------------------------
+
+export function serializeForRoadmapPrompt(
+  docs: Array<KBDocument | FundingProgram>,
+): string {
+  const slimmed = docs.map((doc) => {
+    const d = doc as Record<string, unknown>;
+    const slim: Record<string, unknown> = {
+      id: d.id,
+      title: d.title_en ?? d.id,
+      summary: d.plain_language_summary,
+      source_url: d.source_url,
+    };
+
+    if (d.is_mandatory != null) slim.is_mandatory = d.is_mandatory;
+
+    // Cost — keep only the fee amount or a short cost note
+    if (d.cost != null) {
+      const cost = d.cost as Record<string, unknown>;
+      slim.cost = {
+        ...(cost.registration_fee != null && { registration_fee: cost.registration_fee }),
+        ...(cost.permit_fee != null && { permit_fee: cost.permit_fee }),
+        ...(cost.fee != null && { fee: cost.fee }),
+        ...(cost.notes != null && { notes: cost.notes }),
+        ...(cost.note != null && { note: cost.note }),
+      };
+    }
+
+    // Timeline — keep top-level only
+    if (d.timeline != null) slim.timeline = d.timeline;
+
+    // Prerequisites — only the step refs matter
+    if (Array.isArray(d.prerequisites) && d.prerequisites.length > 0) {
+      slim.prerequisites = (d.prerequisites as Array<{ step: string; ref?: string }>).map(
+        (p) => p.step,
+      );
+    }
+
+    // Permit types (mapaq, racj, etc.) — keep id, name, eligibility summary, cost, timeline
+    if (Array.isArray(d.permit_types)) {
+      slim.permit_types = (d.permit_types as Record<string, unknown>[]).map((pt) => ({
+        id: pt.id,
+        name: pt.name_en,
+        plain_language: pt.plain_language,
+        cost: pt.cost,
+        timeline: pt.timeline,
+      }));
+    }
+
+    return slim;
+  });
+
+  return JSON.stringify(slimmed);
 }

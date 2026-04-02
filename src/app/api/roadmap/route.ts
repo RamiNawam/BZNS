@@ -16,9 +16,9 @@ export async function GET(req: NextRequest) {
   try {
     if (!profile_id) return NextResponse.json({ error: 'profile_id required' }, { status: 400 })
 
-    const steps = await RoadmapService.getByProfileId(profile_id)
-    console.log(`[GET /api/roadmap] Returning ${steps.length} steps for profile_id=${profile_id}`)
-    return NextResponse.json({ steps })
+    const { steps, flags } = await RoadmapService.getByProfileId(profile_id)
+    console.log(`[GET /api/roadmap] Returning ${steps.length} steps, ${flags.length} flags for profile_id=${profile_id}`)
+    return NextResponse.json({ steps, flags })
   } catch (err) {
     console.error('[GET /api/roadmap] Error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -34,9 +34,9 @@ export async function POST(req: NextRequest) {
 
     if (!profile_id) return NextResponse.json({ error: 'profile_id required' }, { status: 400 })
 
-    const steps = await RoadmapService.generate(profile_id)
-    console.log(`[POST /api/roadmap] SUCCESS — ${steps.length} steps generated for profile_id=${profile_id}`)
-    return NextResponse.json({ steps }, { status: 201 })
+    const { steps, flags } = await RoadmapService.generate(profile_id)
+    console.log(`[POST /api/roadmap] SUCCESS — ${steps.length} steps, ${flags.length} flags for profile_id=${profile_id}`)
+    return NextResponse.json({ steps, flags }, { status: 201 })
   } catch (err) {
     console.error(`[POST /api/roadmap] FAILED for profile_id=${profile_id}:`, err)
     return NextResponse.json({ error: err instanceof Error ? err.message : 'Internal server error' }, { status: 500 })
