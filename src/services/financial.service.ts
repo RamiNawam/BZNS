@@ -8,8 +8,13 @@ import { ProfileRepository } from '@/repositories/profile.repository'
 import { SnapshotRepository } from '@/repositories/snapshot.repository'
 import { CacheRepository } from '@/repositories/cache.repository'
 import type { FinancialSnapshot, SnapshotInput, CreateSnapshotDTO } from '@/types/financial'
+import { calculateTaxSnapshot } from '@/lib/financial/tax-calculator'
+import { getExpenseDefaults } from '@/lib/financial/expense-defaults'
+import { getDeductionSummary } from '@/lib/financial/deductions'
+import { generateScenarios, getBreakEvenResult, calculatePricing, calculateFundingImpact } from '@/lib/financial/projections'
+import type { ClusterID } from '@/lib/clusters'
+import { getClusterQuestions } from '@/lib/financial/cluster-questions'
 
-// TODO: import { TaxCalculator } from '@/lib/financial/tax-calculator'
 // TODO: import { ClaudeClient } from '@/lib/claude/client'
 // TODO: import { FinancialInsightSchema } from '@/lib/claude/schemas'
 
@@ -28,14 +33,71 @@ export const FinancialService = {
    * 7. Return full snapshot
    */
   async generate(input: SnapshotInput): Promise<FinancialSnapshot> {
-    const { profile_id, monthly_expenses, expense_categories, price_per_unit, units_per_month } = input
+    const {
+      profile_id,
+      monthly_expenses,
+      expense_categories,
+      price_per_unit,
+      units_per_month,
+      questionnaire_answers,
+    } = input
 
     // Step 1: Fetch profile
     let profile = await ProfileRepository.getById(profile_id)
     if (!profile) throw new Error(`FinancialService.generate: Profile not found ${profile_id}`)
 
-    // Step 2: Update profile with any new financial inputs
-    if (monthly_expenses !== undefined || expense_categories !== undefined) {
+    // Step 2: Update profile with cluster questionnaire or direct financial inputs.
+    if (questionnaire_answers && profile.cluster_id) {
+      const normalizedAnswers = Object.fromEntries(
+        Object.entries(questionnaire_answers).map(([k, v]) => {
+          if (v === 'true') return [k, true]
+          if (v === 'false') return [k, false]
+          return [k, v]
+        }),
+      ) as Record<string, string | number | boolean>
+
+      const clusterId = profile.cluster_id as ClusterID
+      const computed = getClusterQuestions(clusterId).computeFinancials(normalizedAnswers)
+
+      const defaults = getExpenseDefaults(clusterId)
+      const mergedExpenseCategories: Record<string, number> = Object.fromEntries(
+        defaults.categories.map((c) => [c.key, c.amount]),
+      )
+      Object.entries(computed.expenseOverrides).forEach(([k, v]) => {
+        mergedExpenseCategories[k] = Math.max(0, Number(v) || 0)
+      })
+
+      const inferredPrice =
+        Number(
+          normalizedAnswers.price_per_item ??
+          normalizedAnswers.price_per_service ??
+          normalizedAnswers.avg_product_price ??
+          normalizedAnswers.fee_per_session ??
+          normalizedAnswers.rate_amount ??
+          normalizedAnswers.daily_rate ??
+          0,
+        ) || null
+
+      const inferredUnits =
+        Number(
+          normalizedAnswers.items_per_week ??
+          normalizedAnswers.units_per_month ??
+          normalizedAnswers.sessions_per_week ??
+          normalizedAnswers.clients_per_week ??
+          normalizedAnswers.jobs_per_month ??
+          0,
+        ) || null
+
+      profile = await ProfileRepository.update(profile_id, {
+        expected_monthly_revenue: computed.monthlyRevenue,
+        monthly_expenses: Object.values(mergedExpenseCategories).reduce((sum, n) => sum + n, 0),
+        expense_categories: mergedExpenseCategories,
+        price_per_unit: inferredPrice ?? profile.price_per_unit ?? undefined,
+        units_per_month: inferredUnits ?? profile.units_per_month ?? undefined,
+        financial_questionnaire_completed: true,
+        financial_questionnaire_answers: normalizedAnswers,
+      })
+    } else if (monthly_expenses !== undefined || expense_categories !== undefined) {
       profile = await ProfileRepository.update(profile_id, {
         monthly_expenses: monthly_expenses ?? profile.monthly_expenses ?? undefined,
         expense_categories: expense_categories ?? profile.expense_categories ?? undefined,
@@ -49,31 +111,11 @@ export const FinancialService = {
     const business_structure = profile.business_structure ?? 'sole_proprietorship'
 
     // Step 3: Run deterministic tax calculator
-    // TODO: Uncomment when TaxCalculator is implemented
-    // const taxResult = TaxCalculator.calculate({
-    //   gross_monthly_revenue,
-    //   monthly_expenses: resolved_expenses,
-    //   business_structure,
-    // })
-
-    // STUB tax result until calculator is implemented
-    const taxResult = {
-      annual_revenue: gross_monthly_revenue * 12,
-      gst_collected: 0,
-      qst_collected: 0,
-      gst_qst_remittance: 0,
-      net_revenue: (gross_monthly_revenue - resolved_expenses) * 12,
-      federal_income_tax: 0,
-      provincial_income_tax: 0,
-      qpp_contribution: 0,
-      qpip_premium: 0,
-      total_deductions: 0,
-      monthly_take_home: gross_monthly_revenue - resolved_expenses,
-      effective_take_home_rate: gross_monthly_revenue > 0
-        ? (gross_monthly_revenue - resolved_expenses) / gross_monthly_revenue
-        : 0,
-      quarterly_installment: 0,
-    }
+    const taxResult = calculateTaxSnapshot({
+      gross_monthly_revenue,
+      monthly_expenses: resolved_expenses,
+      business_structure,
+    })
 
     // Step 4: Call Claude for insights
     // TODO: Uncomment when Claude client is wired
@@ -126,5 +168,49 @@ export const FinancialService = {
     await CacheRepository.delete(`snapshot:${input.profile_id}`)
     await SnapshotRepository.deleteByProfileId(input.profile_id)
     return FinancialService.generate(input)
+  },
+
+  // ── NEW: Extended financial dashboard data ─────────────────
+
+  /**
+   * Get cluster-aware expense defaults with full category breakdown.
+   */
+  getExpenseDefaults(clusterId: ClusterID) {
+    return getExpenseDefaults(clusterId)
+  },
+
+  /**
+   * Get common deductions for this cluster with estimated tax savings.
+   */
+  getDeductionSummary(clusterId: ClusterID) {
+    return getDeductionSummary(clusterId)
+  },
+
+  /**
+   * Generate 3 revenue scenarios (conservative/expected/optimistic).
+   */
+  getScenarios(monthlyRevenue: number, monthlyExpenses: number, businessStructure?: string) {
+    return generateScenarios(monthlyRevenue, monthlyExpenses, businessStructure)
+  },
+
+  /**
+   * Break-even: minimum monthly gross revenue to cover expenses + taxes.
+   */
+  getBreakEven(currentMonthlyRevenue: number, monthlyExpenses: number, businessStructure?: string) {
+    return getBreakEvenResult(currentMonthlyRevenue, monthlyExpenses, businessStructure)
+  },
+
+  /**
+   * "If I charge $X and sell Y, what do I keep?"
+   */
+  getPricing(pricePerUnit: number, unitsPerMonth: number, monthlyExpenses: number, businessStructure?: string) {
+    return calculatePricing(pricePerUnit, unitsPerMonth, monthlyExpenses, businessStructure)
+  },
+
+  /**
+   * How matched funding extends the user's runway.
+   */
+  getFundingImpact(fundingAmount: number, monthlyExpenses: number, monthlyTakeHome: number) {
+    return calculateFundingImpact(fundingAmount, monthlyExpenses, monthlyTakeHome)
   },
 }

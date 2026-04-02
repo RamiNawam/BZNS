@@ -17,6 +17,13 @@ import {
 import { useProfileStore } from '@/stores/profile-store';
 import { useRoadmapStore } from '@/stores/roadmap-store';
 import SnapshotCard from '@/components/financial/snapshot-card';
+import type { ClusterComplexity } from '@/types/profile';
+
+const CLUSTER_COLORS: Record<ClusterComplexity, string> = {
+  low:    'bg-green-50 text-green-800 border-green-200',
+  medium: 'bg-amber-50 text-amber-800 border-amber-200',
+  high:   'bg-red-50 text-red-800 border-red-200',
+};
 
 const businessTypeLabels: Record<string, string> = {
   food: 'Food & Bakery',
@@ -131,6 +138,12 @@ export default function DashboardPage() {
             {profile?.business_type && (
               <span className="badge badge-brand">
                 {businessTypeLabels[profile.business_type] ?? profile.business_type}
+              </span>
+            )}
+            {/* Cluster badge — colour-coded by complexity */}
+            {profile?.cluster_id && profile.cluster_label && profile.cluster_complexity && (
+              <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${CLUSTER_COLORS[profile.cluster_complexity]}`}>
+                {profile.cluster_id} · {profile.cluster_label}
               </span>
             )}
             {profile?.municipality && (

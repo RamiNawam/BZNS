@@ -77,6 +77,7 @@ export interface SnapshotInput {
   expense_categories?: Record<string, number>
   price_per_unit?: number
   units_per_month?: number
+  questionnaire_answers?: Record<string, string | number | boolean>
 }
 
 // DTOs
@@ -88,3 +89,9 @@ export interface TaxBracket {
   max: number | null
   rate: number
 }
+
+// ── Re-exports from the financial engine modules ────────────
+// All pure math, no AI. Import from here or directly from the modules.
+export type { Scenario, BreakEvenResult, PricingResult, FundingImpact, MonthProjection } from '@/lib/financial/projections'
+export type { ExpenseCategory, ClusterExpenseProfile } from '@/lib/financial/expense-defaults'
+export type { Deduction, DeductionSummary } from '@/lib/financial/deductions'

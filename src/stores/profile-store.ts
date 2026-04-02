@@ -4,6 +4,7 @@ import type { Profile } from '@/types/profile';
 
 // Intake answers collected from the wizard (one field per question)
 export interface IntakeFormState {
+  business_category: string        // NEW: structured category for classification (maps to C1-C9)
   business_idea: string
   location: string
   borough: string
@@ -42,6 +43,7 @@ interface ProfileStore {
 }
 
 const DEFAULT_INTAKE: Partial<IntakeFormState> = {
+  business_category: '',
   business_idea: '',
   location: 'montreal',
   borough: '',

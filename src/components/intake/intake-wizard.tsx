@@ -6,7 +6,7 @@ import IntakeProgress from './intake-progress';
 import QuestionCard from './question-card';
 import { useProfileStore } from '@/stores/profile-store';
 
-const STEPS = ['Your Business', 'Location', 'Finances', 'About You'];
+const STEPS = ['Business Type', 'Your Business', 'Location', 'Finances', 'About You'];
 
 export default function IntakeWizard() {
   const [currentStep, setCurrentStep] = useState(0);

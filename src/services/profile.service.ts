@@ -4,69 +4,53 @@
 // ============================================================
 
 import { ProfileRepository } from '@/repositories/profile.repository'
-import { askClaude } from '@/lib/claude/client'
-import { buildProfilePrompt } from '@/lib/knowledge-base/prompts'
-import { ProfileClassificationSchema, parseClaudeJSON } from '@/lib/claude/schemas'
 import type {
   Profile,
   IntakeAnswers,
   CreateProfileDTO,
   UpdateProfileDTO,
 } from '@/types/profile'
-import type { IntakeAnswers as PromptIntakeAnswers } from '@/lib/knowledge-base/prompts'
+import { CLUSTERS } from '@/lib/clusters'
+import { classifyBusiness } from '@/lib/classifier'
 
 export const ProfileService = {
 
   /**
    * Called after the user completes the 8-question intake wizard.
-   * 1. Sends raw answers to Claude → classifies business type, sector, name
-   * 2. Merges Claude output with intake answers
+   * 1. Classifies business deterministically from answers (no Claude API needed)
+   * 2. Merges cluster info with intake answers
    * 3. Upserts into the profiles table
    */
   async createFromIntake(user_id: string, answers: IntakeAnswers): Promise<Profile> {
     console.log(`[ProfileService.createFromIntake] START user_id=${user_id} business_idea="${answers.business_idea?.slice(0, 60)}"`)
 
-    // Step 1: Map intake answers to the shape buildProfilePrompt expects
-    const promptAnswers: PromptIntakeAnswers = {
-      business_description: answers.business_idea,
-      location: answers.location,
-      stage: 'starting',
-      expected_revenue_cad: answers.expected_monthly_revenue ? answers.expected_monthly_revenue * 12 : null,
-      employee_count: answers.has_partners ? 2 : 1,
-      serves_alcohol: false,
-      is_home_based: answers.is_home_based,
-      is_regulated_profession: false,
-      age: answers.age ?? null,
-      is_newcomer: answers.immigration_status === 'work_permit' || answers.immigration_status === 'student',
-      is_indigenous: false,
-      is_woman: false,
-    }
+    // Step 1: Classify business deterministically from intake answers (no Claude API needed)
+    const clusterId = classifyBusiness(answers)
+    const clusterMeta = CLUSTERS[clusterId]
+    console.log(`[ProfileService.createFromIntake] Classified as cluster=${clusterId} (${clusterMeta.label})`)
 
-    // Step 2: Call Claude to classify the business type
-    console.log(`[ProfileService.createFromIntake] Calling Claude for business classification`)
-    let classification
-    try {
-      const systemPrompt = buildProfilePrompt(promptAnswers)
-      const rawText = await askClaude(systemPrompt, 'Classify this business profile now.', 'claude-haiku-4-5-20251001', 1024)
-      console.log(`[ProfileService.createFromIntake] Claude raw response: ${rawText.slice(0, 200)}`)
-      classification = ProfileClassificationSchema.parse(parseClaudeJSON(rawText))
-      console.log(`[ProfileService.createFromIntake] Classification: type=${classification.business_type} sector=${classification.industry_sector}`)
-    } catch (err) {
-      console.error(`[ProfileService.createFromIntake] Claude classification failed, falling back to "other":`, err)
-      classification = {
-        business_type: 'other' as const,
-        industry_sector: 'general',
-        business_summary: answers.business_idea,
-      }
+    // Step 2: Derive business_type + industry_sector from cluster (no Claude needed)
+    const CLUSTER_TO_TYPE: Record<string, 'food' | 'freelance' | 'daycare' | 'retail' | 'personal_care' | 'other'> = {
+      C1: 'food', C2: 'freelance', C3: 'daycare',
+      C4: 'other', C5: 'retail', C6: 'food',
+      C7: 'other', C8: 'personal_care', C9: 'other',
     }
+    const CLUSTER_TO_SECTOR: Record<string, string> = {
+      C1: 'home-based food', C2: 'consulting & freelance', C3: 'regulated childcare',
+      C4: 'regulated profession', C5: 'retail & e-commerce', C6: 'food service & hospitality',
+      C7: 'construction & trades', C8: 'personal services', C9: 'general',
+    }
+    const businessType = CLUSTER_TO_TYPE[clusterId] ?? 'other'
+    const industrySector = CLUSTER_TO_SECTOR[clusterId] ?? 'general'
+    console.log(`[ProfileService.createFromIntake] business_type=${businessType} sector=${industrySector}`)
 
     // Step 3: Build the profile DTO
     const profileDTO: CreateProfileDTO = {
       user_id,
-      business_type: classification.business_type,
+      business_type: businessType,
       business_name: null,
-      business_description: classification.business_summary ?? answers.business_idea,
-      industry_sector: classification.industry_sector,
+      business_description: answers.business_idea,
+      industry_sector: industrySector,
       municipality: answers.location,
       borough: answers.borough ?? null,
       is_home_based: answers.is_home_based,
@@ -90,6 +74,10 @@ export const ProfileService = {
       units_per_month: null,
       intake_completed: true,
       intake_answers: answers as unknown as Record<string, unknown>,
+      // Cluster — set by Claude; using default until API is wired
+      cluster_id: clusterId,
+      cluster_label: clusterMeta.label,
+      cluster_complexity: clusterMeta.complexity,
     }
 
     // Step 3: Save to DB

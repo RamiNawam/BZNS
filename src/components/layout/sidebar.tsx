@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 import {
   LayoutDashboard,
   Map,
@@ -30,13 +31,14 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { clearProfile } = useProfileStore();
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
-  const handleSignOut = async () => {
-    console.log('[Sidebar] Signing out');
+  async function handleSignOut() {
+    setIsSigningOut(true);
     await createClient().auth.signOut();
     clearProfile();
-    router.push('/');
-  };
+    router.push('/login');
+  }
 
   return (
     <aside className="w-60 shrink-0 bg-white border-r border-slate-200 flex flex-col h-full">
@@ -109,10 +111,11 @@ export default function Sidebar() {
         <button
           type="button"
           onClick={handleSignOut}
-          className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all duration-150 group"
+          disabled={isSigningOut}
+          className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all duration-150 group disabled:opacity-50"
         >
           <LogOut size={17} className="shrink-0 text-slate-400 group-hover:text-slate-500 transition-colors" />
-          <span>Sign out</span>
+          <span>{isSigningOut ? 'Signing out...' : 'Sign out'}</span>
         </button>
       </div>
     </aside>

@@ -2,18 +2,24 @@
  * Knowledge Base Selector
  * src/lib/knowledge-base/selector.ts
  *
+ * PRIMARY path: selectByClusterId(kb, clusterId)
+ *   - reads CLUSTERS[clusterId].kb_files, resolves each to a KB document.
+ *   - used by roadmap + assistant services after cluster assignment.
+ *
+ * LEGACY path: selectForPrompt(kb, context)
+ *   - kept for backwards compatibility; uses the old KB_MAP.
+ *
  * Given a user's business type, returns only the relevant KB documents
- * to inject into Claude's prompt. Keeps prompts lean — a bakery doesn't
+ * to inject into Claude's prompt. Keeps prompts lean -- a bakery doesn't
  * need IRAP (R&D funding) or RACJ (liquor permits).
  *
- * Funding files are handled separately — they are always fully loaded
+ * Funding files are handled separately -- they are always fully loaded
  * by the scorer (deterministic, no Claude involved). The selector only
  * controls what goes into Claude prompts.
  *
  * Usage:
- *   import { selectForPrompt } from '@/lib/knowledge-base/selector'
- *   const docs = selectForPrompt(kb, 'food')
- *   const kbString = serializeForPrompt(docs)
+ *   import { selectByClusterId } from '@/lib/knowledge-base/selector'
+ *   const docs = selectByClusterId(kb, 'C1')
  */
 
 import {
@@ -22,6 +28,7 @@ import {
   type FundingProgram,
   type KBFileKey,
 } from "./loader";
+import { CLUSTERS, type ClusterID } from "@/lib/clusters";
 
 // ---------------------------------------------------------------------------
 // Business types — must match what Claude returns from the profile prompt
@@ -176,6 +183,47 @@ export function selectForPrompt(
   }
 
   return docs;
+}
+
+// ---------------------------------------------------------------------------
+// PRIMARY: cluster-based selector — replaces KB_MAP logic for all new code.
+// Takes a ClusterID, reads CLUSTERS[id].kb_files, resolves each to a doc.
+// ---------------------------------------------------------------------------
+
+export function selectByClusterId(
+  kb: KnowledgeBase,
+  clusterId: ClusterID,
+): Array<KBDocument | FundingProgram> {
+  const files = CLUSTERS[clusterId].kb_files;
+  const docs: Array<KBDocument | FundingProgram> = [];
+  for (const key of files) {
+    const doc = kb.getByKey(key as KBFileKey);
+    if (doc) docs.push(doc);
+  }
+  return docs;
+}
+
+// Cluster-aware assistant selector: use cluster files + always add the extras
+// that are useful for open-ended chat (cra, installments, signage).
+export function selectForClusterAssistant(
+  kb: KnowledgeBase,
+  clusterId: ClusterID,
+): Array<KBDocument | FundingProgram> {
+  const base = selectByClusterId(kb, clusterId);
+  const seen = new Set(base.map((d) => (d as KBDocument).id));
+
+  const extras: KBFileKey[] = [
+    "registration/cra.json",
+    "tax/installments.json",
+    "compliance/signage.json",
+  ];
+  for (const key of extras) {
+    const doc = kb.getByKey(key);
+    if (doc && !seen.has((doc as KBDocument).id)) {
+      base.push(doc);
+    }
+  }
+  return base;
 }
 
 // ---------------------------------------------------------------------------
