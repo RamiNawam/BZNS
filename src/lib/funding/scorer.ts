@@ -43,6 +43,14 @@ export function scoreProgram(
     score += statusEligible ? 10 : -15;
   }
 
+  // ── Business type ──────────────────────────────────────────────────────────
+  if (program.eligibility.business_types && program.eligibility.business_types.length > 0) {
+    const userType = profile.business_type ?? 'other'
+    const btEligible = program.eligibility.business_types.includes(userType)
+    eligibility.business_type_eligible = btEligible
+    score += btEligible ? 10 : -25
+  }
+
   // ── Demographics ───────────────────────────────────────────────────────────
   if (program.eligibility.demographics && program.eligibility.demographics.length > 0) {
     const userLangs = profile.languages_spoken ?? [];

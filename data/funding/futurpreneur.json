@@ -6,9 +6,9 @@
     "status": "active",
     "verify_urls": {
       "main": "https://www.futurpreneur.ca/en/",
-      "financing": "https://www.futurpreneur.ca/en/",
-      "eligibility": "https://www.futurpreneur.ca/en/",
-      "apply": "https://www.futurpreneur.ca/en/"
+      "financing": "https://www.futurpreneur.ca/en/get-financing/",
+      "eligibility": "https://www.futurpreneur.ca/en/get-financing/",
+      "apply": "https://www.futurpreneur.ca/en/get-financing/"
     }
   },
   "id": "futurpreneur",

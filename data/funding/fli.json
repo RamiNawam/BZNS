@@ -6,8 +6,9 @@
     "status": "active",
     "verify_urls": {
       "main": "https://montreal.ca/en",
-      "pmemtl_fli": "https://www.pmemtl.com/en/financing",
-      "cdec_cote_des_neiges": "NO_VERIFIED_LINK"
+      "pmemtl_fli": "https://www.pmemtl.com/en/financement",
+      "cdec_cote_des_neiges": "NO_VERIFIED_LINK",
+      "apply": "https://www.pmemtl.com/en/nous-joindre"
     }
   },
   "id": "fli",

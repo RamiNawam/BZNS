@@ -10,14 +10,14 @@ import { CacheRepository } from '@/repositories/cache.repository'
 import { scorePrograms } from '@/lib/funding/scorer'
 import { askClaude } from '@/lib/claude/client'
 import { buildSystemPrompt } from '@/lib/claude/prompts'
-import type { FundingMatch, FundingProgramJSON, CreateFundingMatchDTO, UpdateFundingMatchDTO, ProgramType } from '@/types/funding'
+import { parseClaudeJSON } from '@/lib/claude/schemas'
+import type { FundingMatch, FundingProgramJSON, FundingExplanation, CreateFundingMatchDTO, UpdateFundingMatchDTO, ProgramType } from '@/types/funding'
 
 // ── Max numeric amounts per program (for total_potential_funding) ─────────────
 const PROGRAM_MAX_AMOUNTS: Record<string, number> = {
   bdc:                    100_000,
   futurpreneur:            75_000,
   pme_mtl:                 20_000,
-  sta:                     31_200,
   irap:                    50_000,
   fli:                     50_000,
   investissement_quebec:  150_000,
@@ -25,8 +25,9 @@ const PROGRAM_MAX_AMOUNTS: Record<string, number> = {
   demographic_programs:    15_000,
 }
 
+// STA (Soutien au Travail Autonome) is excluded — suspended since May 1, 2024
 const FUNDING_FILES = [
-  'bdc', 'futurpreneur', 'pme_mtl', 'sta', 'irap', 'fli',
+  'bdc', 'futurpreneur', 'pme_mtl', 'irap', 'fli',
   'investissement_quebec', 'canada_summer_jobs', 'demographic_programs',
 ]
 
@@ -50,6 +51,26 @@ function extractUrl(raw: Record<string, unknown>): string {
   return urls?.apply ?? urls?.main ?? ''
 }
 
+function extractSourceUrl(raw: Record<string, unknown>): string {
+  const meta = raw._meta as Record<string, unknown> | undefined
+  const urls = meta?.verify_urls as Record<string, string> | undefined
+  return urls?.main ?? extractUrl(raw)
+}
+
+// Normalize JSON immigration status values to match Profile.ImmigrationStatus enum
+const IMMIGRATION_NORMALIZE: Record<string, string> = {
+  canadian_citizen:  'citizen',
+  protected_person:  'citizen',
+  refugee:           'citizen',
+  // permanent_resident, work_permit, student already match Profile enum
+}
+
+// Per-program business type allow-lists (empty = no restriction)
+// BusinessType enum: 'food' | 'freelance' | 'daycare' | 'retail' | 'personal_care' | 'other'
+const PROGRAM_BUSINESS_TYPES: Record<string, string[]> = {
+  irap: ['freelance', 'other'], // only tech/innovation businesses qualify
+}
+
 function extractEligibility(raw: Record<string, unknown>): FundingProgramJSON['eligibility'] {
   const elig = (raw.eligibility ?? {}) as Record<string, unknown>
   const criteria = (elig.criteria ?? {}) as Record<string, unknown>
@@ -60,11 +81,12 @@ function extractEligibility(raw: Record<string, unknown>): FundingProgramJSON['e
   const rawMax = ageCriteria.max_age ?? ageCriteria.maximum
   const ageMax = typeof rawMax === 'number' ? rawMax : undefined
 
-  // Immigration status
+  // Immigration status — normalize keys to match Profile.ImmigrationStatus
   const immCriteria = (criteria.immigration_status ?? {}) as Record<string, unknown>
-  const immigrationStatus = (immCriteria.eligible ?? []) as string[]
+  const rawStatuses = (immCriteria.eligible ?? []) as string[]
+  const immigrationStatus = rawStatuses.map((s) => IMMIGRATION_NORMALIZE[s] ?? s)
 
-  // Location — flag Montreal-specific programs
+  // Location — flag Montréal-specific programs
   const locationRequired = raw.location_required as string | undefined
   const locCriteria = (criteria.location ?? {}) as Record<string, unknown>
   const locEligible = (locCriteria.eligible ?? locCriteria.detail ?? '') as string
@@ -83,12 +105,16 @@ function extractEligibility(raw: Record<string, unknown>): FundingProgramJSON['e
     demographics.push('immigrant', 'newcomer', 'woman', 'youth')
   }
 
+  // Business types (programs with sector restrictions)
+  const businessTypes = PROGRAM_BUSINESS_TYPES[raw.program_key as string] ?? []
+
   return {
     ...(ageMin !== undefined && { age_min: ageMin }),
     ...(ageMax !== undefined && { age_max: ageMax }),
     ...(locations.length > 0 && { locations }),
     ...(immigrationStatus.length > 0 && { immigration_status: immigrationStatus }),
     ...(demographics.length > 0 && { demographics }),
+    ...(businessTypes.length > 0 && { business_types: businessTypes }),
   }
 }
 
@@ -121,7 +147,7 @@ function adaptProgram(raw: Record<string, unknown>): FundingProgramJSON {
     amount_description: extractAmountDescription(raw),
     summary: (raw.plain_language_summary ?? '') as string,
     application_url: extractUrl(raw),
-    source_url: extractUrl(raw),
+    source_url: extractSourceUrl(raw),
     eligibility: extractEligibility(raw),
     scoring_weights: extractScoringWeights(raw),
   }
@@ -148,13 +174,19 @@ function computeTotalPotential(matches: CreateFundingMatchDTO[]): string {
 
 export const FundingService = {
 
-  async scoreForProfile(profile_id: string): Promise<{
+  computeTotalFromMatches(matches: FundingMatch[]): string {
+    return computeTotalPotential(matches as unknown as CreateFundingMatchDTO[])
+  },
+
+  async scoreForProfile(profile_id: string, force_refresh = false): Promise<{
     matches: FundingMatch[]
     total_potential_funding: string
   }> {
     const cacheKey = `funding:${profile_id}`
-    const cached = await CacheRepository.get<{ matches: FundingMatch[]; total_potential_funding: string }>(cacheKey)
-    if (cached) return cached
+    if (!force_refresh) {
+      const cached = await CacheRepository.get<{ matches: FundingMatch[]; total_potential_funding: string }>(cacheKey)
+      if (cached) return cached
+    }
 
     const profile = await ProfileRepository.getById(profile_id)
     if (!profile) throw new Error(`FundingService.scoreForProfile: Profile not found ${profile_id}`)
@@ -177,20 +209,127 @@ export const FundingService = {
     return FundingRepository.getByProfileId(profile_id)
   },
 
-  async explainProgram(profile_id: string, program_key: string): Promise<string> {
+  async explainProgram(
+    profile_id: string,
+    program_key: string,
+    match_score?: number,
+    eligibility_details?: Record<string, boolean> | null,
+  ): Promise<FundingExplanation> {
     const profile = await ProfileRepository.getById(profile_id)
     if (!profile) throw new Error(`FundingService.explainProgram: Profile not found`)
 
     const programs = loadFundingPrograms()
     const program = programs.find((p) => p.key === program_key)
+    if (!program) throw new Error(`FundingService.explainProgram: Program not found: ${program_key}`)
+
+    const programFacts = JSON.stringify({
+      name: program.name,
+      type: program.type,
+      amount: program.amount_description,
+      summary: program.summary,
+      eligibility: program.eligibility,
+      application_url: program.application_url,
+    }, null, 2)
+
+    const userProfile = JSON.stringify({
+      age: profile.age,
+      immigration_status: profile.immigration_status,
+      municipality: profile.municipality,
+      borough: profile.borough,
+      business_description: profile.business_description,
+      business_type: profile.business_type,
+      languages_spoken: profile.languages_spoken,
+    }, null, 2)
+
+    const eligibilityCtx = eligibility_details
+      ? JSON.stringify(eligibility_details, null, 2)
+      : 'Not available'
+
+    const scoreCtx = match_score !== undefined ? `${match_score}/100` : 'Not available'
 
     const systemPrompt = buildSystemPrompt({ profileContext: profile })
-    const explanation = await askClaude(
+
+    // Step A — Generate structured JSON explanation grounded in supplied facts only
+    const rawText = await askClaude(
       systemPrompt,
-      `Explain the "${program?.name ?? program_key}" funding program to this person in 2-3 plain sentences. Focus on why it's relevant to them and what they need to do next. Be direct and practical. User profile: ${JSON.stringify({ business_type: profile.business_type, city: profile.municipality, age: profile.age, immigration_status: profile.immigration_status })}`,
-      'claude-sonnet-4-6'
+      `You are a Quebec business funding expert. Explain why this program did or didn't fully match this user.
+Use ONLY the facts below — never invent amounts, rules, or eligibility criteria.
+
+PROGRAM FACTS:
+${programFacts}
+
+USER PROFILE:
+${userProfile}
+
+ELIGIBILITY CHECK RESULTS (true = user meets criterion, false = user does not):
+${eligibilityCtx}
+
+MATCH SCORE: ${scoreCtx}
+
+Return ONLY this exact JSON (no markdown fences, no extra text):
+{
+  "program_overview": "2 sentences: (1) what this program provides and its key benefit, (2) the primary reason this specific user was matched.",
+  "eligible_factors": [
+    { "label": "Short factor name", "detail": "Specific sentence using the user's actual data (age, city, status).", "impact": "high" }
+  ],
+  "missing_factors": [
+    { "label": "Short factor name", "detail": "What the user lacks or what would have raised the score. Be constructive." }
+  ],
+  "next_step": "One direct sentence: exactly what to do right now, referencing the application URL."
+}
+
+Rules:
+- eligible_factors: only what the user actually meets based on ELIGIBILITY CHECK RESULTS. Max 4.
+- missing_factors: real gaps or optional improvements only. Can be []. Max 3.
+- impact values must be exactly "high", "medium", or "low".
+- Reference the user's real characteristics (age, city, immigration status). Never be generic.
+- next_step must be one concrete actionable sentence.`,
+      'claude-sonnet-4-6',
+      700
     )
-    return explanation
+
+    // Step B — Parse + validate JSON
+    let parsed: FundingExplanation
+    try {
+      parsed = parseClaudeJSON(rawText) as FundingExplanation
+      if (!parsed.program_overview || !Array.isArray(parsed.eligible_factors) || !parsed.next_step) {
+        throw new Error('Missing required fields')
+      }
+    } catch {
+      // Fallback: minimal structure so UI never breaks
+      return {
+        program_overview: rawText.slice(0, 300),
+        eligible_factors: [],
+        missing_factors: [],
+        next_step: `Visit ${program.application_url} to begin your application.`,
+      }
+    }
+
+    // Step C — Self-verify: fact-check key claims against source facts
+    const verifyText = await askClaude(
+      'You are a fact-checker for a Quebec business funding assistant.',
+      `PROGRAM FACTS (authoritative):
+${programFacts}
+
+EXPLANATION JSON TO VERIFY:
+${JSON.stringify(parsed, null, 2)}
+
+Check: does any field contain amounts, dates, or eligibility rules that contradict the program facts?
+- If all accurate: return the JSON unchanged.
+- If inaccurate: return corrected JSON with the same structure.
+Return ONLY valid JSON. No markdown, no commentary.`,
+      'claude-sonnet-4-6',
+      700
+    )
+
+    try {
+      const verified = parseClaudeJSON(verifyText) as FundingExplanation
+      if (verified.program_overview && Array.isArray(verified.eligible_factors) && verified.next_step) {
+        return verified
+      }
+    } catch { /* fall through to unverified */ }
+
+    return parsed
   },
 
   async updateMatch(match_id: string, update: UpdateFundingMatchDTO): Promise<FundingMatch> {

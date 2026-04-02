@@ -9,9 +9,10 @@
       "women_entrepreneurship": "https://ised-isde.canada.ca/site/women-entrepreneurship-strategy/en",
       "black_entrepreneurship": "https://ised-isde.canada.ca/site/national-black-canadians-entrepreneurship-program/en",
       "mifi_entrepreneurs": "https://www.immigration-quebec.gouv.qc.ca/en/",
-      "yes_montreal": "https://www.yesmontreal.ca",
-      "ceed": "https://ceed.ca/en/",
-      "irap": "https://nrc.canada.ca/en/support-technology-innovation"
+      "yes_montreal": "https://www.yesmontreal.ca/programs/",
+      "ceed": "https://ceed.ca/en/programs/",
+      "irap": "https://nrc.canada.ca/en/support-technology-innovation",
+      "apply": "https://www.yesmontreal.ca/programs/"
     }
   },
   "id": "demographic_programs",

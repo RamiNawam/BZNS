@@ -6,10 +6,11 @@
     "status": "active",
     "verify_urls": {
       "main": "https://www.pmemtl.com/en",
-      "financing": "https://www.pmemtl.com/en/financing",
-      "young_entrepreneurs": "https://www.pmemtl.com/en/financing",
-      "advisory": "https://www.pmemtl.com/en",
-      "contact": "https://www.pmemtl.com/en"
+      "financing": "https://www.pmemtl.com/en/financement",
+      "young_entrepreneurs": "https://www.pmemtl.com/en/financement",
+      "advisory": "https://www.pmemtl.com/en/services-aux-entreprises",
+      "contact": "https://www.pmemtl.com/en/nous-joindre",
+      "apply": "https://www.pmemtl.com/en/nous-joindre"
     }
   },
   "id": "pme_mtl",

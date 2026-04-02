@@ -4,8 +4,9 @@ import { useState } from 'react';
 import {
   Bookmark, BookmarkCheck, CheckCircle2, XCircle,
   ExternalLink, ChevronDown, ChevronUp, Sparkles, Loader2,
+  ArrowRight, AlertTriangle,
 } from 'lucide-react';
-import type { FundingMatch, ProgramType } from '@/types/funding';
+import type { FundingMatch, FundingExplanation, ProgramType } from '@/types/funding';
 import { useFundingStore } from '@/stores/funding-store';
 
 interface FundingCardProps {
@@ -60,8 +61,87 @@ function matchLabel(score: number): { text: string; cls: string } {
   return               { text: 'Partial Match',  cls: 'badge bg-slate-100 text-slate-500' };
 }
 
-function eligibilityLabel(key: string): string {
-  return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+const IMPACT_BADGE: Record<string, string> = {
+  high:   'bg-emerald-100 text-emerald-700',
+  medium: 'bg-amber-100 text-amber-700',
+  low:    'bg-slate-100 text-slate-500',
+};
+
+// ── Structured AI explanation ─────────────────────────────────────────────────
+
+function ExplanationPanel({ exp }: { exp: FundingExplanation }) {
+  return (
+    <div className="rounded-xl border border-brand-200 bg-brand-50 overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-brand-200 bg-brand-100/60">
+        <span className="flex items-center gap-1.5 text-xs font-semibold text-brand-700 uppercase tracking-wide">
+          <Sparkles size={11} /> AI Analysis
+        </span>
+        <span className="text-xs text-brand-500 font-medium">AI-verified</span>
+      </div>
+
+      <div className="p-4 space-y-4">
+
+        {/* 1 — Program overview */}
+        <p className="text-sm text-brand-900 leading-relaxed">{exp.program_overview}</p>
+
+        {/* 2 — Eligible factors */}
+        {exp.eligible_factors.length > 0 && (
+          <div>
+            <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-2">
+              Why you qualify
+            </p>
+            <ul className="space-y-2">
+              {exp.eligible_factors.map((f, i) => (
+                <li key={i} className="flex items-start gap-2.5">
+                  <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-medium text-slate-800">{f.label}</span>
+                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full uppercase tracking-wide ${IMPACT_BADGE[f.impact] ?? IMPACT_BADGE.low}`}>
+                        {f.impact} impact
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{f.detail}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* 3 — Missing factors */}
+        {exp.missing_factors.length > 0 && (
+          <div>
+            <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">
+              What would raise your score
+            </p>
+            <ul className="space-y-2">
+              {exp.missing_factors.map((f, i) => (
+                <li key={i} className="flex items-start gap-2.5">
+                  <AlertTriangle size={13} className="text-amber-400 shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-medium text-slate-700">{f.label}</span>
+                    <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{f.detail}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* 4 — Next step */}
+        <div className="rounded-lg bg-white border border-brand-200 px-3.5 py-3 flex items-start gap-2.5">
+          <ArrowRight size={14} className="text-brand-600 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-xs font-semibold text-brand-700 uppercase tracking-wide mb-0.5">Next step</p>
+            <p className="text-sm text-slate-700 leading-relaxed">{exp.next_step}</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -70,7 +150,7 @@ export default function FundingCard({ match }: FundingCardProps) {
   const { toggleBookmark } = useFundingStore();
   const [expanded, setExpanded] = useState(false);
   const [explaining, setExplaining] = useState(false);
-  const [explanation, setExplanation] = useState<string | null>(null);
+  const [explanation, setExplanation] = useState<FundingExplanation | null>(null);
 
   const label = matchLabel(match.match_score);
 
@@ -82,10 +162,17 @@ export default function FundingCard({ match }: FundingCardProps) {
       const res = await fetch('/api/funding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ profile_id: match.profile_id, explain_program: match.program_key }),
+        body: JSON.stringify({
+          profile_id: match.profile_id,
+          explain_program: match.program_key,
+          match_score: match.match_score,
+          eligibility_details: match.eligibility_details,
+        }),
       });
       const data = await res.json();
-      setExplanation(data.explanation ?? 'No explanation available.');
+      if (data.explanation && data.explanation.program_overview) {
+        setExplanation(data.explanation as FundingExplanation);
+      }
     } finally {
       setExplaining(false);
     }
@@ -105,7 +192,6 @@ export default function FundingCard({ match }: FundingCardProps) {
         <div className="flex items-start gap-4">
           <ScoreRing score={match.match_score} />
 
-          {/* Content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
@@ -118,16 +204,9 @@ export default function FundingCard({ match }: FundingCardProps) {
                   </span>
                   <span className={label.cls}>{label.text}</span>
                 </div>
-
                 {match.amount_description && (
-                  <p className="text-sm font-semibold text-emerald-600 mb-1">
+                  <p className="text-sm font-semibold text-emerald-600">
                     {match.amount_description}
-                  </p>
-                )}
-
-                {match.summary && (
-                  <p className="text-sm text-slate-500 leading-relaxed line-clamp-2">
-                    {match.summary}
                   </p>
                 )}
               </div>
@@ -158,11 +237,11 @@ export default function FundingCard({ match }: FundingCardProps) {
       {expanded && (
         <div className="border-t border-slate-100 px-5 pb-5 pt-4 space-y-4">
 
-          {/* Eligibility checklist */}
-          {match.eligibility_details && Object.keys(match.eligibility_details).length > 0 && (
+          {/* Raw eligibility checklist — shown only before AI explanation loads */}
+          {!explanation && match.eligibility_details && Object.keys(match.eligibility_details).length > 0 && (
             <div>
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-                Your eligibility
+                Quick eligibility check
               </p>
               <ul className="space-y-1.5">
                 {Object.entries(match.eligibility_details).map(([key, val]) => (
@@ -172,7 +251,7 @@ export default function FundingCard({ match }: FundingCardProps) {
                       : <XCircle size={14} className="text-red-400 shrink-0" />
                     }
                     <span className={val ? 'text-slate-700' : 'text-slate-400'}>
-                      {eligibilityLabel(key)}
+                      {key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
                     </span>
                   </li>
                 ))}
@@ -180,14 +259,9 @@ export default function FundingCard({ match }: FundingCardProps) {
             </div>
           )}
 
-          {/* AI explanation */}
+          {/* Structured AI explanation */}
           {explanation && (
-            <div className="card-brand rounded-xl p-4">
-              <p className="text-xs font-semibold text-brand-700 uppercase tracking-wide mb-1 flex items-center gap-1.5">
-                <Sparkles size={11} /> AI Explanation
-              </p>
-              <p className="text-sm text-brand-800 leading-relaxed">{explanation}</p>
-            </div>
+            <ExplanationPanel exp={explanation} />
           )}
 
           {/* Action buttons */}
@@ -210,11 +284,11 @@ export default function FundingCard({ match }: FundingCardProps) {
               className="btn-secondary btn-sm gap-1.5 inline-flex"
             >
               {explaining ? (
-                <><Loader2 size={12} className="animate-spin" /> Explaining…</>
+                <><Loader2 size={12} className="animate-spin" /> Analysing…</>
               ) : explanation ? (
-                'Hide explanation'
+                'Hide analysis'
               ) : (
-                <><Sparkles size={12} /> Explain this program</>
+                <><Sparkles size={12} /> Analyse my eligibility</>
               )}
             </button>
             {match.source_url && match.source_url !== match.application_url && (

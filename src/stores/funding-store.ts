@@ -46,7 +46,7 @@ export const useFundingStore = create<FundingStore>((set, get) => ({
       const res = await fetch('/api/funding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ profile_id: profileId }),
+        body: JSON.stringify({ profile_id: profileId, force_refresh: true }),
       })
       if (!res.ok) throw new Error('Failed to generate funding matches')
       const data = await res.json()
