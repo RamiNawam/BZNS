@@ -76,6 +76,35 @@ export type FundingMatch = z.infer<typeof FundingMatchSchema>;
 export type FinancialSnapshot = z.infer<typeof FinancialSnapshotSchema>;
 
 // ---------------------------------------------------------------------------
+// Gap detection schema — Layer 2 adversarial review output
+// ---------------------------------------------------------------------------
+
+export const SuggestedStepSchema = z.object({
+  step_key: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  why_needed: z.string(),
+  estimated_cost: z.string(),
+  estimated_timeline: z.string(),
+  depends_on: z.array(z.string()),
+  government_url: z.string(),
+  source: z.string(),
+});
+
+export const GapFlagSchema = z.object({
+  type: z.enum(['missing_step', 'wrong_step', 'edge_case', 'verify_with_professional']),
+  severity: z.enum(['high', 'medium', 'low']),
+  related_step_key: z.string().nullable(),
+  issue: z.string().min(1),
+  recommendation: z.string().min(1),
+  suggested_step: SuggestedStepSchema.optional(),
+});
+
+export const GapDetectionResponseSchema = z.array(GapFlagSchema);
+
+export type GapFlagParsed = z.infer<typeof GapFlagSchema>;
+
+// ---------------------------------------------------------------------------
 // parseClaudeJSON — strips markdown fences Claude wraps around JSON output,
 // then JSON.parses. Claude often returns: ```json\n[...]\n```
 // ---------------------------------------------------------------------------
@@ -85,5 +114,17 @@ export function parseClaudeJSON(text: string): unknown {
     .replace(/^```(?:json)?\s*/i, '')
     .replace(/\s*```\s*$/, '')
     .trim();
-  return JSON.parse(cleaned);
+
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    // Recover from truncated JSON array (stop_reason=max_tokens cuts mid-object).
+    // Find the last fully closed object in the array and close the array there.
+    const lastCompleteObject = cleaned.lastIndexOf('\n  }');
+    if (lastCompleteObject !== -1) {
+      const recovered = cleaned.slice(0, lastCompleteObject + 4) + '\n]';
+      return JSON.parse(recovered);
+    }
+    throw new Error(`JSON parse failed after recovery attempt: ${cleaned.slice(0, 200)}`);
+  }
 }

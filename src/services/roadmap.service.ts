@@ -1,17 +1,19 @@
 // ============================================================
 // ROADMAP SERVICE — business logic for legal roadmap generation
-// Orchestrates: fetch profile → select KB → call Claude → validate → save
+// Layer 1: fetch profile → select KB → call Claude → validate → save
+// Layer 2: adversarial gap detection — second Claude call to find errors
+// Layer 3: merge flags into steps with confidence levels
 // ============================================================
 
 import { ProfileRepository } from '@/repositories/profile.repository'
 import { RoadmapRepository } from '@/repositories/roadmap.repository'
 import { CacheRepository } from '@/repositories/cache.repository'
-import { loadKnowledgeBase, serializeForPrompt } from '@/lib/knowledge-base/loader'
+import { loadKnowledgeBase, serializeForRoadmapPrompt, serializeFullKB } from '@/lib/knowledge-base/loader'
 import { selectForPrompt, contextFromProfile } from '@/lib/knowledge-base/selector'
-import { buildRoadmapPrompt } from '@/lib/knowledge-base/prompts'
+import { buildRoadmapPrompt, buildGapDetectionPrompt } from '@/lib/knowledge-base/prompts'
 import { askClaude } from '@/lib/claude/client'
-import { ClaudeRoadmapResponseSchema, parseClaudeJSON } from '@/lib/claude/schemas'
-import type { RoadmapStep, CreateRoadmapStepDTO, UpdateStepStatusDTO } from '@/types/roadmap'
+import { ClaudeRoadmapResponseSchema, GapDetectionResponseSchema, parseClaudeJSON } from '@/lib/claude/schemas'
+import type { RoadmapStep, CreateRoadmapStepDTO, UpdateStepStatusDTO, GapFlag, StepConfidence } from '@/types/roadmap'
 import type { Profile } from '@/types/profile'
 import type { UserProfile } from '@/lib/knowledge-base/prompts'
 
@@ -49,27 +51,112 @@ function toPromptProfile(p: Profile): UserProfile {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Layer 3: Merge flags into steps, compute confidence, insert inferred steps.
+// ---------------------------------------------------------------------------
+
+function mergeFlags(
+  steps: RoadmapStep[],
+  flags: GapFlag[],
+  profile_id: string,
+): RoadmapStep[] {
+  // Build a map of step_key → flags for fast lookup
+  const flagsByStep = new Map<string, GapFlag[]>()
+  const missingStepFlags: GapFlag[] = []
+
+  for (const flag of flags) {
+    if (flag.type === 'missing_step' && flag.suggested_step) {
+      missingStepFlags.push(flag)
+    } else if (flag.related_step_key) {
+      const existing = flagsByStep.get(flag.related_step_key) ?? []
+      existing.push(flag)
+      flagsByStep.set(flag.related_step_key, existing)
+    }
+  }
+
+  // Assign confidence to existing steps
+  const enriched: RoadmapStep[] = steps.map((step) => {
+    const stepFlags = flagsByStep.get(step.step_key) ?? []
+    const hasHighOrMedium = stepFlags.some(
+      (f) => f.severity === 'high' || f.severity === 'medium'
+    )
+
+    const confidence: StepConfidence = hasHighOrMedium ? 'flagged' : 'verified'
+
+    return {
+      ...step,
+      confidence,
+      flags: stepFlags.length > 0 ? stepFlags : undefined,
+    }
+  })
+
+  // Insert inferred steps from missing_step flags
+  const maxOrder = Math.max(...enriched.map((s) => s.step_order), 0)
+
+  for (let i = 0; i < missingStepFlags.length; i++) {
+    const flag = missingStepFlags[i]
+    const ss = flag.suggested_step!
+
+    const inferredStep: RoadmapStep = {
+      // Synthetic ID — these steps aren't in the DB
+      id: `inferred-${ss.step_key}`,
+      profile_id,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      step_order: maxOrder + 1 + i,
+      step_key: ss.step_key,
+      title: ss.title,
+      description: ss.description,
+      why_needed: ss.why_needed,
+      estimated_cost: ss.estimated_cost,
+      estimated_timeline: ss.estimated_timeline,
+      required_documents: [],
+      government_url: ss.government_url || null,
+      source: ss.source || null,
+      depends_on: ss.depends_on,
+      status: 'pending',
+      completed_at: null,
+      notes: null,
+      confidence: 'inferred',
+      flags: [flag],
+    }
+
+    enriched.push(inferredStep)
+  }
+
+  return enriched
+}
+
+// ---------------------------------------------------------------------------
+// Exported service
+// ---------------------------------------------------------------------------
+
+export interface GenerateResult {
+  steps: RoadmapStep[]
+  flags: GapFlag[]
+}
+
 export const RoadmapService = {
 
   /**
    * Generate a full personalized roadmap for a user.
-   * 1. Check cache — return immediately on hit (demo day: Yara's roadmap is pre-cached)
-   * 2. Fetch profile
-   * 3. Load KB + select relevant documents for this business type
-   * 4. Call Claude with profile + KB → get ordered steps
-   * 5. Validate with Zod — throws if Claude returned malformed data
-   * 6. Save to DB + cache
+   *
+   * Layer 1: fetch profile → select KB → call Claude Haiku → validate → save
+   * Layer 2: call Claude Sonnet with full KB for adversarial gap detection
+   * Layer 3: merge flags into steps with confidence levels
    */
-  async generate(profile_id: string): Promise<RoadmapStep[]> {
+  async generate(profile_id: string): Promise<GenerateResult> {
     const cacheKey = `roadmap:${profile_id}`
+    const flagsCacheKey = `roadmap-flags:${profile_id}`
     console.log(`[RoadmapService.generate] START profile_id=${profile_id}`)
 
-    // 1. Cache check
+    // 1. Cache check — return both steps and flags
     console.log(`[RoadmapService.generate] Checking cache key=${cacheKey}`)
     const cached = await CacheRepository.get<RoadmapStep[]>(cacheKey)
     if (cached) {
       console.log(`[RoadmapService.generate] Cache HIT — returning ${cached.length} cached steps`)
-      return cached
+      const cachedFlags = await CacheRepository.get<GapFlag[]>(flagsCacheKey) ?? []
+      return { steps: cached, flags: cachedFlags }
     }
     console.log(`[RoadmapService.generate] Cache MISS — generating fresh roadmap`)
 
@@ -79,48 +166,51 @@ export const RoadmapService = {
     if (!profile) throw new Error(`RoadmapService.generate: Profile not found ${profile_id}`)
     console.log(`[RoadmapService.generate] Profile found: business_type=${profile.business_type} municipality=${profile.municipality}`)
 
-    // 3. Load KB and select documents relevant to this business type
+    // 3. Load KB
     console.log(`[RoadmapService.generate] Loading knowledge base`)
     const kb = await loadKnowledgeBase()
+
+    // =====================================================================
+    // LAYER 1 — JSON-based roadmap generation (Haiku, slim KB)
+    // =====================================================================
+
     const context = contextFromProfile({
       business_type: profile.business_type,
       industry_sector: profile.industry_sector ?? undefined,
       is_home_based: profile.is_home_based,
     })
     const docs = selectForPrompt(kb, context)
-    const kbJson = serializeForPrompt(docs)
-    console.log(`[RoadmapService.generate] KB selected ${docs.length} documents, serialized to ${kbJson.length} chars`)
+    const kbJson = serializeForRoadmapPrompt(docs)
+    console.log(`[RoadmapService.generate] [Layer 1] KB selected ${docs.length} documents, serialized to ${kbJson.length} chars`)
 
-    // 4. Build the prompt and call Claude (up to 2 attempts)
     const systemPrompt = buildRoadmapPrompt(toPromptProfile(profile), kbJson)
-    console.log(`[RoadmapService.generate] System prompt length: ${systemPrompt.length} chars`)
+    console.log(`[RoadmapService.generate] [Layer 1] System prompt length: ${systemPrompt.length} chars`)
     let rawText: string
 
     try {
       rawText = await askClaude(systemPrompt, 'Generate the roadmap now.', 'claude-haiku-4-5-20251001')
     } catch (firstError) {
-      console.warn('[RoadmapService.generate] First Claude call failed, retrying:', firstError)
+      console.warn('[RoadmapService.generate] [Layer 1] First Claude call failed, retrying:', firstError)
       rawText = await askClaude(systemPrompt, 'Generate the roadmap now.', 'claude-haiku-4-5-20251001')
     }
-    console.log(`[RoadmapService.generate] Claude raw response length: ${rawText.length} chars`)
-    console.log(`[RoadmapService.generate] Claude raw response preview: ${rawText.slice(0, 300)}`)
+    console.log(`[RoadmapService.generate] [Layer 1] Claude raw response length: ${rawText.length} chars`)
+    console.log(`[RoadmapService.generate] [Layer 1] Claude raw response preview: ${rawText.slice(0, 300)}`)
 
-    // 5. Parse + validate with Zod
     let claudeSteps
     try {
       const parsed = parseClaudeJSON(rawText)
-      console.log(`[RoadmapService.generate] JSON parsed successfully, validating with Zod`)
+      console.log(`[RoadmapService.generate] [Layer 1] JSON parsed successfully, validating with Zod`)
       claudeSteps = ClaudeRoadmapResponseSchema.parse(parsed)
-      console.log(`[RoadmapService.generate] Zod validation passed — ${claudeSteps.length} steps`)
+      console.log(`[RoadmapService.generate] [Layer 1] Zod validation passed — ${claudeSteps.length} steps`)
     } catch (err) {
-      console.error(`[RoadmapService.generate] Validation failed:`, err)
-      console.error(`[RoadmapService.generate] Full raw response:`, rawText)
+      console.error(`[RoadmapService.generate] [Layer 1] Validation failed:`, err)
+      console.error(`[RoadmapService.generate] [Layer 1] Full raw response:`, rawText)
       throw new Error(
         `RoadmapService.generate: Claude response failed validation. Raw: ${rawText.slice(0, 200)}`
       )
     }
 
-    // 6. Map validated Claude steps → DB insert shape
+    // Save Layer 1 steps to DB
     const stepDTOs: CreateRoadmapStepDTO[] = claudeSteps.map((step) => ({
       profile_id,
       step_order: step.step_order,
@@ -139,21 +229,95 @@ export const RoadmapService = {
       notes: null,
     }))
 
-    // 7. Save to DB and cache
-    console.log(`[RoadmapService.generate] Saving ${stepDTOs.length} steps to DB`)
+    console.log(`[RoadmapService.generate] [Layer 1] Saving ${stepDTOs.length} steps to DB`)
     const savedSteps = await RoadmapRepository.batchUpsert(stepDTOs)
-    console.log(`[RoadmapService.generate] DB save OK — ${savedSteps.length} rows inserted`)
-    await CacheRepository.set(cacheKey, savedSteps)
+    console.log(`[RoadmapService.generate] [Layer 1] DB save OK — ${savedSteps.length} rows inserted`)
+
+    // =====================================================================
+    // LAYER 2 — Adversarial gap detection (Sonnet, full KB)
+    // =====================================================================
+
+    console.log(`[RoadmapService.generate] [Layer 2] Starting adversarial gap detection`)
+    const fullKbJson = serializeFullKB(kb)
+    console.log(`[RoadmapService.generate] [Layer 2] Full KB serialized to ${fullKbJson.length} chars`)
+
+    const promptProfile = toPromptProfile(profile)
+    const roadmapForReview = savedSteps.map((s) => ({
+      step_key: s.step_key,
+      title: s.title,
+      description: s.description,
+      estimated_cost: s.estimated_cost,
+      depends_on: s.depends_on,
+      source: s.source,
+    }))
+
+    const gapPrompt = buildGapDetectionPrompt(promptProfile, roadmapForReview, fullKbJson)
+    console.log(`[RoadmapService.generate] [Layer 2] Gap detection prompt length: ${gapPrompt.length} chars`)
+
+    let flags: GapFlag[] = []
+
+    try {
+      const gapRawText = await askClaude(
+        gapPrompt,
+        'Review the roadmap now. Find every gap, error, and edge case. Be adversarial.',
+        'claude-sonnet-4-20250514',
+        4096,
+      )
+      console.log(`[RoadmapService.generate] [Layer 2] Gap detection response length: ${gapRawText.length} chars`)
+      console.log(`[RoadmapService.generate] [Layer 2] Gap detection response preview: ${gapRawText.slice(0, 400)}`)
+
+      const parsedFlags = parseClaudeJSON(gapRawText)
+      flags = GapDetectionResponseSchema.parse(parsedFlags)
+      console.log(`[RoadmapService.generate] [Layer 2] Validated ${flags.length} flags`)
+      for (const f of flags) {
+        console.log(`[RoadmapService.generate] [Layer 2]   ${f.severity.toUpperCase()} ${f.type}: ${f.issue.slice(0, 120)}`)
+      }
+    } catch (err) {
+      // Layer 2 failure is non-fatal — we still have the Layer 1 roadmap
+      console.error(`[RoadmapService.generate] [Layer 2] Gap detection failed (non-fatal):`, err)
+      flags = []
+    }
+
+    // =====================================================================
+    // LAYER 3 — Merge flags into steps with confidence levels
+    // =====================================================================
+
+    console.log(`[RoadmapService.generate] [Layer 3] Merging ${flags.length} flags into ${savedSteps.length} steps`)
+    const enrichedSteps = mergeFlags(savedSteps, flags, profile_id)
+    console.log(`[RoadmapService.generate] [Layer 3] Final roadmap: ${enrichedSteps.length} steps (${enrichedSteps.length - savedSteps.length} inferred)`)
+
+    const verified = enrichedSteps.filter((s) => s.confidence === 'verified').length
+    const flagged = enrichedSteps.filter((s) => s.confidence === 'flagged').length
+    const inferred = enrichedSteps.filter((s) => s.confidence === 'inferred').length
+    console.log(`[RoadmapService.generate] [Layer 3] Confidence: ${verified} verified, ${flagged} flagged, ${inferred} inferred`)
+
+    // Cache the enriched result (steps with confidence + flags)
+    await CacheRepository.set(cacheKey, enrichedSteps)
+    await CacheRepository.set(flagsCacheKey, flags)
     console.log(`[RoadmapService.generate] Cache set OK`)
 
-    return savedSteps
+    return { steps: enrichedSteps, flags }
   },
 
   /**
    * Fetch existing roadmap steps for a profile (no regeneration).
+   * Attaches cached flags if available.
    */
-  async getByProfileId(profile_id: string): Promise<RoadmapStep[]> {
-    return RoadmapRepository.getByProfileId(profile_id)
+  async getByProfileId(profile_id: string): Promise<GenerateResult> {
+    const steps = await RoadmapRepository.getByProfileId(profile_id)
+    const flags = await CacheRepository.get<GapFlag[]>(`roadmap-flags:${profile_id}`) ?? []
+
+    // Re-merge flags into steps if we have them
+    if (flags.length > 0) {
+      const enriched = mergeFlags(steps, flags, profile_id)
+      return { steps: enriched, flags }
+    }
+
+    // No flags cached — return steps as verified
+    return {
+      steps: steps.map((s) => ({ ...s, confidence: 'verified' as StepConfidence })),
+      flags: [],
+    }
   },
 
   /**
@@ -189,9 +353,10 @@ export const RoadmapService = {
   /**
    * Regenerate the roadmap from scratch (clears old steps first).
    */
-  async regenerate(profile_id: string): Promise<RoadmapStep[]> {
+  async regenerate(profile_id: string): Promise<GenerateResult> {
     await RoadmapRepository.deleteByProfileId(profile_id)
     await CacheRepository.delete(`roadmap:${profile_id}`)
+    await CacheRepository.delete(`roadmap-flags:${profile_id}`)
     return RoadmapService.generate(profile_id)
   },
 
@@ -202,5 +367,6 @@ export const RoadmapService = {
   async clear(profile_id: string): Promise<void> {
     await RoadmapRepository.deleteByProfileId(profile_id)
     await CacheRepository.delete(`roadmap:${profile_id}`)
+    await CacheRepository.delete(`roadmap-flags:${profile_id}`)
   },
 }
