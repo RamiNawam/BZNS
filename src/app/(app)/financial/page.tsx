@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import {
   TrendingUp,
@@ -20,12 +20,16 @@ import {
   Receipt,
   Banknote,
   SlidersHorizontal,
+  ChevronLeft,
+  Edit3,
 } from 'lucide-react';
 import { useProfileStore } from '@/stores/profile-store';
 import { calculateTakeHome } from '@/lib/financial/tax-calculator';
 import { getExpenseDefaults } from '@/lib/financial/expense-defaults';
 import { generateScenarios, getBreakEvenResult, calculatePricing, calculateFundingImpact } from '@/lib/financial/projections';
 import { getDeductionSummary } from '@/lib/financial/deductions';
+import { getClusterQuestions } from '@/lib/financial/cluster-questions';
+import type { FinancialQuestion } from '@/lib/financial/cluster-questions';
 import type { ClusterID } from '@/lib/clusters';
 import type { ExpenseCategory } from '@/lib/financial/expense-defaults';
 
@@ -714,6 +718,267 @@ function generateFlags(
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// CLUSTER FINANCIAL QUESTIONNAIRE — gate shown before the dashboard
+// ══════════════════════════════════════════════════════════════════════════════
+
+function QuestionInput({
+  question,
+  value,
+  onChange,
+}: {
+  question: FinancialQuestion;
+  value: string | number | boolean;
+  onChange: (v: string | number | boolean) => void;
+}) {
+  if (question.type === 'boolean') {
+    const opts = question.options ?? [
+      { value: 'true', label: 'Yes' },
+      { value: 'false', label: 'No' },
+    ];
+    // Normalise value: true/false booleans → 'true'/'false' strings
+    const strVal = value === true ? 'true' : value === false ? 'false' : String(value);
+    return (
+      <div className="grid grid-cols-2 gap-3">
+        {opts.map((opt) => {
+          const isSelected = strVal === opt.value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => onChange(opt.value)}
+              className={`rounded-xl border-2 p-4 text-left transition-all ${
+                isSelected
+                  ? 'border-brand-500 bg-brand-50 shadow-sm'
+                  : 'border-slate-200 bg-white hover:border-brand-300 hover:bg-slate-50'
+              }`}
+            >
+              <div className="text-sm font-semibold text-slate-900">{opt.label}</div>
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  if (question.type === 'select' && question.options) {
+    return (
+      <div className="grid grid-cols-1 gap-2">
+        {question.options.map((opt) => {
+          const isSelected = String(value) === opt.value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => onChange(opt.value)}
+              className={`rounded-xl border-2 p-4 text-left transition-all flex items-center gap-3 ${
+                isSelected
+                  ? 'border-brand-500 bg-brand-50 shadow-sm'
+                  : 'border-slate-200 bg-white hover:border-brand-300 hover:bg-slate-50'
+              }`}
+            >
+              <div
+                className={`h-5 w-5 rounded-full border-2 shrink-0 flex items-center justify-center ${
+                  isSelected ? 'border-brand-500 bg-brand-500' : 'border-slate-300'
+                }`}
+              >
+                {isSelected && <div className="h-2 w-2 rounded-full bg-white" />}
+              </div>
+              <span className="text-sm font-medium text-slate-900">{opt.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // currency or number
+  return (
+    <div className="relative">
+      {question.type === 'currency' && (
+        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg font-medium pointer-events-none">
+          $
+        </span>
+      )}
+      <input
+        type="number"
+        min={question.min ?? 0}
+        max={question.max}
+        step={question.step ?? (question.type === 'currency' ? 1 : 1)}
+        value={value as number || ''}
+        onChange={(e) => onChange(Number(e.target.value) || 0)}
+        placeholder={String(question.defaultValue)}
+        className={`w-full border border-slate-200 rounded-xl py-4 text-lg font-semibold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition ${
+          question.type === 'currency' ? 'pl-9 pr-4' : 'px-4'
+        }`}
+      />
+      {question.suffix && (
+        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">
+          {question.suffix}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function FinancialQuestionnaire({
+  clusterId,
+  clusterLabel,
+  onComplete,
+}: {
+  clusterId: ClusterID;
+  clusterLabel: string;
+  onComplete: (answers: Record<string, string | number | boolean>) => void;
+}) {
+  const questionSet = useMemo(() => getClusterQuestions(clusterId), [clusterId]);
+  const questions = questionSet.questions;
+
+  // Initialize answers with default values
+  const [currentStep, setCurrentStep] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string | number | boolean>>(() => {
+    const init: Record<string, string | number | boolean> = {};
+    questions.forEach((q) => {
+      init[q.key] = q.defaultValue ?? (q.type === 'currency' || q.type === 'number' ? 0 : '');
+    });
+    return init;
+  });
+
+  const question = questions[currentStep];
+  const isLast = currentStep === questions.length - 1;
+  const isFirst = currentStep === 0;
+
+  const handleChange = useCallback(
+    (v: string | number | boolean) => {
+      setAnswers((prev) => ({ ...prev, [question.key]: v }));
+    },
+    [question.key],
+  );
+
+  const handleNext = () => {
+    if (isLast) {
+      onComplete(answers);
+    } else {
+      setCurrentStep((s) => s + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (!isFirst) setCurrentStep((s) => s - 1);
+  };
+
+  const currentValue = answers[question.key];
+
+  return (
+    <div className="max-w-lg mx-auto pt-4 pb-12">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="inline-flex items-center gap-2 text-xs font-medium text-brand-700 bg-brand-50 border border-brand-200 rounded-full px-3 py-1 mb-3">
+          <Calculator size={12} />
+          Your business type: <strong>{clusterLabel}</strong>
+        </div>
+        <h1 className="font-heading text-2xl font-bold text-slate-900">
+          {questionSet.title}
+        </h1>
+        <p className="text-slate-500 text-sm mt-1 leading-relaxed">
+          {questionSet.description}
+        </p>
+      </div>
+
+      {/* Progress dots */}
+      <div className="flex items-center gap-2 mb-8">
+        {questions.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => i < currentStep && setCurrentStep(i)}
+            className={`transition-all duration-300 rounded-full ${
+              i === currentStep
+                ? 'h-2.5 w-8 bg-brand-500'
+                : i < currentStep
+                ? 'h-2 w-2 bg-brand-300 cursor-pointer'
+                : 'h-2 w-2 bg-slate-200 cursor-default'
+            }`}
+            aria-label={`Question ${i + 1}`}
+            disabled={i > currentStep}
+          />
+        ))}
+        <span className="ml-2 text-xs text-slate-400">
+          {currentStep + 1} of {questions.length}
+        </span>
+      </div>
+
+      {/* Question card */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
+        <div className="flex items-start gap-3">
+          <div className="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-brand-50 shrink-0">
+            <Calculator size={18} className="text-brand-600" />
+          </div>
+          <div>
+            <h2 className="font-heading font-semibold text-slate-900 text-base leading-snug">
+              {question.label}
+            </h2>
+            <p className="text-slate-500 text-sm mt-1 leading-relaxed">
+              {question.description}
+            </p>
+          </div>
+        </div>
+
+        <QuestionInput
+          question={question}
+          value={currentValue}
+          onChange={handleChange}
+        />
+      </div>
+
+      {/* Navigation */}
+      <div className="flex items-center justify-between mt-6">
+        <button
+          type="button"
+          onClick={handlePrev}
+          disabled={isFirst}
+          className={`flex items-center gap-1.5 text-sm font-medium rounded-xl px-4 py-2.5 transition-all ${
+            isFirst
+              ? 'text-slate-300 cursor-not-allowed'
+              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+          }`}
+        >
+          <ChevronLeft size={16} />
+          Back
+        </button>
+
+        <button
+          type="button"
+          onClick={handleNext}
+          className="flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm rounded-xl px-6 py-2.5 transition-all shadow-sm hover:shadow-md"
+        >
+          {isLast ? (
+            <>
+              Calculate my finances
+              <ArrowRight size={16} />
+            </>
+          ) : (
+            <>
+              Next
+              <ArrowRight size={16} />
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Skip link */}
+      <p className="text-center mt-4">
+        <button
+          type="button"
+          onClick={() => onComplete(answers)}
+          className="text-xs text-slate-400 hover:text-slate-600 underline-offset-2 hover:underline transition-colors"
+        >
+          Skip and use default estimates
+        </button>
+      </p>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // MAIN PAGE — assembles all zones
 // ══════════════════════════════════════════════════════════════════════════════
 
@@ -725,20 +990,86 @@ export default function FinancialPage() {
   // Cluster-aware defaults
   const clusterId = (profile?.cluster_id ?? 'C9') as ClusterID;
   const expenseProfile = useMemo(() => getExpenseDefaults(clusterId), [clusterId]);
+  const questionSet = useMemo(() => getClusterQuestions(clusterId), [clusterId]);
 
+  // ── All state declarations first ─────────────────────────────────────────
   const defaultRevenue = profile?.expected_monthly_revenue ?? 0;
   const [monthlyRevenue, setMonthlyRevenue] = useState(defaultRevenue);
   const [expenseCategories, setExpenseCategories] = useState<ExpenseCategory[]>(expenseProfile.categories);
+  const [questionnaireComplete, setQuestionnaireComplete] = useState(false);
+
+  // ── Financial questionnaire gate ──────────────────────────────────────────
+  // Key stored per cluster so changing business type re-asks questions
+  const STORAGE_KEY = `bzns-fin-answers-${clusterId}`;
+
+  // On mount, check if we already have saved answers for this cluster
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) setQuestionnaireComplete(true);
+    } catch {
+      // localStorage unavailable (SSR / private mode)
+    }
+  }, [STORAGE_KEY]);
+
+  // Called when user finishes (or skips) the questionnaire
+  const handleQuestionnaireComplete = useCallback(
+    (answers: Record<string, string | number | boolean>) => {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
+      } catch { /* ignore */ }
+
+      // Apply computed revenue + expense overrides
+      const computed = questionSet.computeFinancials(answers);
+      setMonthlyRevenue(computed.monthlyRevenue);
+      setExpenseCategories((prev) =>
+        prev.map((cat) =>
+          computed.expenseOverrides[cat.key] !== undefined
+            ? { ...cat, amount: computed.expenseOverrides[cat.key] }
+            : cat,
+        ),
+      );
+      setQuestionnaireComplete(true);
+    },
+    [STORAGE_KEY, questionSet],
+  );
+
+  const handleResetQuestionnaire = () => {
+    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+    setQuestionnaireComplete(false);
+  };
+
   const monthlyExpenses = expenseCategories.reduce((sum, c) => sum + c.amount, 0);
 
-  // Sync with profile / cluster once loaded
+  // Sync with profile / cluster once loaded (only if questionnaire not done yet)
   useEffect(() => {
-    if (profile?.expected_monthly_revenue) setMonthlyRevenue(profile.expected_monthly_revenue);
-  }, [profile?.expected_monthly_revenue]);
+    if (profile?.expected_monthly_revenue && !questionnaireComplete) {
+      setMonthlyRevenue(profile.expected_monthly_revenue);
+    }
+  }, [profile?.expected_monthly_revenue, questionnaireComplete]);
 
   useEffect(() => {
-    setExpenseCategories(expenseProfile.categories);
-  }, [expenseProfile]);
+    // Apply saved questionnaire answers on cluster change
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const answers = JSON.parse(saved) as Record<string, string | number | boolean>;
+        const computed = questionSet.computeFinancials(answers);
+        setMonthlyRevenue(computed.monthlyRevenue);
+        setExpenseCategories(
+          expenseProfile.categories.map((cat) =>
+            computed.expenseOverrides[cat.key] !== undefined
+              ? { ...cat, amount: computed.expenseOverrides[cat.key] }
+              : cat,
+          ),
+        );
+      } else {
+        setExpenseCategories(expenseProfile.categories);
+      }
+    } catch {
+      setExpenseCategories(expenseProfile.categories);
+    }
+  }, [expenseProfile, questionSet, STORAGE_KEY]);
 
   // All calculations are deterministic — no API needed for live updates
   const taxes = useMemo(
@@ -762,13 +1093,39 @@ export default function FinancialPage() {
     );
   };
 
+  // ── Gate: show questionnaire until complete ──────────────────────────────
+  if (!questionnaireComplete) {
+    return (
+      <FinancialQuestionnaire
+        clusterId={clusterId}
+        clusterLabel={questionSet.title}
+        onComplete={handleQuestionnaireComplete}
+      />
+    );
+  }
+
   return (
     <div className="max-w-3xl mx-auto space-y-5">
 
       {/* Header */}
-      <div>
-        <h1 className="page-title">Financial Snapshot</h1>
-        <p className="page-subtitle">Your personal CFO dashboard — estimated taxes, take-home, and what to watch for. Updated live.</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="page-title">Financial Snapshot</h1>
+          <p className="page-subtitle">Your personal CFO dashboard — estimated taxes, take-home, and what to watch for. Updated live.</p>
+          <div className="inline-flex items-center gap-1.5 mt-2 text-xs font-medium text-brand-700 bg-brand-50 border border-brand-200 rounded-full px-3 py-1">
+            <Calculator size={11} />
+            Business type: <strong className="ml-0.5">{questionSet.title}</strong>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={handleResetQuestionnaire}
+          className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-brand-700 border border-slate-200 hover:border-brand-300 rounded-lg px-3 py-1.5 transition-all shrink-0 mt-1"
+          title="Re-answer the setup questions"
+        >
+          <Edit3 size={12} />
+          Edit inputs
+        </button>
       </div>
 
       {/* ════════════════════════════════════════════════════════════════════ */}
