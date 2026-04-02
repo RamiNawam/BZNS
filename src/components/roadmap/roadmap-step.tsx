@@ -114,7 +114,7 @@ export default function RoadmapStep({
   function handleCheck(e: React.MouseEvent) {
     e.stopPropagation();
     if (locked || !profile?.id) return;
-    updateStepStatus(step.id, nextStatus(step.status));
+    updateStepStatus(step.id, profile.id, nextStatus(step.status));
   }
 
   return (
