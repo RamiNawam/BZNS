@@ -484,3 +484,430 @@ Files changed: 49 (16 new files created, 33 modified)
 ================================================================
 END OF ENTRY — April 1, 2026
 ================================================================
+
+
+================================================================
+BUSINESS CLUSTER CLASSIFICATION — SESSION 3
+================================================================
+
+DATE: April 2, 2026
+BRANCH: feat/backend-logic
+BUILD STATUS: Zero TypeScript errors confirmed
+
+----------------------------------------------------------------
+
+OVERVIEW
+--------
+Added a full business cluster classification system. After the
+intake wizard, every user gets assigned to one of 9 clusters
+(C1-C9) based on their business description. The cluster drives
+which KB files are loaded, which permits appear in the roadmap,
+and what the assistant talks about. Designed so Claude makes the
+classification call — currently defaulting to C9 until the API
+key is wired in.
+
+----------------------------------------------------------------
+
+1. THE 9 CLUSTERS
+------------------
+
+src/lib/clusters.ts  [NEW FILE]
+
+Defines the ClusterID type and the CLUSTERS lookup table.
+Each entry has: label, complexity (low/medium/high), kb_files[].
+
+  C1  Home-based food          — complexity: high
+  C2  Freelance / consulting   — complexity: low
+  C3  Regulated childcare      — complexity: high
+  C4  Regulated professional   — complexity: medium
+  C5  Retail / product sales   — complexity: medium
+  C6  Food service/hospitality — complexity: high
+  C7  Construction / trades    — complexity: high
+  C8  Personal services        — complexity: medium
+  C9  General / unknown        — complexity: medium  (default stub)
+
+Each cluster has its own hand-picked list of KB JSON files so
+Claude only sees the permits, taxes, and funding programs that
+actually apply to that business type.
+
+----------------------------------------------------------------
+
+2. DATABASE MIGRATION
+----------------------
+
+Migration name: add_cluster_columns_to_profiles
+Applied to: Supabase project ncpmghgxtaqhzohauymn
+
+SQL applied:
+  ALTER TABLE profiles
+    ADD COLUMN IF NOT EXISTS cluster_id TEXT
+      CHECK (cluster_id IN ('C1','C2','C3','C4','C5','C6','C7','C8','C9'))
+      DEFAULT 'C9',
+    ADD COLUMN IF NOT EXISTS cluster_label TEXT,
+    ADD COLUMN IF NOT EXISTS cluster_complexity TEXT
+      CHECK (cluster_complexity IN ('low','medium','high'));
+
+All existing rows default to cluster_id = 'C9' automatically.
+
+----------------------------------------------------------------
+
+3. TYPE SYSTEM UPDATES
+-----------------------
+
+src/types/profile.ts
+  - Added: export type ClusterID = 'C1'|'C2'|...|'C9'
+  - Added: export type ClusterComplexity = 'low'|'medium'|'high'
+  - Added 3 new fields to Profile interface:
+      cluster_id: ClusterID | null
+      cluster_label: string | null
+      cluster_complexity: ClusterComplexity | null
+  - CreateProfileDTO and UpdateProfileDTO pick these up
+    automatically (they are Omit<Profile, ...> derived types).
+
+----------------------------------------------------------------
+
+4. CLAUDE LAYER
+----------------
+
+src/lib/claude/schemas.ts
+  - Added ProfileResponseSchema (new):
+      business_name: z.string().nullable()
+      business_description: z.string().nullable()
+      industry_sector: z.string().nullable()
+      business_type: z.enum([...])
+      cluster_id: z.enum(['C1',...,'C9'])
+  - Added ProfileResponse type (inferred from schema).
+
+src/lib/claude/prompts.ts
+  - Added PROFILE_SYNTHESIS_PROMPT constant:
+      Full system prompt for the intake classification call.
+      Describes all 9 clusters with examples and rules.
+      Rules: prefer C1 over C6 for home food, prefer C4 for
+      professional orders, never return C9 if C1-C8 fits.
+  - Added buildProfilePrompt(answers) function:
+      Appends raw intake answers to PROFILE_SYNTHESIS_PROMPT.
+  - Updated buildRoadmapPrompt(profile):
+      If profile.cluster_id is set, injects at the top:
+      "Business cluster: C1 — Home-based food (complexity: high)
+       Only generate steps applicable to this cluster."
+  - Updated buildSystemPrompt() [assistant prompt]:
+      Same cluster context line injected before the user profile
+      block so the chat assistant stays cluster-focused.
+
+----------------------------------------------------------------
+
+5. PROFILE SERVICE — CLUSTER WIRING
+-------------------------------------
+
+src/services/profile.service.ts
+  - Imports CLUSTERS from @/lib/clusters and ClusterID type.
+  - createFromIntake() now:
+      1. Stubs: const clusterId: ClusterID = 'C9'
+         (swap this one line for claudeResult.cluster_id when
+          the API key is added)
+      2. Reads clusterMeta = CLUSTERS[clusterId]
+      3. Writes cluster_id, cluster_label, cluster_complexity
+         into the CreateProfileDTO before upsert.
+  - TODO comments in place for the 3 Claude lines to uncomment.
+
+HOW TO ACTIVATE LIVE CLASSIFICATION:
+  1. Add ANTHROPIC_API_KEY to .env.local
+  2. Uncomment the 3 lines in createFromIntake()
+  3. Replace `const clusterId = 'C9'` with `claudeClusterId`
+
+----------------------------------------------------------------
+
+6. KNOWLEDGE BASE SELECTOR — CLUSTER-FIRST LOGIC
+--------------------------------------------------
+
+src/lib/knowledge-base/selector.ts
+  - Added import: CLUSTERS, ClusterID from @/lib/clusters
+  - Added selectByClusterId(kb, clusterId) [NEW — primary]:
+      Reads CLUSTERS[clusterId].kb_files, resolves each file key
+      to a KB document via kb.getByKey(). Skips nulls.
+      Use this instead of selectForPrompt() for all new code.
+  - Added selectForClusterAssistant(kb, clusterId) [NEW]:
+      Calls selectByClusterId(), then adds 3 universal extras
+      (cra.json, installments.json, signage.json) for chat.
+  - Old selectForPrompt() and selectForAssistant() kept for
+    backwards compatibility, not deleted.
+
+----------------------------------------------------------------
+
+7. DASHBOARD — CLUSTER BADGE
+------------------------------
+
+src/app/(app)/dashboard/page.tsx
+  - Converted from sync to async server component.
+  - Now fetches profile via ProfileRepository.getByUserId().
+  - Added CLUSTER_COLORS map (inline, no new file):
+      low    → green badge
+      medium → amber badge
+      high   → red badge
+  - Header now shows:
+      - business_name (or "Dashboard" fallback)
+      - business_description (or generic subtitle)
+      - Cluster badge "C1 · Home-based food" in correct colour
+        (only renders when cluster data exists on the profile)
+
+----------------------------------------------------------------
+
+8. DEMO PERSONA EXPECTED RESULTS (once API key is live)
+---------------------------------------------------------
+
+  Yara   — home pastry chef             → C1 (Home-based food)
+  Marcus — freelance React developer    → C2 (Freelance / consulting)
+  Fatima — licensed home daycare        → C3 (Regulated childcare)
+
+  Currently all default to C9 (stub). One line swap activates.
+
+----------------------------------------------------------------
+
+FILES CHANGED IN THIS SESSION
+-------------------------------
+
+  src/lib/clusters.ts                        [NEW]
+  src/types/profile.ts                       [+3 fields + 2 types]
+  src/lib/claude/schemas.ts                  [+ProfileResponseSchema]
+  src/lib/claude/prompts.ts                  [+synthesis prompt + cluster injection]
+  src/services/profile.service.ts            [+cluster DTO fields]
+  src/lib/knowledge-base/selector.ts         [+2 cluster selector functions]
+  src/app/(app)/dashboard/page.tsx           [async + cluster badge]
+
+DB migration applied:
+  add_cluster_columns_to_profiles
+
+================================================================
+END OF ENTRY — April 2, 2026 (Clusters)
+================================================================
+
+
+================================================================
+FINANCIAL CFO DASHBOARD — SESSION 4
+================================================================
+
+DATE: April 2, 2026
+BRANCH: feat/backend-logic
+BUILD STATUS: ✅ Zero TypeScript errors
+
+----------------------------------------------------------------
+
+OVERVIEW
+--------
+Built a complete "personal CFO dashboard" for micro-business owners.
+The page answers three questions at once:
+  1. Where am I now?  → The snapshot (hero take-home + waterfall bar)
+  2. Where am I going? → 12-month projections, scenarios, break-even
+  3. What should I do?  → Watch-out flags, deductions, funding impact
+
+All calculations are deterministic pure math — no API calls needed.
+Every number updates live as the user adjusts inputs. Claude is
+only involved for future watch-out flags (currently deterministic).
+
+Cluster-aware: all expense defaults, deduction suggestions, and
+financial hints are pre-loaded based on the user's business cluster
+(C1-C9), not just a flat business_type string.
+
+Progressive disclosure: Tier 1 (intake data) shows a useful
+snapshot immediately. Tier 2 (expenses) is pre-filled by cluster
+and editable. Tier 3 (pricing, deductions) is expandable sections.
+
+----------------------------------------------------------------
+
+1. NEW BACKEND ENGINE FILES
+-----------------------------
+
+src/lib/financial/expense-defaults.ts  [NEW]
+  - Cluster-aware expense defaults with full category breakdowns
+  - Each of 9 clusters has its own list of ExpenseCategory objects:
+      { key, label, amount, description }
+  - C1 (home food): 6 categories — ingredients $250, packaging $80,
+    market fees $60, delivery $45, insurance $30, permits $15 = $480
+  - C2 (freelance): 5 categories — software $120, home office $200,
+    phone $45, professional dev $30, accounting $25 = $420
+  - C3 (childcare): 6 categories — meals $180, supplies $80,
+    safety $20, insurance $55, cleaning $35, training $15 = $385
+  - C4 (regulated prof): 5 categories — dues $125, E&O insurance $150,
+    office $300, software $80, CE credits $60 = $715
+  - C5 (retail): 5 categories — inventory $400, shipping $80,
+    platform fees $50, marketing $60, insurance $35 = $625
+  - C6 (food service): 6 categories — food cost $800, rent $1200,
+    utilities $200, equipment $150, insurance $100, permits $40 = $2490
+  - C7 (construction): 6 categories — materials $500, vehicle $350,
+    tools $120, insurance $180, RBQ $45, phone $40 = $1235
+  - C8 (personal services): 5 categories — products $150,
+    chair/room $300, insurance $45, tools $40, marketing $30 = $565
+  - C9 (general): 4 categories — general $100, phone $45,
+    software $40, insurance $30 = $215
+  - Exports: getExpenseDefaults(clusterId), getDefaultExpenseTotal(businessType)
+
+src/lib/financial/projections.ts  [NEW]
+  - Scenario comparison engine:
+      generateScenarios(revenue, expenses, structure)
+      Returns 3 scenarios: conservative (70%), expected (100%), optimistic (140%)
+      Each has: taxes, take-home, keep-rate, GST-required flag
+  - Break-even calculator:
+      calculateBreakEven(expenses, structure) — binary search because
+      tax brackets make break-even non-linear
+      getBreakEvenResult() — adds surplus, months-to-break-even
+      (assumes 10% monthly growth), isAboveBreakEven flag
+  - Pricing calculator:
+      calculatePricing(pricePerUnit, unitsPerMonth, expenses, structure)
+      Returns: gross, take-home, per-unit take-home, per-unit tax burden
+  - Monthly projection data:
+      generateMonthlyProjections() — 12-month cumulative with GST threshold crossing
+  - Funding impact calculator:
+      calculateFundingImpact(fundingAmount, expenses, takeHome)
+      Returns: months of runway, months of full income, readable message
+
+src/lib/financial/deductions.ts  [NEW]
+  - Cluster-aware common deductions with estimated tax savings
+  - Each cluster has its own list of Deduction objects:
+      { key, label, annualAmount, description, source }
+  - Source field references the actual CRA form (T2125, CCA Schedule, etc.)
+  - Tax savings estimated at ~27% combined marginal rate (federal + QC)
+  - C1 example: home kitchen $1200 + ingredients $3000 + packaging $960
+    + mileage $1728 + market fees $720 + MAPAQ $180 = $7,788 total
+    → saves ~$2,103/year in taxes
+  - Exports: getDeductionSummary(clusterId)
+
+----------------------------------------------------------------
+
+2. TYPE SYSTEM UPDATES
+-----------------------
+
+src/types/financial.ts
+  - Added re-exports for all new types:
+      Scenario, BreakEvenResult, PricingResult, FundingImpact,
+      MonthProjection, ExpenseCategory, ClusterExpenseProfile,
+      Deduction, DeductionSummary
+
+----------------------------------------------------------------
+
+3. SERVICE LAYER UPDATES
+--------------------------
+
+src/services/financial.service.ts
+  - Added imports for all 3 new engine modules
+  - Added 6 new methods to FinancialService:
+      getExpenseDefaults(clusterId)  → cluster expense categories
+      getDeductionSummary(clusterId) → deductions + tax savings
+      getScenarios(revenue, expenses, structure) → 3 scenarios
+      getBreakEven(revenue, expenses, structure) → break-even point
+      getPricing(price, units, expenses, structure) → pricing calc
+      getFundingImpact(funding, expenses, takeHome) → runway calc
+  - All existing methods (generate, getByProfileId, refresh) unchanged
+
+----------------------------------------------------------------
+
+4. SNAPSHOT CARD UPDATE
+------------------------
+
+src/components/financial/snapshot-card.tsx
+  - Replaced hardcoded EXPENSE_DEFAULTS map with cluster-aware:
+      import { getExpenseDefaults } from '@/lib/financial/expense-defaults'
+      const clusterId = (profile?.cluster_id ?? 'C9') as ClusterID
+      const monthlyExpenses = getExpenseDefaults(clusterId).total
+  - Now shows accurate cluster-specific expense totals on dashboard
+
+----------------------------------------------------------------
+
+5. FINANCIAL PAGE — FULL REWRITE
+----------------------------------
+
+src/app/(app)/financial/page.tsx  [FULL REWRITE — 650+ lines]
+
+PRESERVED from previous version (my friend's UI):
+  - WaterfallBar component (horizontal stacked bar)
+  - ProjectionChart (12-month SVG line chart with GST threshold)
+  - TaxCalendar (timeline with installment dates/amounts)
+  - QPPShock (double contribution explainer)
+  - generateFlags() (deterministic watch-out flags)
+  - Hero card (gradient teal, big take-home number)
+  - 4 stat cards (Revenue, Tax, Expenses, Take-Home)
+  - Input section (revenue + expenses)
+
+NEW COMPONENTS ADDED:
+
+  Expandable — reusable accordion wrapper (icon, title, subtitle, children)
+    Used for: expense breakdown, tax breakdown, scenarios, pricing, calendar, deductions
+
+  ExpenseDonut — SVG donut chart showing expense categories
+    - Teal/amber colour palette, 9 segment colours
+    - Center shows total expense amount
+    - Legend shows each category with amount
+    - Categories are pre-loaded from cluster defaults
+
+  PricingSlider — "If I charge $X and sell Y, what do I keep?"
+    - Price per unit slider ($5-$500)
+    - Units per month slider (1-200)
+    - 3 result cards: Gross Revenue, You Keep, Per Unit Profit
+    - Dynamic hint: "Charging $5 more adds ~$XXX/month to take-home"
+
+  ScenarioComparison — 3 side-by-side revenue scenarios
+    - Conservative (70%), Expected (100%), Optimistic (140%)
+    - Each shows: take-home, tax burden, keep rate, GST required
+    - Expected scenario has a teal highlight ring
+
+  BreakEvenCard — visual break-even indicator
+    - Shows minimum revenue needed vs current projection
+    - Green/amber/red progress bar
+    - If below: "At 10% monthly growth, reach break-even in ~N months"
+    - If above: "You're $X/mo above break-even — healthy margin"
+
+  DeductionTracker — cluster-aware deduction list
+    - Green savings headline: "Estimated annual tax savings: $X,XXX"
+    - Each deduction shows: label, description, CRA source, annual amount
+    - Per-deduction savings shown (amount × 27%)
+
+  FundingImpactCard — how grants extend runway
+    - 3 stat boxes: funding available, months of expenses, months of full income
+    - Human-readable message about runway
+    - Link to funding matches page
+
+PAGE STRUCTURE (top to bottom):
+
+  ZONE 1: The Snapshot (always visible)
+    → Hero card with take-home number + waterfall
+    → Revenue + expense inputs
+    → 4 stat cards
+    → Expense donut (expandable)
+    → Tax breakdown (expandable)
+    → QPP shock explainer
+
+  ZONE 2: Where Am I Going (projections)
+    → 12-month projection chart
+    → Revenue scenarios (expandable, default open)
+    → Break-even indicator
+    → Pricing calculator (expandable)
+
+  ZONE 3: Tax Calendar & Deductions
+    → 2026 tax calendar (expandable)
+    → Common deductions tracker (expandable)
+
+  ZONE 4: What Should I Do (action items)
+    → Watch-out flags
+    → Funding impact card
+
+EXPENSE HANDLING:
+  - Old: flat EXPENSE_DEFAULTS[businessType] → single number
+  - New: getExpenseDefaults(clusterId) → category array, each editable inline
+  - Donut chart updates live as user changes individual category amounts
+  - Total expense feeds into all calculations
+
+----------------------------------------------------------------
+
+FILES CHANGED IN THIS SESSION
+-------------------------------
+
+  src/lib/financial/expense-defaults.ts     [NEW — 165 lines]
+  src/lib/financial/projections.ts          [NEW — 186 lines]
+  src/lib/financial/deductions.ts           [NEW — 188 lines]
+  src/types/financial.ts                    [+re-exports]
+  src/services/financial.service.ts         [+6 methods]
+  src/components/financial/snapshot-card.tsx [cluster-aware expenses]
+  src/app/(app)/financial/page.tsx          [FULL REWRITE — 650+ lines]
+
+================================================================
+END OF ENTRY — April 2, 2026 (Financial Dashboard)
+================================================================

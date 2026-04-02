@@ -3,6 +3,9 @@
 // snake_case matches Supabase's default column naming
 // ============================================================
 
+export type ClusterID = 'C1' | 'C2' | 'C3' | 'C4' | 'C5' | 'C6' | 'C7' | 'C8' | 'C9'
+export type ClusterComplexity = 'low' | 'medium' | 'high'
+
 export type BusinessType =
   | 'food'
   | 'freelance'
@@ -65,6 +68,11 @@ export interface Profile {
   // Intake tracking
   intake_completed: boolean
   intake_answers: Record<string, unknown> | null
+
+  // Business cluster — set by Claude after intake
+  cluster_id: ClusterID | null
+  cluster_label: string | null
+  cluster_complexity: ClusterComplexity | null
 }
 
 // Raw answers from the 8-question intake wizard (sent from the frontend)

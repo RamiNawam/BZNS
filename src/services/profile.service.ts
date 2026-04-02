@@ -11,9 +11,11 @@ import type {
   UpdateProfileDTO,
   BusinessType,
 } from '@/types/profile'
+import { CLUSTERS } from '@/lib/clusters'
+import type { ClusterID } from '@/lib/clusters'
 
 // TODO: import { ClaudeClient } from '@/lib/claude/client'
-// TODO: import { ProfileSynthesisSchema } from '@/lib/claude/schemas'
+// TODO: import { ProfileResponseSchema } from '@/lib/claude/schemas'
 
 export const ProfileService = {
 
@@ -26,9 +28,13 @@ export const ProfileService = {
   async createFromIntake(user_id: string, answers: IntakeAnswers): Promise<Profile> {
     // Step 1: Call Claude to classify the business
     // TODO: Uncomment when Claude client is wired up
-    // const claudeResult = await ClaudeClient.classifyBusiness(answers)
-    // const { business_type, industry_sector, business_name, business_description } =
-    //   ProfileSynthesisSchema.parse(claudeResult)
+    // const rawJson = await ClaudeClient.complete(buildProfilePrompt(answers as Record<string, unknown>))
+    // const claudeResult = ProfileResponseSchema.parse(JSON.parse(rawJson))
+    // const { business_type, industry_sector, business_name, business_description, cluster_id: claudeClusterId } = claudeResult
+
+    // Step 1b: Stub cluster until Claude is live — default to C9
+    const clusterId: ClusterID = 'C9'                    // TODO: replace with claudeClusterId
+    const clusterMeta = CLUSTERS[clusterId]
 
     // Step 2: Build the profile DTO (using stubs until Claude is live)
     const profileDTO: CreateProfileDTO = {
@@ -60,6 +66,10 @@ export const ProfileService = {
       units_per_month: null,
       intake_completed: true,
       intake_answers: answers as unknown as Record<string, unknown>,
+      // Cluster — set by Claude; using default until API is wired
+      cluster_id: clusterId,
+      cluster_label: clusterMeta.label,
+      cluster_complexity: clusterMeta.complexity,
     }
 
     // Step 3: Save to DB

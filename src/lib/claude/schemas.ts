@@ -4,6 +4,17 @@ import { z } from 'zod';
  * Zod schemas for validating Claude API responses.
  */
 
+// Profile synthesis — Claude's response after the intake wizard
+export const ProfileResponseSchema = z.object({
+  business_name: z.string().nullable(),
+  business_description: z.string().nullable(),
+  industry_sector: z.string().nullable(),
+  business_type: z.enum(['food', 'freelance', 'daycare', 'retail', 'personal_care', 'other']),
+  cluster_id: z.enum(['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9']),
+});
+
+export type ProfileResponse = z.infer<typeof ProfileResponseSchema>;
+
 export const RoadmapStepSchema = z.object({
   id: z.string(),
   title_en: z.string(),

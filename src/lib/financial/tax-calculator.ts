@@ -4,123 +4,148 @@ import {
   FEDERAL_QC_ABATEMENT,
   QUEBEC_TAX_BRACKETS,
   QUEBEC_BASIC_PERSONAL_AMOUNT,
+  GST_RATE,
+  QST_RATE,
+  SALES_TAX_REGISTRATION_THRESHOLD,
   QPP_BASIC_EXEMPTION,
   QPP_MAX_PENSIONABLE_EARNINGS,
   QPP_SELF_EMPLOYED_RATE,
-  QPP2_YAMPE,
-  QPP2_SELF_EMPLOYED_RATE,
   QPIP_SELF_EMPLOYED_RATE,
   QPIP_MAX_INSURABLE_EARNINGS,
-  QPIP_BASIC_EXEMPTION,
+  QUARTERLY_INSTALLMENT_THRESHOLD,
 } from './constants';
+import type { BusinessStructure } from '@/types/profile';
+import type { TaxCalculationResult } from '@/types/financial';
 
-export interface TaxSnapshot {
-  grossIncome: number;
-  businessExpenses: number;
-  netBusinessIncome: number;
-  qpp: number;
-  qpip: number;
-  qppEmployerDeduction: number; // Deductible employer-equivalent portion
-  federalTaxableIncome: number;
-  federalTax: number;
-  quebecTax: number;
-  totalTax: number;
-  estimatedTakeHome: number;
-  effectiveTaxRate: number;
-  warnings: string[];
+export interface TaxCalculatorInput {
+  gross_monthly_revenue: number;
+  monthly_expenses: number;
+  business_structure: BusinessStructure | string;
 }
 
-/**
- * Calculate marginal tax using a bracket table.
- */
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
 function applyBrackets(
   income: number,
-  brackets: readonly { min: number; max: number | typeof Infinity; rate: number }[]
+  brackets: readonly { min: number; max: number | null; rate: number }[],
 ): number {
   let tax = 0;
   for (const bracket of brackets) {
     if (income <= bracket.min) break;
-    const taxable = Math.min(income, bracket.max) - bracket.min;
-    tax += taxable * bracket.rate;
+    const bracketCap = bracket.max ?? Number.POSITIVE_INFINITY;
+    const taxableInBracket = Math.max(0, Math.min(income, bracketCap) - bracket.min);
+    tax += taxableInBracket * bracket.rate;
   }
   return tax;
 }
 
-/**
- * Calculate a full self-employed tax snapshot for a Quebec resident.
- */
-export function calculateTakeHome(
-  grossIncome: number,
-  businessExpenses = 0
-): TaxSnapshot {
-  const warnings: string[] = [];
-  const netBusinessIncome = Math.max(0, grossIncome - businessExpenses);
+export function calculateTaxSnapshot(input: TaxCalculatorInput): TaxCalculationResult {
+  const grossMonthlyRevenue = Math.max(0, input.gross_monthly_revenue);
+  const monthlyExpenses = Math.max(0, input.monthly_expenses);
 
-  // QPP contributions
-  const qppContributoryEarnings = Math.max(
-    0,
-    Math.min(netBusinessIncome, QPP_MAX_PENSIONABLE_EARNINGS) - QPP_BASIC_EXEMPTION
-  );
-  const qpp = qppContributoryEarnings * QPP_SELF_EMPLOYED_RATE;
+  const annualRevenue = grossMonthlyRevenue * 12;
+  const annualExpenses = monthlyExpenses * 12;
+  const netRevenue = Math.max(0, annualRevenue - annualExpenses);
 
-  // QPP2
-  const qpp2ContributoryEarnings = Math.max(
-    0,
-    Math.min(netBusinessIncome, QPP2_YAMPE) - QPP_MAX_PENSIONABLE_EARNINGS
-  );
-  const qpp2 = qpp2ContributoryEarnings * QPP2_SELF_EMPLOYED_RATE;
-  const totalQpp = qpp + qpp2;
+  const mustRegisterSalesTax = annualRevenue > SALES_TAX_REGISTRATION_THRESHOLD;
+  const gstCollected = mustRegisterSalesTax ? annualRevenue * GST_RATE : 0;
+  const qstCollected = mustRegisterSalesTax ? annualRevenue * QST_RATE : 0;
+  const gstQstRemittance = gstCollected + qstCollected;
 
-  // QPIP contributions
-  const qpipInsurableEarnings = Math.max(
-    0,
-    Math.min(netBusinessIncome, QPIP_MAX_INSURABLE_EARNINGS) - QPIP_BASIC_EXEMPTION
-  );
-  const qpip = qpipInsurableEarnings * QPIP_SELF_EMPLOYED_RATE;
+  // For this release, we treat partnership the same as sole_prop at the individual level.
+  const isPersonalTaxPath =
+    input.business_structure === 'sole_proprietorship' ||
+    input.business_structure === 'partnership' ||
+    !input.business_structure;
 
-  // Deductible employer-equivalent portion of QPP (50%)
-  const qppEmployerDeduction = totalQpp * 0.5;
+  let federalIncomeTax = 0;
+  let provincialIncomeTax = 0;
+  let qppContribution = 0;
+  let qpipPremium = 0;
 
-  // Federal taxable income
-  const federalTaxableIncome = Math.max(
-    0,
-    netBusinessIncome - qppEmployerDeduction - FEDERAL_BASIC_PERSONAL_AMOUNT
-  );
-  const federalTaxBefore = applyBrackets(federalTaxableIncome, FEDERAL_TAX_BRACKETS as never);
-  const federalTax = Math.max(0, federalTaxBefore * (1 - FEDERAL_QC_ABATEMENT));
+  if (isPersonalTaxPath) {
+    const federalTaxableIncome = Math.max(0, netRevenue - FEDERAL_BASIC_PERSONAL_AMOUNT);
+    const federalBeforeAbatement = applyBrackets(federalTaxableIncome, FEDERAL_TAX_BRACKETS);
+    federalIncomeTax = federalBeforeAbatement * (1 - FEDERAL_QC_ABATEMENT);
 
-  // Quebec taxable income
-  const quebecTaxableIncome = Math.max(
-    0,
-    netBusinessIncome - qppEmployerDeduction - QUEBEC_BASIC_PERSONAL_AMOUNT
-  );
-  const quebecTax = applyBrackets(quebecTaxableIncome, QUEBEC_TAX_BRACKETS as never);
+    const provincialTaxableIncome = Math.max(0, netRevenue - QUEBEC_BASIC_PERSONAL_AMOUNT);
+    provincialIncomeTax = applyBrackets(provincialTaxableIncome, QUEBEC_TAX_BRACKETS);
 
-  const totalTax = federalTax + quebecTax + totalQpp + qpip;
-  const estimatedTakeHome = netBusinessIncome - totalTax;
-  const effectiveTaxRate = netBusinessIncome > 0 ? totalTax / netBusinessIncome : 0;
+    const qppPensionableIncome = Math.max(
+      0,
+      Math.min(netRevenue, QPP_MAX_PENSIONABLE_EARNINGS) - QPP_BASIC_EXEMPTION,
+    );
+    qppContribution = qppPensionableIncome * QPP_SELF_EMPLOYED_RATE;
 
-  // Warnings
-  if (grossIncome >= 30000) {
-    warnings.push('You must register for GST and QST once taxable revenues exceed $30,000');
+    const qpipInsurableIncome = Math.max(0, Math.min(netRevenue, QPIP_MAX_INSURABLE_EARNINGS));
+    qpipPremium = qpipInsurableIncome * QPIP_SELF_EMPLOYED_RATE;
+  } else {
+    // Corporation path not fully modeled yet; keep deterministic but conservative.
+    federalIncomeTax = 0;
+    provincialIncomeTax = 0;
+    qppContribution = 0;
+    qpipPremium = 0;
   }
-  if (estimatedTakeHome < 0) {
-    warnings.push('Expenses exceed income — review your financial projections');
-  }
+
+  const totalDeductions = federalIncomeTax + provincialIncomeTax + qppContribution + qpipPremium;
+  const annualTakeHome = Math.max(0, netRevenue - totalDeductions);
+  const monthlyTakeHome = annualTakeHome / 12;
+  const effectiveTakeHomeRate = grossMonthlyRevenue > 0 ? monthlyTakeHome / grossMonthlyRevenue : 0;
+  const quarterlyInstallment =
+    totalDeductions >= QUARTERLY_INSTALLMENT_THRESHOLD ? totalDeductions / 4 : 0;
 
   return {
-    grossIncome,
-    businessExpenses,
-    netBusinessIncome,
-    qpp: totalQpp,
-    qpip,
-    qppEmployerDeduction,
-    federalTaxableIncome,
-    federalTax,
-    quebecTax,
-    totalTax,
-    estimatedTakeHome,
-    effectiveTaxRate,
-    warnings,
+    annual_revenue: round2(annualRevenue),
+    gst_collected: round2(gstCollected),
+    qst_collected: round2(qstCollected),
+    gst_qst_remittance: round2(gstQstRemittance),
+    net_revenue: round2(netRevenue),
+    federal_income_tax: round2(federalIncomeTax),
+    provincial_income_tax: round2(provincialIncomeTax),
+    qpp_contribution: round2(qppContribution),
+    qpip_premium: round2(qpipPremium),
+    total_deductions: round2(totalDeductions),
+    monthly_take_home: round2(monthlyTakeHome),
+    effective_take_home_rate: round2(effectiveTakeHomeRate),
+    quarterly_installment: round2(quarterlyInstallment),
+  };
+}
+
+/**
+ * Convenience alias used by the frontend financial page and snapshot card.
+ * Accepts annualRevenue and annualExpenses directly (already multiplied by 12).
+ * Returns all snake_case fields PLUS camelCase aliases for frontend compatibility.
+ */
+export function calculateTakeHome(
+  annualRevenue: number,
+  annualExpenses: number,
+): TaxCalculationResult & {
+  federalTax: number;
+  quebecTax: number;
+  qpp: number;
+  qpip: number;
+  estimatedTakeHome: number;
+  totalTax: number;
+  effectiveTaxRate: number;
+  netBusinessIncome: number;
+} {
+  const r = calculateTaxSnapshot({
+    gross_monthly_revenue: annualRevenue / 12,
+    monthly_expenses: annualExpenses / 12,
+    business_structure: 'sole_proprietorship',
+  });
+  return {
+    ...r,
+    // camelCase aliases for frontend components
+    federalTax:        r.federal_income_tax,
+    quebecTax:         r.provincial_income_tax,
+    qpp:               r.qpp_contribution,
+    qpip:              r.qpip_premium,
+    estimatedTakeHome: r.monthly_take_home,
+    totalTax:          r.total_deductions,
+    effectiveTaxRate:  r.effective_take_home_rate,
+    netBusinessIncome: r.net_revenue,
   };
 }

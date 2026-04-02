@@ -5,11 +5,8 @@ import Link from 'next/link';
 import { ArrowRight, Wallet } from 'lucide-react';
 import { useProfileStore } from '@/stores/profile-store';
 import { calculateTakeHome } from '@/lib/financial/tax-calculator';
-
-const EXPENSE_DEFAULTS: Record<string, number> = {
-  food: 390, freelance: 360, daycare: 215,
-  retail: 300, personal_care: 250, creative: 200, tech: 300, other: 200,
-};
+import { getExpenseDefaults } from '@/lib/financial/expense-defaults';
+import type { ClusterID } from '@/lib/clusters';
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
@@ -17,7 +14,8 @@ const fmt = (n: number) =>
 export default function SnapshotCard() {
   const { profile } = useProfileStore();
   const monthlyRevenue  = profile?.expected_monthly_revenue ?? 0;
-  const monthlyExpenses = EXPENSE_DEFAULTS[profile?.business_type ?? 'other'] ?? 200;
+  const clusterId = (profile?.cluster_id ?? 'C9') as ClusterID;
+  const monthlyExpenses = getExpenseDefaults(clusterId).total;
 
   const taxes = useMemo(
     () => calculateTakeHome(monthlyRevenue * 12, monthlyExpenses * 12),

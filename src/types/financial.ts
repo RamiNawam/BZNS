@@ -88,3 +88,9 @@ export interface TaxBracket {
   max: number | null
   rate: number
 }
+
+// ── Re-exports from the financial engine modules ────────────
+// All pure math, no AI. Import from here or directly from the modules.
+export type { Scenario, BreakEvenResult, PricingResult, FundingImpact, MonthProjection } from '@/lib/financial/projections'
+export type { ExpenseCategory, ClusterExpenseProfile } from '@/lib/financial/expense-defaults'
+export type { Deduction, DeductionSummary } from '@/lib/financial/deductions'
