@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 import {
   LayoutDashboard,
   Map,
@@ -13,6 +14,7 @@ import {
   Zap,
   type LucideIcon,
 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 const navItems: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/dashboard',  label: 'Dashboard',    icon: LayoutDashboard },
@@ -25,6 +27,14 @@ const navItems: { href: string; label: string; icon: LucideIcon }[] = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  async function handleSignOut() {
+    setIsSigningOut(true);
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.location.href = '/login';
+  }
 
   return (
     <aside className="w-60 shrink-0 bg-white border-r border-slate-200 flex flex-col h-full">
@@ -74,13 +84,14 @@ export default function Sidebar() {
 
       {/* Bottom */}
       <div className="px-3 py-4 border-t border-slate-100 space-y-0.5">
-        <Link
-          href="/login"
-          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all duration-150 group"
+        <button
+          onClick={handleSignOut}
+          disabled={isSigningOut}
+          className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all duration-150 group disabled:opacity-50"
         >
           <LogOut size={17} className="shrink-0 text-slate-400 group-hover:text-slate-500 transition-colors" />
-          <span>Sign out</span>
-        </Link>
+          <span>{isSigningOut ? 'Signing out...' : 'Sign out'}</span>
+        </button>
       </div>
     </aside>
   );
