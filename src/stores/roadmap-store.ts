@@ -8,10 +8,10 @@ interface RoadmapStore {
 
   loadRoadmap: () => Promise<void>;
   generateRoadmap: (profileId: string) => Promise<void>;
-  updateStepStatus: (stepId: string, status: StepStatus) => void;
+  updateStepStatus: (stepId: string, status: StepStatus) => Promise<void>;
 }
 
-export const useRoadmapStore = create<RoadmapStore>((set) => ({
+export const useRoadmapStore = create<RoadmapStore>((set, get) => ({
   steps: [],
   isLoading: false,
   error: null,
@@ -48,12 +48,34 @@ export const useRoadmapStore = create<RoadmapStore>((set) => ({
     }
   },
 
-  updateStepStatus: (stepId, status) =>
+  updateStepStatus: async (stepId, status) => {
+    // Capture previous state for rollback
+    const previousSteps = get().steps;
+
+    // Optimistic update — immediate UI response
     set((state) => ({
-      steps: state.steps.map((step) =>
-        step.id === stepId
-          ? { ...step, status, completedAt: status === 'completed' ? new Date().toISOString() : null }
-          : step
+      steps: state.steps.map((s) =>
+        s.id === stepId
+          ? { ...s, status, completed_at: status === 'completed' ? new Date().toISOString() : null }
+          : s
       ),
-    })),
+    }));
+
+    try {
+      const res = await fetch('/api/roadmap', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ step_id: stepId, status }),
+      });
+      if (!res.ok) throw new Error('Failed to update step');
+      const { step } = await res.json();
+      // Sync with authoritative server response
+      set((state) => ({
+        steps: state.steps.map((s) => (s.id === step.id ? step : s)),
+      }));
+    } catch {
+      // Revert to previous state on failure
+      set({ steps: previousSteps });
+    }
+  },
 }));
