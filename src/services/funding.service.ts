@@ -71,6 +71,16 @@ const PROGRAM_BUSINESS_TYPES: Record<string, string[]> = {
   irap: ['freelance', 'other'], // only tech/innovation businesses qualify
 }
 
+// Per-program business stage restrictions (empty = no restriction)
+// Stages: 'pre_launch' (no NEQ), 'launching' (has NEQ, <$5k/mo), 'operating' (has NEQ, ≥$5k/mo)
+const PROGRAM_BUSINESS_STAGES: Record<string, string[]> = {
+  futurpreneur:           ['pre_launch', 'launching'],   // targets early-stage entrepreneurs
+  fli:                    ['pre_launch', 'launching'],   // local investment for new ventures
+  canada_summer_jobs:     ['operating'],                  // must be an established employer
+  irap:                   ['operating'],                  // R&D requires established tech business
+  investissement_quebec:  ['launching', 'operating'],    // needs some business presence
+}
+
 function extractEligibility(raw: Record<string, unknown>): FundingProgramJSON['eligibility'] {
   const elig = (raw.eligibility ?? {}) as Record<string, unknown>
   const criteria = (elig.criteria ?? {}) as Record<string, unknown>
@@ -108,6 +118,9 @@ function extractEligibility(raw: Record<string, unknown>): FundingProgramJSON['e
   // Business types (programs with sector restrictions)
   const businessTypes = PROGRAM_BUSINESS_TYPES[raw.program_key as string] ?? []
 
+  // Business stages (programs targeting specific maturity levels)
+  const businessStages = PROGRAM_BUSINESS_STAGES[raw.program_key as string] ?? []
+
   return {
     ...(ageMin !== undefined && { age_min: ageMin }),
     ...(ageMax !== undefined && { age_max: ageMax }),
@@ -115,6 +128,7 @@ function extractEligibility(raw: Record<string, unknown>): FundingProgramJSON['e
     ...(immigrationStatus.length > 0 && { immigration_status: immigrationStatus }),
     ...(demographics.length > 0 && { demographics }),
     ...(businessTypes.length > 0 && { business_types: businessTypes }),
+    ...(businessStages.length > 0 && { business_stages: businessStages }),
   }
 }
 
@@ -129,6 +143,48 @@ function extractScoringWeights(raw: Record<string, unknown>): FundingProgramJSON
     business_type: sw.business_type ?? sw.business_type_tech ?? sw.sector ?? 0.2,
     demographics:  sw.demographics ?? sw.immigration_status_immigrant ?? 0.2,
   }
+}
+
+// Documents not in any JSON field — written from official program process descriptions
+const FALLBACK_DOCUMENTS: Record<string, string[]> = {
+  irap: [
+    'Contact an NRC Industrial Technology Advisor (ITA) first — no application before ITA approval',
+    'R&D project proposal: technical objectives, timeline, budget, expected outcomes',
+    'Proof of Canadian incorporation',
+    'Employee payroll records (funding covers eligible salary costs)',
+  ],
+  canada_summer_jobs: [
+    'GCOS portal account (Grants and Contributions Online Services at canada.ca)',
+    'Business Number (BN) from CRA',
+    'Job position description and duties for the summer role',
+    'Proof of eligible employer status (non-profit, public body, or private business with under 50 employees)',
+  ],
+  investissement_quebec: [
+    'Business plan',
+    '2-3 year financial projections',
+    'Personal and business financial statements',
+    'NEQ registration',
+    'Bank statements (last 6 months)',
+    'Proof of Quebec residency',
+  ],
+  demographic_programs: [
+    'Business plan or project description',
+    'Proof of immigration status or newcomer documents',
+    'Government-issued photo ID',
+    'Financial projections',
+    'Contact YES Montréal or PACO directly — required documents vary by program',
+  ],
+}
+
+function extractDocuments(raw: Record<string, unknown>): string[] {
+  // Try the common document list field names used across our JSON files
+  const docs =
+    (raw.what_you_need_to_apply as string[] | undefined) ??
+    (raw.what_you_need as string[] | undefined) ??
+    (raw.documents_required as string[] | undefined)
+  if (Array.isArray(docs) && docs.length > 0) return docs
+  // Fall back to static list for programs that describe their process narratively
+  return FALLBACK_DOCUMENTS[raw.program_key as string] ?? []
 }
 
 function adaptProgram(raw: Record<string, unknown>): FundingProgramJSON {
@@ -150,6 +206,7 @@ function adaptProgram(raw: Record<string, unknown>): FundingProgramJSON {
     source_url: extractSourceUrl(raw),
     eligibility: extractEligibility(raw),
     scoring_weights: extractScoringWeights(raw),
+    documents_required: extractDocuments(raw),
   }
 }
 
@@ -161,13 +218,27 @@ function loadFundingPrograms(): FundingProgramJSON[] {
   })
 }
 
+// Mandatory eligibility keys — ALL must be true for a program to count toward the total.
+// demographic_match is a score booster only and never gates the total.
+const MANDATORY_ELIGIBILITY_KEYS = new Set([
+  'age_eligible',
+  'location_eligible',
+  'immigration_status_eligible',
+  'business_type_eligible',
+  'business_stage_eligible',
+])
+
 function computeTotalPotential(matches: CreateFundingMatchDTO[]): string {
   const total = matches
-    .filter((m) => m.match_score >= 50)
+    .filter((m) => {
+      const details = (m.eligibility_details ?? {}) as Record<string, boolean>
+      return Object.entries(details).every(
+        ([k, v]) => !MANDATORY_ELIGIBILITY_KEYS.has(k) || v === true
+      )
+    })
     .reduce((sum, m) => sum + (PROGRAM_MAX_AMOUNTS[m.program_key] ?? 0), 0)
   if (total === 0) return 'Funding available'
-  const thousands = Math.round(total / 1000)
-  return `$${thousands}K+`
+  return `$${Math.round(total / 1000)}K+`
 }
 
 // ── Service ───────────────────────────────────────────────────────────────────
@@ -199,14 +270,27 @@ export const FundingService = {
       ? await FundingRepository.batchUpsert(filtered)
       : []
 
+    // Enrich with document requirements from JSON (not persisted in DB)
+    const docsMap = new Map(programs.map((p) => [p.key, p.documents_required]))
+    const enrichedMatches = savedMatches.map((m) => ({
+      ...m,
+      documents_required: docsMap.get(m.program_key) ?? [],
+    }))
+
     const total_potential_funding = computeTotalPotential(filtered)
-    const result = { matches: savedMatches, total_potential_funding }
+    const result = { matches: enrichedMatches, total_potential_funding }
     await CacheRepository.set(cacheKey, result)
     return result
   },
 
   async getByProfileId(profile_id: string): Promise<FundingMatch[]> {
-    return FundingRepository.getByProfileId(profile_id)
+    const matches = await FundingRepository.getByProfileId(profile_id)
+    const programs = loadFundingPrograms()
+    const docsMap = new Map(programs.map((p) => [p.key, p.documents_required]))
+    return matches.map((m) => ({
+      ...m,
+      documents_required: docsMap.get(m.program_key) ?? [],
+    }))
   },
 
   async explainProgram(

@@ -26,13 +26,15 @@ export function scoreProgram(
   }
 
   // ── Location ───────────────────────────────────────────────────────────────
+  // All users are Quebec-based, so being in Quebec is not a differentiator.
+  // Apply a small bonus for Montréal-specific programs and a mild penalty if outside.
   if (program.eligibility.locations && program.eligibility.locations.length > 0) {
     const userLocation = profile.municipality ?? '';
     const locationEligible = program.eligibility.locations.some((loc) =>
       userLocation.toLowerCase().includes(loc.toLowerCase())
     );
     eligibility.location_eligible = locationEligible;
-    score += locationEligible ? 15 : -20;
+    score += locationEligible ? 5 : -8;
   }
 
   // ── Immigration status ─────────────────────────────────────────────────────
@@ -40,7 +42,7 @@ export function scoreProgram(
     const userStatus = profile.immigration_status ?? '';
     const statusEligible = program.eligibility.immigration_status.includes(userStatus);
     eligibility.immigration_status_eligible = statusEligible;
-    score += statusEligible ? 10 : -15;
+    score += statusEligible ? 20 : -25;
   }
 
   // ── Business type ──────────────────────────────────────────────────────────
@@ -48,21 +50,33 @@ export function scoreProgram(
     const userType = profile.business_type ?? 'other'
     const btEligible = program.eligibility.business_types.includes(userType)
     eligibility.business_type_eligible = btEligible
-    score += btEligible ? 10 : -25
+    score += btEligible ? 15 : -30
+  }
+
+  // ── Business stage ─────────────────────────────────────────────────────────
+  if (program.eligibility.business_stages && program.eligibility.business_stages.length > 0) {
+    const revenue = profile.expected_monthly_revenue ?? 0
+    const hasNeq = profile.has_neq ?? false
+    const inferredStage = !hasNeq ? 'pre_launch' : revenue < 5000 ? 'launching' : 'operating'
+    const stageEligible = program.eligibility.business_stages.includes(inferredStage)
+    eligibility.business_stage_eligible = stageEligible
+    score += stageEligible ? 15 : -10
   }
 
   // ── Demographics ───────────────────────────────────────────────────────────
   if (program.eligibility.demographics && program.eligibility.demographics.length > 0) {
     const userLangs = profile.languages_spoken ?? [];
     const isNewcomer = profile.immigration_status === 'work_permit' || profile.immigration_status === 'permanent_resident';
+    const isWoman = (profile.gender ?? '').toLowerCase() === 'woman' || (profile.gender ?? '').toLowerCase() === 'female';
     const demographicMatch = program.eligibility.demographics.some((demo) => {
       if (demo === 'immigrant' || demo === 'newcomer') return isNewcomer;
       if (demo === 'youth') return (profile.age ?? 99) < 35;
+      if (demo === 'woman') return isWoman;
       if (demo === 'francophone') return userLangs.includes('fr');
       return false;
     });
     eligibility.demographic_match = demographicMatch;
-    score += demographicMatch ? 15 : 0;
+    score += demographicMatch ? 20 : 0;
   }
 
   score = Math.max(0, Math.min(100, score));

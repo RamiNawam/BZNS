@@ -22,6 +22,8 @@ export interface FundingMatch {
 
   is_bookmarked: boolean
   is_dismissed: boolean
+  // Populated at API layer from JSON knowledge base — not persisted in DB
+  documents_required?: string[]
 }
 
 // Shape of each program JSON in /data/funding/*.json
@@ -41,7 +43,8 @@ export interface FundingProgramJSON {
     business_types?: string[]
     business_structures?: string[]
     max_employees?: number
-    demographics?: string[]   // e.g. ['immigrant', 'woman', 'youth']
+    demographics?: string[]         // e.g. ['immigrant', 'woman', 'youth']
+    business_stages?: string[]      // e.g. ['pre_launch', 'launching', 'operating']
   }
   scoring_weights: {
     age: number
@@ -50,6 +53,7 @@ export interface FundingProgramJSON {
     business_type: number
     demographics: number
   }
+  documents_required: string[]
 }
 
 // DTOs

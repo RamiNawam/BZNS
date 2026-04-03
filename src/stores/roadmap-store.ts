@@ -1,5 +1,8 @@
 import { create } from "zustand";
 import type { RoadmapStep, StepStatus, GapFlag } from "@/types/roadmap";
+import { STEP_PROFILE_SYNC } from "@/lib/roadmap/step-profile-sync";
+import { useProfileStore } from "@/stores/profile-store";
+import { useFundingStore } from "@/stores/funding-store";
 
 interface RoadmapStore {
   steps: RoadmapStep[];
@@ -133,6 +136,16 @@ export const useRoadmapStore = create<RoadmapStore>((set, get) => ({
             : s,
         ),
       }));
+
+      // If step was just completed, check for profile field updates and refresh funding
+      if (status === "completed") {
+        const step = get().steps.find((s) => s.id === stepId);
+        const profileUpdates = step ? STEP_PROFILE_SYNC[step.step_key] : undefined;
+        if (profileUpdates) {
+          await useProfileStore.getState().updateProfile(profileUpdates);
+          useFundingStore.getState().generateMatches();
+        }
+      }
     } catch (err) {
       // Rollback on failure
       set({

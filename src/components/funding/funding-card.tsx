@@ -4,10 +4,12 @@ import { useState } from 'react';
 import {
   Bookmark, BookmarkCheck, CheckCircle2, XCircle,
   ExternalLink, ChevronDown, ChevronUp, Sparkles, Loader2,
-  ArrowRight, AlertTriangle,
+  ArrowRight, AlertTriangle, ClipboardList, FileText,
 } from 'lucide-react';
 import type { FundingMatch, FundingExplanation, ProgramType } from '@/types/funding';
+import type { Profile } from '@/types/profile';
 import { useFundingStore } from '@/stores/funding-store';
+import { useProfileStore } from '@/stores/profile-store';
 
 interface FundingCardProps {
   match: FundingMatch;
@@ -66,6 +68,116 @@ const IMPACT_BADGE: Record<string, string> = {
   medium: 'bg-amber-100 text-amber-700',
   low:    'bg-slate-100 text-slate-500',
 };
+
+// ── Requirements panel ────────────────────────────────────────────────────────
+
+interface RequirementMeta {
+  label: string;
+  mandatory: boolean;
+  // When this requirement fails AND this profile boolean is false, show a roadmap hint
+  gatedBy?: keyof Profile;
+  roadmapHint?: string;
+}
+
+const REQUIREMENT_META: Record<string, RequirementMeta> = {
+  age_eligible:                { label: 'Age requirement',      mandatory: true },
+  location_eligible:           { label: 'Location requirement', mandatory: true },
+  immigration_status_eligible: { label: 'Immigration status',   mandatory: true },
+  business_type_eligible:      { label: 'Business sector',      mandatory: true },
+  business_stage_eligible: {
+    label: 'Business stage',
+    mandatory: false,
+    gatedBy: 'has_neq',
+    roadmapHint: 'Complete REQ Registration in your Roadmap — it advances your stage from pre-launch to launching, boosting your score for this program.',
+  },
+  demographic_match: { label: 'Demographic criteria', mandatory: false },
+};
+
+function RequirementsPanel({
+  eligibilityDetails,
+  profile,
+}: {
+  eligibilityDetails: Record<string, boolean>;
+  profile: Profile | null;
+}) {
+  const entries = Object.entries(eligibilityDetails);
+  const mandatory = entries.filter(([k]) => REQUIREMENT_META[k]?.mandatory !== false);
+  const optional  = entries.filter(([k]) => REQUIREMENT_META[k]?.mandatory === false);
+
+  const roadmapHints = entries.filter(([k, v]) => {
+    if (v) return false;
+    const meta = REQUIREMENT_META[k];
+    if (!meta?.roadmapHint || !meta.gatedBy) return false;
+    return profile?.[meta.gatedBy] === false;
+  });
+
+  const label = (key: string) =>
+    REQUIREMENT_META[key]?.label ??
+    key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+  return (
+    <div>
+      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
+        Application requirements
+      </p>
+
+      {/* Mandatory */}
+      <ul className="space-y-1.5 mb-3">
+        {mandatory.map(([key, val]) => (
+          <li key={key} className="flex items-center gap-2.5 text-sm">
+            {val
+              ? <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
+              : <XCircle      size={14} className="text-red-400 shrink-0" />
+            }
+            <span className={val ? 'text-slate-700' : 'text-red-600 font-medium'}>
+              {label(key)}
+            </span>
+            {!val && (
+              <span className="ml-auto text-[10px] font-semibold bg-red-50 text-red-500 px-1.5 py-0.5 rounded-full uppercase tracking-wide shrink-0">
+                Required
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+
+      {/* Score boosters */}
+      {optional.length > 0 && (
+        <>
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1.5">
+            Score boosters
+          </p>
+          <ul className="space-y-1.5">
+            {optional.map(([key, val]) => (
+              <li key={key} className="flex items-center gap-2.5 text-sm">
+                {val
+                  ? <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
+                  : <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-300 shrink-0" />
+                }
+                <span className={val ? 'text-slate-700' : 'text-slate-400'}>{label(key)}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {/* Roadmap hints for fixable gaps */}
+      {roadmapHints.length > 0 && (
+        <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 px-3.5 py-2.5 flex items-start gap-2">
+          <ClipboardList size={13} className="text-amber-500 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-xs font-semibold text-amber-700 mb-1">Improve via your Roadmap</p>
+            {roadmapHints.map(([key]) => (
+              <p key={key} className="text-xs text-amber-600 leading-relaxed">
+                {REQUIREMENT_META[key]?.roadmapHint}
+              </p>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ── Structured AI explanation ─────────────────────────────────────────────────
 
@@ -148,6 +260,7 @@ function ExplanationPanel({ exp }: { exp: FundingExplanation }) {
 
 export default function FundingCard({ match }: FundingCardProps) {
   const { toggleBookmark } = useFundingStore();
+  const profile = useProfileStore((s) => s.profile);
   const [expanded, setExpanded] = useState(false);
   const [explaining, setExplaining] = useState(false);
   const [explanation, setExplanation] = useState<FundingExplanation | null>(null);
@@ -237,22 +350,25 @@ export default function FundingCard({ match }: FundingCardProps) {
       {expanded && (
         <div className="border-t border-slate-100 px-5 pb-5 pt-4 space-y-4">
 
-          {/* Raw eligibility checklist — shown only before AI explanation loads */}
-          {!explanation && match.eligibility_details && Object.keys(match.eligibility_details).length > 0 && (
+          {/* Requirements — always visible, roadmap hints for fixable gaps */}
+          {match.eligibility_details && Object.keys(match.eligibility_details).length > 0 && (
+            <RequirementsPanel
+              eligibilityDetails={match.eligibility_details}
+              profile={profile}
+            />
+          )}
+
+          {/* What you'll need to apply */}
+          {match.documents_required && match.documents_required.length > 0 && (
             <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-                Quick eligibility check
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                <FileText size={11} /> What you&apos;ll need to apply
               </p>
               <ul className="space-y-1.5">
-                {Object.entries(match.eligibility_details).map(([key, val]) => (
-                  <li key={key} className="flex items-center gap-2.5 text-sm">
-                    {val
-                      ? <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
-                      : <XCircle size={14} className="text-red-400 shrink-0" />
-                    }
-                    <span className={val ? 'text-slate-700' : 'text-slate-400'}>
-                      {key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
-                    </span>
+                {match.documents_required.map((doc, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700">
+                    <div className="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0 mt-1.5" />
+                    {doc}
                   </li>
                 ))}
               </ul>
