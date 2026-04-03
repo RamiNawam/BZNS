@@ -8,7 +8,6 @@ import {
   Map,
   DollarSign,
   BarChart3,
-  MessageSquare,
   FileText,
   LogOut,
   Settings,
@@ -17,20 +16,21 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useProfileStore } from '@/stores/profile-store';
+import { useTranslation } from '@/lib/i18n/useTranslation';
 
-const navItems: { href: string; label: string; icon: LucideIcon }[] = [
-  { href: '/dashboard',  label: 'Dashboard',    icon: LayoutDashboard },
-  { href: '/roadmap',    label: 'Roadmap',       icon: Map             },
-  { href: '/funding',    label: 'Funding',       icon: DollarSign      },
-  { href: '/financial',  label: 'Finances',      icon: BarChart3       },
-  { href: '/assistant',  label: 'AI Assistant',  icon: MessageSquare   },
-  { href: '/starter-kit',label: 'Starter Kit',   icon: FileText        },
+const navItems: { href: string; labelKey: string; icon: LucideIcon }[] = [
+  { href: '/dashboard',  labelKey: 'nav.dashboard',  icon: LayoutDashboard },
+  { href: '/roadmap',    labelKey: 'nav.roadmap',     icon: Map             },
+  { href: '/funding',    labelKey: 'nav.funding',     icon: DollarSign      },
+  { href: '/financial',  labelKey: 'nav.finances',    icon: BarChart3       },
+  { href: '/starter-kit',labelKey: 'nav.starterKit',  icon: FileText        },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { clearProfile } = useProfileStore();
+  const { t } = useTranslation();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   async function handleSignOut() {
@@ -51,7 +51,7 @@ export default function Sidebar() {
           </div>
           <div>
             <div className="font-heading font-bold text-slate-900 text-base leading-none">BZNS</div>
-            <div className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5">Micro-Business Launchpad</div>
+            <div className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5">{t('brand.tagline')}</div>
           </div>
         </Link>
       </div>
@@ -77,7 +77,7 @@ export default function Sidebar() {
                   isActive ? 'text-brand-600' : 'text-slate-400 group-hover:text-slate-600'
                 }`}
               />
-              <span>{item.label}</span>
+              <span>{t(item.labelKey)}</span>
               {isActive && (
                 <span className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500" />
               )}
@@ -102,7 +102,7 @@ export default function Sidebar() {
               pathname === '/settings' ? 'text-brand-600' : 'text-slate-400 group-hover:text-slate-600'
             }`}
           />
-          <span>Settings</span>
+          <span>{t('nav.settings')}</span>
           {pathname === '/settings' && (
             <span className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500" />
           )}
@@ -115,7 +115,7 @@ export default function Sidebar() {
           className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all duration-150 group disabled:opacity-50"
         >
           <LogOut size={17} className="shrink-0 text-slate-400 group-hover:text-slate-500 transition-colors" />
-          <span>{isSigningOut ? 'Signing out...' : 'Sign out'}</span>
+          <span>{isSigningOut ? t('nav.signingOut') : t('nav.signOut')}</span>
         </button>
       </div>
     </aside>

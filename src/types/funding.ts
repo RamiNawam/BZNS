@@ -22,6 +22,8 @@ export interface FundingMatch {
 
   is_bookmarked: boolean
   is_dismissed: boolean
+  // Populated at API layer from JSON knowledge base — not persisted in DB
+  documents_required?: string[]
 }
 
 // Shape of each program JSON in /data/funding/*.json
@@ -41,7 +43,8 @@ export interface FundingProgramJSON {
     business_types?: string[]
     business_structures?: string[]
     max_employees?: number
-    demographics?: string[]   // e.g. ['immigrant', 'woman', 'youth']
+    demographics?: string[]         // e.g. ['immigrant', 'woman', 'youth']
+    business_stages?: string[]      // e.g. ['pre_launch', 'launching', 'operating']
   }
   scoring_weights: {
     age: number
@@ -50,8 +53,23 @@ export interface FundingProgramJSON {
     business_type: number
     demographics: number
   }
+  documents_required: string[]
 }
 
 // DTOs
 export type CreateFundingMatchDTO = Omit<FundingMatch, 'id' | 'created_at'>
 export type UpdateFundingMatchDTO = Pick<FundingMatch, 'is_bookmarked' | 'is_dismissed'>
+
+// Structured AI explanation — returned by /api/funding POST with explain_program
+export interface FundingExplanationFactor {
+  label: string                         // e.g. "Age requirement"
+  detail: string                        // e.g. "You are 26, within the required 18–39 range"
+  impact: 'high' | 'medium' | 'low'   // how much this factor affects the score
+}
+
+export interface FundingExplanation {
+  program_overview: string              // 2 sentences: what it is + why it matched this user
+  eligible_factors: FundingExplanationFactor[]  // things the user has that qualify them
+  missing_factors: Array<{ label: string; detail: string }>  // gaps or improvements
+  next_step: string                     // single concrete action sentence
+}

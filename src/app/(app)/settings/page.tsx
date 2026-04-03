@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useProfileStore } from '@/stores/profile-store';
+import { useRoadmapStore } from '@/stores/roadmap-store';
 import { createClient } from '@/lib/supabase/client';
 import { Save, CheckCircle2, AlertCircle, Info } from 'lucide-react';
 
@@ -142,6 +143,7 @@ export default function SettingsPage() {
 
       console.log('[Settings] Save OK — refreshing profile store');
       await loadProfile();
+      useRoadmapStore.getState().markStale();
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {

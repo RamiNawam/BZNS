@@ -1,5 +1,8 @@
 import { create } from "zustand";
 import type { RoadmapStep, StepStatus, GapFlag } from "@/types/roadmap";
+import { STEP_PROFILE_SYNC } from "@/lib/roadmap/step-profile-sync";
+import { useProfileStore } from "@/stores/profile-store";
+import { useFundingStore } from "@/stores/funding-store";
 
 interface RoadmapStore {
   steps: RoadmapStep[];
@@ -7,6 +10,8 @@ interface RoadmapStore {
   isLoading: boolean;
   isGenerating: boolean;
   error: string | null;
+  /** True when business settings changed since the roadmap was last generated */
+  isStale: boolean;
 
   loadRoadmap: (profileId: string) => Promise<void>;
   generateRoadmap: (profileId: string) => Promise<void>;
@@ -16,6 +21,8 @@ interface RoadmapStore {
     profileId: string,
     status: StepStatus,
   ) => Promise<void>;
+  /** Called from settings page after saving business-relevant changes */
+  markStale: () => void;
 }
 
 export const useRoadmapStore = create<RoadmapStore>((set, get) => ({
@@ -24,6 +31,7 @@ export const useRoadmapStore = create<RoadmapStore>((set, get) => ({
   isLoading: false,
   isGenerating: false,
   error: null,
+  isStale: false,
 
   loadRoadmap: async (profileId) => {
     // Don't clobber an in-flight generation with a quick GET that returns 0 steps
@@ -45,6 +53,8 @@ export const useRoadmapStore = create<RoadmapStore>((set, get) => ({
     }
   },
 
+  markStale: () => set({ isStale: true }),
+
   generateRoadmap: async (profileId) => {
     set({ isLoading: true, isGenerating: true, error: null });
     try {
@@ -58,7 +68,7 @@ export const useRoadmapStore = create<RoadmapStore>((set, get) => ({
         throw new Error(errData.error ?? "Failed to generate roadmap");
       }
       const data = await response.json();
-      set({ steps: data.steps ?? [], flags: data.flags ?? [] });
+      set({ steps: data.steps ?? [], flags: data.flags ?? [], isStale: false });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : "Unknown error" });
     } finally {
@@ -82,7 +92,7 @@ export const useRoadmapStore = create<RoadmapStore>((set, get) => ({
         throw new Error(errData.error ?? "Failed to regenerate roadmap");
       }
       const data = await response.json();
-      set({ steps: data.steps ?? [], flags: data.flags ?? [] });
+      set({ steps: data.steps ?? [], flags: data.flags ?? [], isStale: false });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : "Unknown error" });
     } finally {
@@ -133,6 +143,16 @@ export const useRoadmapStore = create<RoadmapStore>((set, get) => ({
             : s,
         ),
       }));
+
+      // If step was just completed, check for profile field updates and refresh funding
+      if (status === "completed") {
+        const step = get().steps.find((s) => s.id === stepId);
+        const profileUpdates = step ? STEP_PROFILE_SYNC[step.step_key] : undefined;
+        if (profileUpdates) {
+          await useProfileStore.getState().updateProfile(profileUpdates);
+          useFundingStore.getState().generateMatches();
+        }
+      }
     } catch (err) {
       // Rollback on failure
       set({

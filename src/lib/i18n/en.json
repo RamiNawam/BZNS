@@ -4,8 +4,23 @@
     "intake": "Business Profile",
     "roadmap": "Roadmap",
     "funding": "Funding",
+    "finances": "Finances",
     "starterKit": "Starter Kit",
-    "assistant": "AI Assistant"
+    "settings": "Settings",
+    "signOut": "Sign out",
+    "signingOut": "Signing out..."
+  },
+  "brand": {
+    "tagline": "Micro-Business Launchpad"
+  },
+  "topbar": {
+    "dashboard": { "title": "Dashboard", "subtitle": "Your business overview" },
+    "roadmap": { "title": "Legal Roadmap", "subtitle": "Step-by-step registration guide" },
+    "funding": { "title": "Funding Matcher", "subtitle": "Québec programs you qualify for" },
+    "financial": { "title": "Finances", "subtitle": "Your financial snapshot" },
+    "starterKit": { "title": "Starter Kit", "subtitle": "Download-ready templates" },
+    "intake": { "title": "Business Profile", "subtitle": "Tell us about your idea" },
+    "settings": { "title": "Settings", "subtitle": "Your profile and preferences" }
   },
   "home": {
     "title": "BZNS — Micro-Business Launchpad",
@@ -39,8 +54,21 @@
     }
   },
   "roadmap": {
-    "title": "Your Roadmap",
+    "title": "Legal Roadmap",
+    "subtitle": "Personalized, dependency-ordered steps to launch your business in Québec legally.",
     "empty": "Complete your business profile to generate a personalised roadmap.",
+    "noRoadmapTitle": "No roadmap yet",
+    "noRoadmapProfile": "Complete your business profile first.",
+    "noRoadmapGenerate": "Generate your personalised legal checklist.",
+    "generateBtn": "Generate My Roadmap",
+    "staleWarning": "Your settings changed since this roadmap was generated.",
+    "updateBtn": "Update roadmap",
+    "reviewBanner": "We reviewed your roadmap for your specific business",
+    "reviewDetail": "need your attention before moving forward — tap the highlighted steps to see what to confirm.",
+    "stepsCompleted": "steps completed",
+    "verified": "verified",
+    "needsAttention": "needs attention",
+    "recommendedForBusiness": "recommended for your business",
     "categories": {
       "registration": "Registration",
       "permits": "Permits",
@@ -48,20 +76,92 @@
       "banking": "Banking",
       "insurance": "Insurance",
       "other": "Other"
-    }
+    },
+    "status": {
+      "pending": "To do",
+      "in_progress": "In progress",
+      "completed": "Done",
+      "skipped": "Skipped"
+    },
+    "confidence": {
+      "verified": "Verified",
+      "needsAttention": "Needs Attention",
+      "recommended": "Recommended"
+    },
+    "itemsToReview": "items to review",
+    "completeFirst": "Complete \"{step}\" first"
   },
   "funding": {
     "title": "Funding Matches",
+    "subtitle": "Québec programs you qualify for",
     "empty": "Complete your business profile to see funding matches.",
     "score": "Match score",
     "recommended": "Recommended",
     "learnMore": "Learn more"
   },
+  "financial": {
+    "title": "Finances",
+    "subtitle": "Your financial snapshot"
+  },
   "assistant": {
-    "title": "AI Assistant",
-    "placeholder": "Ask me anything about starting your business in Quebec...",
+    "greeting": "Hey! How can I help you today?",
+    "title": "BZNS Assistant",
+    "placeholder": "Ask about registration, taxes, funding...",
     "send": "Send",
-    "thinking": "Thinking..."
+    "thinking": "Thinking...",
+    "clear": "Clear",
+    "emptyState": "Ask me anything about your business in Quebec."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your profile and business information.",
+    "roadmapNotice": "After saving changes to your business type or location, go to your dashboard and click {bold} to get updated steps.",
+    "roadmapNoticeBold": "Generate My Roadmap",
+    "account": "Account",
+    "email": "Email",
+    "emailHint": "Your login email — managed through magic link authentication.",
+    "fullName": "Full name",
+    "preferredLanguage": "Preferred language",
+    "yourBusiness": "Your Business",
+    "businessType": "Business type",
+    "businessTypeHint": "Used to select the right legal steps and funding programs for your roadmap.",
+    "businessName": "Business name",
+    "businessNameHint": "Leave blank if you haven't chosen a name yet.",
+    "businessDescription": "Business description",
+    "businessDescriptionHint": "A short summary of what you do. Used to personalize your roadmap.",
+    "location": "Location",
+    "city": "City / Municipality",
+    "borough": "Borough",
+    "boroughHint": "Montréal borough, if applicable (e.g. Villeray, Plateau-Mont-Royal).",
+    "businessLocation": "Business location",
+    "homeBased": "Home-based business",
+    "aboutYou": "About You",
+    "age": "Age",
+    "immigrationStatus": "Immigration status",
+    "revenue": "Revenue",
+    "expectedRevenue": "Expected monthly revenue (CAD)",
+    "expectedRevenueHint": "Used to calculate your tax snapshot and GST/QST registration threshold.",
+    "changesSaved": "Changes saved",
+    "saveChanges": "Save changes",
+    "saving": "Saving…"
+  },
+  "dashboard": {
+    "welcome": "Welcome back",
+    "completeIntakeTitle": "Let's get started",
+    "completeIntakeSubtitle": "Complete your business profile to unlock your personalized roadmap, funding matches, and financial snapshot.",
+    "startIntake": "Start business profile",
+    "roadmapProgress": "Roadmap Progress",
+    "stepsCompleted": "steps completed",
+    "completeIntakeToGenerate": "Complete intake to generate",
+    "viewRoadmap": "View roadmap",
+    "fundingAvailable": "Funding Available",
+    "acrossPrograms": "across matched programs",
+    "viewMatches": "View matches",
+    "financesLabel": "Finances",
+    "viewFinancialSnapshot": "your financial snapshot",
+    "viewFinances": "View finances",
+    "staleWarning": "Your settings changed since this roadmap was generated.",
+    "updateRoadmap": "Update roadmap"
   },
   "common": {
     "save": "Save",
@@ -69,6 +169,7 @@
     "next": "Next",
     "back": "Back",
     "loading": "Loading...",
-    "error": "Something went wrong. Please try again."
+    "error": "Something went wrong. Please try again.",
+    "of": "of"
   }
 }

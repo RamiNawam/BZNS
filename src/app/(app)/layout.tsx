@@ -18,6 +18,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { ProfileRepository } from '@/repositories/profile.repository'
 import Sidebar from '@/components/layout/sidebar'
 import TopBar from '@/components/layout/top-bar'
+import FloatingAssistant from '@/components/assistant/floating-assistant'
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const pathname = headers().get('x-pathname') ?? ''
@@ -69,6 +70,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         <TopBar />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
+      <FloatingAssistant />
     </div>
   )
 }

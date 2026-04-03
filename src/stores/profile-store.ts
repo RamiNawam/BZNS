@@ -39,6 +39,9 @@ interface ProfileStore {
   // Set profile directly (used by server-fetched data)
   setProfile: (profile: Profile) => void
 
+  // Patch specific profile fields (called after roadmap step completion)
+  updateProfile: (updates: Partial<Profile>) => Promise<void>
+
   clearProfile: () => void
 }
 
@@ -109,6 +112,23 @@ export const useProfileStore = create<ProfileStore>()(
           set({ error: err instanceof Error ? err.message : 'Unknown error' })
         } finally {
           set({ isLoading: false })
+        }
+      },
+
+      updateProfile: async (updates) => {
+        const { profile } = get()
+        if (!profile) return
+        try {
+          const response = await fetch('/api/profile', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ profile_id: profile.id, updates }),
+          })
+          if (!response.ok) return
+          const data = await response.json()
+          set({ profile: data.profile })
+        } catch {
+          // silent — profile update is a background sync, not user-initiated
         }
       },
 

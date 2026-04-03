@@ -6,10 +6,11 @@ import {
   RefreshCw,
   ShieldCheck,
   Sparkles,
-  AlertTriangle,
+  Search,
 } from "lucide-react";
 import { useRoadmapStore } from "@/stores/roadmap-store";
 import { useProfileStore } from "@/stores/profile-store";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import RoadmapStep from "./roadmap-step";
 import ProgressBar from "@/components/ui/progress-bar";
 
@@ -39,27 +40,29 @@ function ConfidenceLegend({
   verified,
   flagged,
   inferred,
+  t,
 }: {
   verified: number;
   flagged: number;
   inferred: number;
+  t: (key: string) => string;
 }) {
   return (
     <div className="flex flex-wrap gap-4 text-xs">
       <span className="inline-flex items-center gap-1.5 text-emerald-700">
         <ShieldCheck size={13} />
-        {verified} verified
+        {verified} {t("roadmap.verified")}
       </span>
       {flagged > 0 && (
-        <span className="inline-flex items-center gap-1.5 text-red-600 font-medium">
-          <AlertTriangle size={13} />
-          {flagged} flagged
+        <span className="inline-flex items-center gap-1.5 text-amber-600 font-medium">
+          <Search size={13} />
+          {flagged} {t("roadmap.needsAttention")}
         </span>
       )}
       {inferred > 0 && (
-        <span className="inline-flex items-center gap-1.5 text-amber-600">
+        <span className="inline-flex items-center gap-1.5 text-teal-600">
           <Sparkles size={13} />
-          {inferred} AI-added
+          {inferred} {t("roadmap.recommendedForBusiness")}
         </span>
       )}
     </div>
@@ -70,29 +73,24 @@ function ConfidenceLegend({
 function FlagSummaryBanner({
   highCount,
   mediumCount,
+  t,
 }: {
   highCount: number;
   mediumCount: number;
+  t: (key: string) => string;
 }) {
   if (highCount === 0 && mediumCount === 0) return null;
 
   return (
-    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+    <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
       <div className="flex items-start gap-2.5">
-        <AlertTriangle size={16} className="shrink-0 text-red-500 mt-0.5" />
+        <Search size={16} className="shrink-0 text-amber-600 mt-0.5" />
         <div>
-          <p className="text-sm font-semibold text-red-800">
-            Adversarial review found {highCount + mediumCount} issue
-            {highCount + mediumCount > 1 ? "s" : ""}
+          <p className="text-sm font-semibold text-amber-800">
+            {t("roadmap.reviewBanner")}
           </p>
-          <p className="text-xs text-red-600 mt-0.5">
-            {highCount > 0 && (
-              <span className="font-semibold">{highCount} high severity</span>
-            )}
-            {highCount > 0 && mediumCount > 0 && " + "}
-            {mediumCount > 0 && <span>{mediumCount} medium severity</span>}{" "}
-            &mdash; expand flagged steps (red border) for details and
-            recommendations.
+          <p className="text-xs text-amber-700 mt-0.5">
+            {highCount + mediumCount} {t("roadmap.reviewDetail")}
           </p>
         </div>
       </div>
@@ -102,14 +100,10 @@ function FlagSummaryBanner({
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function RoadmapList() {
-  const { steps, flags, isLoading, loadRoadmap, generateRoadmap, regenerateRoadmap } =
+  const { steps, flags, isLoading, isStale, loadRoadmap, generateRoadmap, regenerateRoadmap } =
     useRoadmapStore();
   const { profile } = useProfileStore();
-
-  const roadmapIsStale =
-    steps.length > 0 &&
-    !!profile?.updated_at &&
-    new Date(profile.updated_at) > new Date(steps[0].created_at);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (profile?.id) {
@@ -151,12 +145,12 @@ export default function RoadmapList() {
         </div>
         <div>
           <p className="font-heading font-semibold text-slate-900">
-            No roadmap yet
+            {t("roadmap.noRoadmapTitle")}
           </p>
           <p className="text-sm text-slate-500 mt-1">
             {profile?.id
-              ? "Generate your personalised legal checklist."
-              : "Complete your business profile first."}
+              ? t("roadmap.noRoadmapGenerate")
+              : t("roadmap.noRoadmapProfile")}
           </p>
         </div>
         {profile?.id && (
@@ -164,7 +158,7 @@ export default function RoadmapList() {
             onClick={() => generateRoadmap(profile.id)}
             className="btn-primary"
           >
-            Generate My Roadmap
+            {t("roadmap.generateBtn")}
           </button>
         )}
       </div>
@@ -175,36 +169,37 @@ export default function RoadmapList() {
   return (
     <div className="space-y-5">
       {/* Stale warning */}
-      {roadmapIsStale && (
+      {isStale && (
         <div className="flex items-center justify-between gap-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
           <div className="flex items-center gap-2.5 text-sm text-amber-800">
             <RefreshCw size={15} className="shrink-0 text-amber-600" />
-            <span>Your settings changed since this roadmap was generated.</span>
+            <span>{t("roadmap.staleWarning")}</span>
           </div>
           <button
             onClick={() => profile?.id && regenerateRoadmap(profile.id)}
             disabled={isLoading}
             className="shrink-0 text-xs font-semibold text-amber-700 border border-amber-300 bg-white hover:bg-amber-50 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50"
           >
-            Update roadmap
+            {t("roadmap.updateBtn")}
           </button>
         </div>
       )}
 
       {/* Flag summary banner — shown when adversarial review found issues */}
-      <FlagSummaryBanner highCount={highFlags} mediumCount={mediumFlags} />
+      <FlagSummaryBanner highCount={highFlags} mediumCount={mediumFlags} t={t} />
 
       {/* Progress + confidence legend */}
       <div className="card p-5 space-y-3">
         <ProgressBar
           value={progress}
-          label={`${completed} of ${steps.length} steps completed`}
+          label={`${completed} ${t("common.of")} ${steps.length} ${t("roadmap.stepsCompleted")}`}
           showValue
         />
         <ConfidenceLegend
           verified={verified}
           flagged={flagged}
           inferred={inferred}
+          t={t}
         />
       </div>
 

@@ -6,8 +6,9 @@
     "status": "active",
     "verify_urls": {
       "main": "https://www.investquebec.com/en/",
-      "plan_pme": "https://www.investquebec.com/en/",
-      "startup": "https://www.investquebec.com/en/"
+      "plan_pme": "https://www.investquebec.com/en/entrepreneurs/financing/loan",
+      "startup": "https://www.investquebec.com/en/entrepreneurs/financing/loan",
+      "apply": "https://www.investquebec.com/en/entrepreneurs/financing/loan"
     }
   },
   "id": "investissement_quebec",

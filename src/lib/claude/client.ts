@@ -21,7 +21,7 @@ export function getAnthropicClient(): Anthropic {
 export async function askClaude(
   systemPrompt: string,
   userMessage: string,
-  model = 'claude-opus-4-5',
+  model = 'claude-sonnet-4-6',
   maxTokens = 4096
 ): Promise<string> {
   const client = getAnthropicClient();

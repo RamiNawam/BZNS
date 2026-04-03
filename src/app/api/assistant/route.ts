@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { profile_id, message, session_id, context_type } = body
+    const { profile_id, message, session_id, context_type, page_context, context_data } = body
 
     if (!profile_id) return NextResponse.json({ error: 'profile_id required' }, { status: 400 })
     if (!message || typeof message !== 'string') {
@@ -37,14 +37,16 @@ export async function POST(req: NextRequest) {
 
     const resolvedSessionId = session_id ?? randomUUID()
 
-    const reply = await AssistantService.chat(
+    const result = await AssistantService.chat(
       profile_id,
       message,
       resolvedSessionId,
-      context_type
+      context_type,
+      page_context,
+      context_data
     )
 
-    return NextResponse.json({ reply, session_id: resolvedSessionId })
+    return NextResponse.json({ reply: result.message, session_id: resolvedSessionId })
   } catch (err) {
     console.error('[POST /api/assistant]', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
