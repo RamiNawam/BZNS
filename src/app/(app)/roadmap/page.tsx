@@ -3,10 +3,12 @@
 import { useEffect } from 'react';
 import { Map } from 'lucide-react';
 import { useProfileStore } from '@/stores/profile-store';
+import { useTranslation } from '@/lib/i18n/useTranslation';
 import RoadmapList from '@/components/roadmap/roadmap-list';
 
 export default function RoadmapPage() {
   const { profile, loadProfile } = useProfileStore();
+  const { t } = useTranslation();
 
   useEffect(() => {
     loadProfile();
@@ -17,9 +19,9 @@ export default function RoadmapPage() {
 
       {/* Header */}
       <div>
-        <h1 className="page-title">Legal Roadmap</h1>
+        <h1 className="page-title">{t('roadmap.title')}</h1>
         <p className="page-subtitle">
-          Personalized, dependency-ordered steps to launch your business in Québec legally.
+          {t('roadmap.subtitle')}
         </p>
       </div>
 
@@ -30,8 +32,8 @@ export default function RoadmapPage() {
             <Map size={24} className="text-slate-400" />
           </div>
           <div>
-            <p className="font-heading font-semibold text-slate-900">Complete your business profile first</p>
-            <p className="text-sm text-slate-500 mt-1">We need to know about your business before we can generate your roadmap.</p>
+            <p className="font-heading font-semibold text-slate-900">{t('roadmap.noRoadmapProfile')}</p>
+            <p className="text-sm text-slate-500 mt-1">{t('roadmap.empty')}</p>
           </div>
         </div>
       )}

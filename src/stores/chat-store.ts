@@ -22,7 +22,7 @@ interface ChatStore {
     extra?: { profile_id?: string; page_context?: string; context_data?: object },
   ) => Promise<void>;
   /** Show the static greeting as the first assistant message */
-  showGreeting: () => void;
+  showGreeting: (text?: string) => void;
   clearMessages: () => void;
 }
 
@@ -85,7 +85,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }
   },
 
-  showGreeting: () => {
+  showGreeting: (text) => {
     if (get().greeted) return;
     set({
       greeted: true,
@@ -93,7 +93,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         {
           id: generateId(),
           role: 'assistant',
-          content: 'Hey! How can I help you today?',
+          content: text ?? 'Hey! How can I help you today?',
           created_at: new Date().toISOString(),
         },
       ],

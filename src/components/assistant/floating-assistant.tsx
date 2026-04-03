@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { MessageSquare, X, Send } from 'lucide-react';
 import { useChatStore } from '@/stores/chat-store';
 import { useProfileStore } from '@/stores/profile-store';
+import { useTranslation } from '@/lib/i18n/useTranslation';
 import MessageBubble from './message-bubble';
 
 // ── Route → readable context ─────────────────────────────────────────────────
@@ -44,6 +45,7 @@ export default function FloatingAssistant() {
 
   const { messages, isLoading, sendMessage, showGreeting, clearMessages } = useChatStore();
   const { profile } = useProfileStore();
+  const { t } = useTranslation();
 
   // Fetch full data context once on mount
   useEffect(() => {
@@ -79,7 +81,7 @@ export default function FloatingAssistant() {
   // Static greeting on first open
   function handleOpen() {
     setIsOpen(true);
-    showGreeting();
+    showGreeting(t('assistant.greeting'));
   }
 
   // Auto-scroll to bottom on new messages
@@ -122,7 +124,7 @@ export default function FloatingAssistant() {
               🤖
             </div>
             <div>
-              <span className="font-semibold text-slate-800 text-sm">BZNS Assistant</span>
+              <span className="font-semibold text-slate-800 text-sm">{t('assistant.title')}</span>
               <span className="ml-2 h-1.5 w-1.5 rounded-full bg-green-400 inline-block" />
             </div>
           </div>
@@ -131,7 +133,7 @@ export default function FloatingAssistant() {
               onClick={clearMessages}
               className="text-[10px] text-slate-400 hover:text-slate-600 transition-colors"
             >
-              Clear
+              {t('assistant.clear')}
             </button>
             <button
               onClick={() => setIsOpen(false)}
@@ -147,7 +149,7 @@ export default function FloatingAssistant() {
           {messages.length === 0 && !isLoading && (
             <div className="text-center text-slate-400 text-xs mt-6 px-4">
               <p className="text-lg mb-1.5">👋</p>
-              <p>Ask me anything about your business in Quebec.</p>
+              <p>{t('assistant.emptyState')}</p>
             </div>
           )}
 
@@ -177,7 +179,7 @@ export default function FloatingAssistant() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about registration, taxes, funding..."
+            placeholder={t('assistant.placeholder')}
             rows={1}
             className="flex-1 resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
           />

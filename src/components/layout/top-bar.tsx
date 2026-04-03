@@ -1,51 +1,75 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Bell, Settings } from 'lucide-react';
-import { useProfileStore } from '@/stores/profile-store';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Bell, Settings } from "lucide-react";
+import { useProfileStore } from "@/stores/profile-store";
+import { useLocaleStore } from "@/stores/locale-store";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
-const pageTitles: Record<string, { title: string; subtitle: string }> = {
-  '/dashboard': { title: 'Dashboard', subtitle: 'Your business overview' },
-  '/roadmap': { title: 'Legal Roadmap', subtitle: 'Step-by-step registration guide' },
-  '/funding': { title: 'Funding Matcher', subtitle: 'Québec programs you qualify for' },
-  '/starter-kit': { title: 'Starter Kit', subtitle: 'Download-ready templates' },
-  '/intake': { title: 'Business Profile', subtitle: 'Tell us about your idea' },
-  '/settings': { title: 'Settings', subtitle: 'Your profile and preferences' },
+const pageKeys: Record<string, string> = {
+  "/dashboard": "dashboard",
+  "/roadmap": "roadmap",
+  "/funding": "funding",
+  "/financial": "financial",
+  "/starter-kit": "starterKit",
+  "/intake": "intake",
+  "/settings": "settings",
 };
 
-function getInitials(profile: { full_name?: string | null; business_name?: string | null } | null): string {
+function getInitials(
+  profile: { full_name?: string | null; business_name?: string | null } | null,
+): string {
   if (profile?.full_name) {
     return profile.full_name
-      .split(' ')
+      .split(" ")
       .filter(Boolean)
       .map((n) => n[0])
-      .join('')
+      .join("")
       .slice(0, 2)
       .toUpperCase();
   }
   if (profile?.business_name) {
     return profile.business_name.slice(0, 2).toUpperCase();
   }
-  return 'U';
+  return "U";
 }
 
 export default function TopBar() {
   const pathname = usePathname();
-  const page = pageTitles[pathname] ?? { title: 'BZNS', subtitle: '' };
+  const { t } = useTranslation();
+  const { locale, setLocale } = useLocaleStore();
   const { profile } = useProfileStore();
   const initials = getInitials(profile);
+
+  const key = pageKeys[pathname];
+  const title = key ? t(`topbar.${key}.title`) : "BZNS";
+  const subtitle = key ? t(`topbar.${key}.subtitle`) : "";
 
   return (
     <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
       <div>
-        <h1 className="font-heading font-semibold text-slate-900 text-base leading-none">{page.title}</h1>
-        {page.subtitle && (
-          <p className="text-xs text-slate-400 mt-0.5">{page.subtitle}</p>
+        <h1 className="font-heading font-semibold text-slate-900 text-base leading-none">
+          {title}
+        </h1>
+        {subtitle && (
+          <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>
         )}
       </div>
 
       <div className="flex items-center gap-2">
+        {/* Language toggle */}
+        <button
+          type="button"
+          onClick={() => setLocale(locale === "en" ? "fr" : "en")}
+          className="h-8 px-2.5 rounded-lg flex items-center justify-center text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 border border-slate-200 transition-colors"
+          aria-label={
+            locale === "en" ? "Passer au français" : "Switch to English"
+          }
+        >
+          {locale === "en" ? "EN" : "FR"}
+        </button>
+
         <button
           type="button"
           className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
@@ -66,7 +90,7 @@ export default function TopBar() {
         <Link
           href="/settings"
           className="h-8 w-8 rounded-full bg-brand-100 border-2 border-brand-200 flex items-center justify-center hover:border-brand-400 transition-colors"
-          title={profile?.business_name ?? profile?.full_name ?? 'Your profile'}
+          title={profile?.business_name ?? profile?.full_name ?? "Your profile"}
         >
           <span className="text-xs font-bold text-brand-700">{initials}</span>
         </Link>
