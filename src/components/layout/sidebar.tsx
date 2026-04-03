@@ -8,7 +8,6 @@ import {
   Map,
   DollarSign,
   BarChart3,
-  MessageSquare,
   FileText,
   LogOut,
   Settings,
@@ -23,7 +22,6 @@ const navItems: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/roadmap',    label: 'Roadmap',       icon: Map             },
   { href: '/funding',    label: 'Funding',       icon: DollarSign      },
   { href: '/financial',  label: 'Finances',      icon: BarChart3       },
-  { href: '/assistant',  label: 'AI Assistant',  icon: MessageSquare   },
   { href: '/starter-kit',label: 'Starter Kit',   icon: FileText        },
 ];
 

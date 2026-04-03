@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   Map,
   DollarSign,
-  MessageSquare,
+  BarChart3,
   CheckCircle2,
   ArrowRight,
   Sparkles,
@@ -182,14 +182,14 @@ export default function DashboardPage() {
           cta="View matches"
         />
         <StatCard
-          href="/assistant"
-          icon={MessageSquare}
+          href="/financial"
+          icon={BarChart3}
           iconBg="bg-violet-50"
           iconColor="text-violet-600"
-          label="AI Assistant"
-          value="Ask"
-          sub="anything about your business"
-          cta="Open chat"
+          label="Finances"
+          value="View"
+          sub="your financial snapshot"
+          cta="View finances"
         />
       </div>
 

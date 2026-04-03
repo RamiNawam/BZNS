@@ -9,7 +9,6 @@ const pageTitles: Record<string, { title: string; subtitle: string }> = {
   '/dashboard': { title: 'Dashboard', subtitle: 'Your business overview' },
   '/roadmap': { title: 'Legal Roadmap', subtitle: 'Step-by-step registration guide' },
   '/funding': { title: 'Funding Matcher', subtitle: 'Québec programs you qualify for' },
-  '/assistant': { title: 'AI Assistant', subtitle: 'Ask anything about your business' },
   '/starter-kit': { title: 'Starter Kit', subtitle: 'Download-ready templates' },
   '/intake': { title: 'Business Profile', subtitle: 'Tell us about your idea' },
   '/settings': { title: 'Settings', subtitle: 'Your profile and preferences' },

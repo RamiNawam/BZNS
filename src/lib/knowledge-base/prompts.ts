@@ -508,6 +508,8 @@ export function buildAssistantPrompt(
   snapshot: FinancialSnapshot,
   history: ChatMessage[],
   kbJson: string,
+  pageContext?: string,
+  spendingContext?: string,
 ): string {
   const completedSteps = roadmap.filter((s) => s.completed).length;
   const pendingSteps = roadmap.filter((s) => !s.completed);
@@ -571,6 +573,31 @@ Net income YTD: $${snapshot.net_income_ytd.toLocaleString()} CAD
 GST/QST collected YTD: $${snapshot.gst_qst_collected_ytd.toLocaleString()} CAD
 Last updated: ${snapshot.last_updated}
 
+## Projection basis
+
+The figures above represent the user's current monthly estimates. When the user asks about future periods (next 3 months, next quarter, end of year), project these monthly figures forward as a baseline assuming current pace continues. Always clarify this is a projection based on current monthly estimates, not guaranteed income.
+
+When projecting, multiply monthly figures by the number of months requested. Always connect projections to relevant thresholds:
+- Annual revenue pace vs $30,000 GST/QST threshold — flag if annualized revenue will cross it
+- Whether quarterly tax installments will be required at that annual income level
+- QPP contribution implications at the projected annual income
+
+## Current page
+
+The user is currently ${pageContext ?? 'browsing the app'}.
+
+## Spending intelligence
+
+${spendingContext ?? 'No financial data available yet.'}
+
+## Proactive flags
+
+Before answering the user's question, check if any of the following apply and mention them briefly if relevant:
+- If monthly revenue pace suggests the user will cross the $30,000 GST/QST threshold within 8 weeks, flag it
+- If any expense categories are disproportionate relative to expected revenue, flag it
+- If any roadmap steps are high severity flagged and incomplete, mention the most critical one
+Only surface these if genuinely relevant to what the user is asking. Do not repeat flags the user has already acknowledged.
+
 ## Matched funding programs
 
 ${fundingSummary}
@@ -594,5 +621,6 @@ ${historyBlock}
 - Never invent dollar amounts, deadlines, or legal requirements.
 - If the user writes in French, respond entirely in French.
 - Keep responses focused. Do not recite the entire roadmap unless asked.
-- If a required roadmap step is still pending and relevant to the question, mention it briefly.`;
+- If a required roadmap step is still pending and relevant to the question, mention it briefly.
+- Do not repeat information you have already shared earlier in this conversation. If the user asks the same question twice, acknowledge you already covered it and ask if they need clarification on something specific.`;
 }

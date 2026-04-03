@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { MessageRole } from '@/types/chat';
 
 // Lightweight client-side message shape (no DB-required fields)
-interface ClientMessage {
+export interface ClientMessage {
   id: string;
   role: MessageRole;
   content: string;
@@ -14,8 +14,15 @@ interface ChatStore {
   messages: ClientMessage[];
   isLoading: boolean;
   error: string | null;
+  /** True after the static greeting has been shown this session */
+  greeted: boolean;
 
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (
+    content: string,
+    extra?: { profile_id?: string; page_context?: string; context_data?: object },
+  ) => Promise<void>;
+  /** Show the static greeting as the first assistant message */
+  showGreeting: () => void;
   clearMessages: () => void;
 }
 
@@ -28,8 +35,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   messages: [],
   isLoading: false,
   error: null,
+  greeted: false,
 
-  sendMessage: async (content) => {
+  sendMessage: async (content, extra) => {
     const userMessage: ClientMessage = {
       id: generateId(),
       role: 'user',
@@ -48,6 +56,10 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          profile_id: extra?.profile_id,
+          message: content,
+          page_context: extra?.page_context,
+          context_data: extra?.context_data,
           messages: get().messages.map(({ role, content: c }) => ({ role, content: c })),
         }),
       });
@@ -73,5 +85,20 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }
   },
 
-  clearMessages: () => set({ messages: [], error: null }),
+  showGreeting: () => {
+    if (get().greeted) return;
+    set({
+      greeted: true,
+      messages: [
+        {
+          id: generateId(),
+          role: 'assistant',
+          content: 'Hey! How can I help you today?',
+          created_at: new Date().toISOString(),
+        },
+      ],
+    });
+  },
+
+  clearMessages: () => set({ messages: [], error: null, greeted: false }),
 }));
