@@ -3,7 +3,7 @@
 // snake_case matches Supabase's default column naming
 // ============================================================
 
-export type ClusterID = 'C1' | 'C2' | 'C3' | 'C4' | 'C5' | 'C6' | 'C7' | 'C8' | 'C9'
+export type ClusterID = 'C1' | 'C2' | 'C3' | 'C4' | 'C5' | 'C6' | 'C7' | 'C8' | 'C9' | 'C10' | 'C11' | 'C12'
 export type ClusterComplexity = 'low' | 'medium' | 'high'
 
 export type BusinessType =
@@ -81,7 +81,14 @@ export interface Profile {
 
 // Raw answers from the intake wizard (sent from the frontend)
 export interface IntakeAnswers {
-  business_category: string          // structured category for C1-C9 classification
+  // Classification questions (we classify, not the user)
+  business_name: string
+  business_activity: string         // food | services | products | trades | children
+  work_location: string             // home | commercial | client_sites | online
+  license_type: string              // professional_order | trade_cert | food_handling | none
+  pricing_model: string             // per_item | per_hour | per_session | per_project | subscription
+
+  // Legal roadmap questions
   business_idea: string
   location: string
   borough?: string

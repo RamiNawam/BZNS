@@ -14,7 +14,7 @@ const fmt = (n: number) =>
 export default function SnapshotCard() {
   const { profile } = useProfileStore();
   const monthlyRevenue  = profile?.expected_monthly_revenue ?? 0;
-  const clusterId = (profile?.cluster_id ?? 'C9') as ClusterID;
+  const clusterId = (profile?.cluster_id ?? 'C2') as ClusterID;
   const monthlyExpenses = getExpenseDefaults(clusterId).total;
 
   const taxes = useMemo(

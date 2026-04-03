@@ -24,37 +24,45 @@ export const ProfileService = {
   async createFromIntake(user_id: string, answers: IntakeAnswers): Promise<Profile> {
     console.log(`[ProfileService.createFromIntake] START user_id=${user_id} business_idea="${answers.business_idea?.slice(0, 60)}"`)
 
-    // Step 1: Classify business deterministically from intake answers (no Claude API needed)
-    const clusterId = classifyBusiness(answers)
+    // Step 1: Classify business from intake answers (decision tree, no AI)
+    const clusterId = classifyBusiness({
+      business_activity: answers.business_activity,
+      work_location: answers.work_location,
+      license_type: answers.license_type,
+      pricing_model: answers.pricing_model,
+    })
     const clusterMeta = CLUSTERS[clusterId]
     console.log(`[ProfileService.createFromIntake] Classified as cluster=${clusterId} (${clusterMeta.label})`)
 
-    // Step 2: Derive business_type + industry_sector from cluster (no Claude needed)
+    // Step 2: Derive business_type + industry_sector from cluster
     const CLUSTER_TO_TYPE: Record<string, 'food' | 'freelance' | 'daycare' | 'retail' | 'personal_care' | 'other'> = {
       C1: 'food', C2: 'freelance', C3: 'daycare',
-      C4: 'other', C5: 'retail', C6: 'food',
-      C7: 'other', C8: 'personal_care', C9: 'other',
+      C4: 'other', C5: 'retail', C6: 'retail',
+      C7: 'food', C8: 'other', C9: 'personal_care',
+      C10: 'other', C11: 'freelance', C12: 'other',
     }
     const CLUSTER_TO_SECTOR: Record<string, string> = {
-      C1: 'home-based food', C2: 'consulting & freelance', C3: 'regulated childcare',
-      C4: 'regulated profession', C5: 'retail & e-commerce', C6: 'food service & hospitality',
-      C7: 'construction & trades', C8: 'personal services', C9: 'general',
+      C1: 'home-based food', C2: 'freelance & digital', C3: 'regulated childcare',
+      C4: 'regulated profession', C5: 'online retail', C6: 'physical retail',
+      C7: 'restaurant & food service', C8: 'construction & trades', C9: 'personal care & beauty',
+      C10: 'fitness & wellness', C11: 'creative & media', C12: 'education & tutoring',
     }
     const businessType = CLUSTER_TO_TYPE[clusterId] ?? 'other'
     const industrySector = CLUSTER_TO_SECTOR[clusterId] ?? 'general'
     console.log(`[ProfileService.createFromIntake] business_type=${businessType} sector=${industrySector}`)
 
     // Step 3: Build the profile DTO
+    const isHomeBased = answers.work_location === 'home' || answers.is_home_based
     const profileDTO: CreateProfileDTO = {
       user_id,
       business_type: businessType,
-      business_name: null,
+      business_name: answers.business_name || null,
       business_description: answers.business_idea,
       industry_sector: industrySector,
       municipality: answers.location,
       borough: answers.borough ?? null,
-      is_home_based: answers.is_home_based,
-      has_physical_location: !answers.is_home_based,
+      is_home_based: isHomeBased,
+      has_physical_location: !isHomeBased,
       full_name: null,
       age: answers.age,
       immigration_status: answers.immigration_status,

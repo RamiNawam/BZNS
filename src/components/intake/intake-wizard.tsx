@@ -6,7 +6,7 @@ import IntakeProgress from './intake-progress';
 import QuestionCard from './question-card';
 import { useProfileStore } from '@/stores/profile-store';
 
-const STEPS = ['Business Type', 'Your Business', 'Location', 'Finances', 'About You'];
+const STEPS = ['Your Business', 'How You Operate', 'Pricing & Idea', 'Location', 'About You'];
 
 export default function IntakeWizard() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -17,6 +17,7 @@ export default function IntakeWizard() {
     if (!profile?.intake_completed) return;
     if (intakeForm.business_idea) return; // already populated (e.g. partial save)
 
+    if (profile.business_name) updateIntakeField('business_name', profile.business_name);
     updateIntakeField('business_idea', profile.business_description ?? '');
     updateIntakeField('location', profile.municipality ?? 'montreal');
     updateIntakeField('borough', profile.borough ?? '');

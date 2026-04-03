@@ -1013,7 +1013,7 @@ export default function FinancialPage() {
   useEffect(() => { loadProfile(); }, [loadProfile]);
 
   // Cluster-aware defaults
-  const clusterId = (profile?.cluster_id ?? 'C9') as ClusterID;
+  const clusterId = (profile?.cluster_id ?? 'C2') as ClusterID;
   const expenseProfile = useMemo(() => getExpenseDefaults(clusterId), [clusterId]);
   const questionSet = useMemo(() => getClusterQuestions(clusterId), [clusterId]);
 

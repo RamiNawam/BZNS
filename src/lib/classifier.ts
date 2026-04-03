@@ -1,42 +1,79 @@
 // ============================================================
-// BUSINESS CLASSIFIER — Maps intake answers to cluster (C1-C9)
-// Uses the structured business_category from the intake wizard.
-// No AI needed — pure deterministic mapping.
+// BUSINESS CLASSIFIER — Decision tree from intake answers
+// We classify the business into C1-C12, NOT the user.
+// No AI needed — pure deterministic logic from 5 answers.
 // ============================================================
 
 import type { ClusterID } from '@/lib/clusters';
 
 interface ClassifierInput {
-  business_category?: string;
-  is_home_based?: boolean;
+  business_activity?: string;   // food | services | products | trades | children
+  work_location?: string;       // home | commercial | client_sites | online
+  license_type?: string;        // professional_order | trade_cert | food_handling | none
+  pricing_model?: string;       // per_item | per_hour | per_session | per_project | subscription
 }
 
 /**
- * Classify a user's business into one of 9 clusters.
- * Primary signal: business_category (selected in intake step 0).
- * Secondary signal: is_home_based (differentiates C1 vs C6 for food).
+ * Decision tree:
+ *
+ * 1. activity = children → C3 (Childcare)
+ * 2. activity = trades   → C8 (Construction & trades)
+ * 3. activity = food
+ *    - location = home     → C1 (Home-based food)
+ *    - else                → C7 (Restaurant & food service)
+ * 4. activity = products
+ *    - location = online   → C5 (Online retail)
+ *    - else                → C6 (Physical retail)
+ * 5. activity = services
+ *    - license = professional_order → C4 (Regulated professional)
+ *    - license = trade_cert         → C8 (Construction & trades)
+ *    - pricing = per_session + commercial → C9 (Personal care)
+ *    - pricing = per_session              → C10 (Fitness & wellness)
+ *    - pricing = per_project              → C11 (Creative & media)
+ *    - pricing = subscription             → C12 (Education & tutoring)
+ *    - else                               → C2 (Freelance)
+ * 6. fallback → C2 (Freelance — lowest-friction default)
  */
-export function classifyBusiness(intake: ClassifierInput): ClusterID {
-  const category = intake.business_category ?? '';
-  const isHomeBased = intake.is_home_based ?? true;
+export function classifyBusiness(input: ClassifierInput): ClusterID {
+  const { business_activity, work_location, license_type, pricing_model } = input;
 
-  const CATEGORY_TO_CLUSTER: Record<string, ClusterID> = {
-    food_home:       'C1',  // Home-based food
-    food_commercial: 'C6',  // Food service / hospitality
-    freelance:       'C2',  // Freelance / consulting
-    childcare:       'C3',  // Regulated childcare
-    regulated:       'C4',  // Regulated professional
-    retail:          'C5',  // Retail / product sales
-    trades:          'C7',  // Construction / trades
-    personal:        'C8',  // Personal services
-    other:           'C9',  // General / unknown
-  };
-
-  // Direct mapping from category selection
-  if (category && CATEGORY_TO_CLUSTER[category]) {
-    return CATEGORY_TO_CLUSTER[category];
+  // ── Branch: Children ──────────────────────────────────────
+  if (business_activity === 'children') {
+    return 'C3';
   }
 
-  // Fallback: if somehow no category was selected
-  return 'C9';
+  // ── Branch: Trades ────────────────────────────────────────
+  if (business_activity === 'trades') {
+    return 'C8';
+  }
+
+  // ── Branch: Food ──────────────────────────────────────────
+  if (business_activity === 'food') {
+    if (work_location === 'home') return 'C1';
+    return 'C7';
+  }
+
+  // ── Branch: Products ──────────────────────────────────────
+  if (business_activity === 'products') {
+    if (work_location === 'online') return 'C5';
+    return 'C6';
+  }
+
+  // ── Branch: Services (most nuanced) ───────────────────────
+  if (business_activity === 'services') {
+    if (license_type === 'professional_order') return 'C4';
+    if (license_type === 'trade_cert') return 'C8';
+
+    if (pricing_model === 'per_session') {
+      if (work_location === 'commercial' || work_location === 'client_sites') return 'C9';
+      return 'C10';
+    }
+
+    if (pricing_model === 'per_project') return 'C11';
+    if (pricing_model === 'subscription') return 'C12';
+    return 'C2'; // per_hour, per_item, or unset → freelance
+  }
+
+  // ── Fallback ──────────────────────────────────────────────
+  return 'C2';
 }

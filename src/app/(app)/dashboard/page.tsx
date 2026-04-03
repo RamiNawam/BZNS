@@ -147,23 +147,17 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
+          <h1 className="font-heading text-2xl font-bold text-slate-900">
+            {profile?.business_name || 'Your Business'}
+          </h1>
           <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-            {profile?.business_type && (
-              <span className="badge badge-brand">
-                {businessTypeLabels[profile.business_type] ??
-                  profile.business_type}
+            {profile?.cluster_label && (
+              <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${
+                CLUSTER_COLORS[profile.cluster_complexity ?? 'medium']
+              }`}>
+                {profile.cluster_label}
               </span>
             )}
-            {/* Cluster badge — colour-coded by complexity */}
-            {profile?.cluster_id &&
-              profile.cluster_label &&
-              profile.cluster_complexity && (
-                <span
-                  className={`text-xs px-2 py-0.5 rounded-full border font-medium ${CLUSTER_COLORS[profile.cluster_complexity]}`}
-                >
-                  {profile.cluster_id} · {profile.cluster_label}
-                </span>
-              )}
             {profile?.municipality && (
               <span className="flex items-center gap-1 text-xs text-slate-400">
                 <MapPin size={11} />
@@ -172,6 +166,12 @@ export default function DashboardPage() {
             )}
           </div>
         </div>
+        <Link
+          href="/intake"
+          className="text-xs text-brand-600 hover:underline"
+        >
+          Edit profile
+        </Link>
       </div>
 
       {/* Stat cards */}

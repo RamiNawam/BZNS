@@ -5,7 +5,7 @@
 // for that type of business.
 // ============================================================
 
-export type ClusterID = 'C1' | 'C2' | 'C3' | 'C4' | 'C5' | 'C6' | 'C7' | 'C8' | 'C9';
+export type ClusterID = 'C1' | 'C2' | 'C3' | 'C4' | 'C5' | 'C6' | 'C7' | 'C8' | 'C9' | 'C10' | 'C11' | 'C12';
 
 export const CLUSTERS: Record<
   ClusterID,
@@ -26,7 +26,7 @@ export const CLUSTERS: Record<
     ],
   },
   C2: {
-    label: 'Freelance / consulting',
+    label: 'Freelance & digital services',
     complexity: 'low',
     kb_files: [
       'registration/req.json',
@@ -66,7 +66,20 @@ export const CLUSTERS: Record<
     ],
   },
   C5: {
-    label: 'Retail / product sales',
+    label: 'Online retail',
+    complexity: 'medium',
+    kb_files: [
+      'registration/req.json',
+      'registration/revenu_quebec.json',
+      'tax/gst_qst.json',
+      'tax/deductions.json',
+      'funding/pme_mtl.json',
+      'funding/fli.json',
+      'compliance/bill96.json',
+    ],
+  },
+  C6: {
+    label: 'Physical retail',
     complexity: 'medium',
     kb_files: [
       'registration/req.json',
@@ -80,8 +93,8 @@ export const CLUSTERS: Record<
       'compliance/signage.json',
     ],
   },
-  C6: {
-    label: 'Food service / hospitality',
+  C7: {
+    label: 'Restaurant & food service',
     complexity: 'high',
     kb_files: [
       'permits/mapaq.json',
@@ -95,8 +108,8 @@ export const CLUSTERS: Record<
       'compliance/signage.json',
     ],
   },
-  C7: {
-    label: 'Construction / trades',
+  C8: {
+    label: 'Construction & trades',
     complexity: 'high',
     kb_files: [
       'permits/professional_orders.json',
@@ -109,8 +122,8 @@ export const CLUSTERS: Record<
       'compliance/bill96.json',
     ],
   },
-  C8: {
-    label: 'Personal services',
+  C9: {
+    label: 'Personal care & beauty',
     complexity: 'medium',
     kb_files: [
       'registration/req.json',
@@ -123,18 +136,45 @@ export const CLUSTERS: Record<
       'compliance/signage.json',
     ],
   },
-  C9: {
-    label: 'General / unknown',
-    complexity: 'medium',
+  C10: {
+    label: 'Fitness & wellness',
+    complexity: 'low',
+    kb_files: [
+      'registration/req.json',
+      'permits/municipal_montreal.json',
+      'tax/gst_qst.json',
+      'tax/qpp.json',
+      'tax/deductions.json',
+      'funding/sta.json',
+      'funding/futurpreneur.json',
+      'compliance/bill96.json',
+    ],
+  },
+  C11: {
+    label: 'Creative & media',
+    complexity: 'low',
     kb_files: [
       'registration/req.json',
       'registration/revenu_quebec.json',
       'tax/qpp.json',
+      'tax/deductions.json',
       'tax/gst_qst.json',
-      'tax/installments.json',
-      'funding/sta.json',
       'funding/futurpreneur.json',
-      'funding/pme_mtl.json',
+      'funding/bdc.json',
+      'compliance/bill96.json',
+    ],
+  },
+  C12: {
+    label: 'Education & tutoring',
+    complexity: 'low',
+    kb_files: [
+      'registration/req.json',
+      'registration/revenu_quebec.json',
+      'tax/qpp.json',
+      'tax/deductions.json',
+      'tax/gst_qst.json',
+      'funding/futurpreneur.json',
+      'funding/sta.json',
       'compliance/bill96.json',
     ],
   },
