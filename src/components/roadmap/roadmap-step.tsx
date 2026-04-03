@@ -6,10 +6,10 @@ import {
   Lock,
   ChevronDown,
   ChevronUp,
-  AlertTriangle,
+  Search,
   ShieldCheck,
   Sparkles,
-  AlertCircle,
+  Info,
 } from "lucide-react";
 import type {
   RoadmapStep as RoadmapStepType,
@@ -60,8 +60,8 @@ const STATUS_LABEL: Record<StepStatus, string> = {
 
 const CONFIDENCE_BORDER: Record<StepConfidence, string> = {
   verified: "border-l-emerald-400",
-  inferred: "border-l-amber-400",
-  flagged: "border-l-red-400",
+  inferred: "border-l-teal-400",
+  flagged: "border-l-amber-400",
 };
 
 const CONFIDENCE_BADGE: Record<StepConfidence, { class: string; label: string; icon: typeof ShieldCheck }> = {
@@ -71,14 +71,14 @@ const CONFIDENCE_BADGE: Record<StepConfidence, { class: string; label: string; i
     icon: ShieldCheck,
   },
   inferred: {
-    class: "bg-amber-50 text-amber-700 border-amber-200",
-    label: "AI-Inferred",
+    class: "bg-teal-50 text-teal-700 border-teal-200",
+    label: "Recommended",
     icon: Sparkles,
   },
   flagged: {
-    class: "bg-red-50 text-red-700 border-red-200",
-    label: "Flagged",
-    icon: AlertTriangle,
+    class: "bg-amber-50 text-amber-700 border-amber-200",
+    label: "Needs Attention",
+    icon: Search,
   },
 };
 
@@ -96,7 +96,7 @@ function FlagCard({ flag }: { flag: GapFlag }) {
       className={`rounded-lg border p-3 text-sm ${SEVERITY_STYLE[flag.severity]}`}
     >
       <div className="flex items-start gap-2">
-        <AlertCircle size={14} className="shrink-0 mt-0.5" />
+        <Info size={14} className="shrink-0 mt-0.5" />
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-xs uppercase tracking-wide">
@@ -151,8 +151,8 @@ function StepNode({
   // Pending — color the node ring by confidence
   if (confidence === "flagged") {
     return (
-      <div className="h-9 w-9 rounded-full border-2 border-red-400 bg-red-50 flex items-center justify-center">
-        <AlertTriangle size={13} className="text-red-500" />
+      <div className="h-9 w-9 rounded-full border-2 border-amber-400 bg-amber-50 flex items-center justify-center">
+        <Search size={13} className="text-amber-500" />
       </div>
     );
   }
@@ -214,9 +214,9 @@ export default function RoadmapStep({
               isCompleted
                 ? "bg-brand-200"
                 : confidence === "flagged"
-                  ? "bg-red-200"
+                  ? "bg-amber-200"
                   : confidence === "inferred"
-                    ? "bg-amber-200"
+                    ? "bg-teal-200"
                     : "bg-slate-200"
             }`}
           />
@@ -295,7 +295,7 @@ export default function RoadmapStep({
                 )}
 
                 {!locked && step.description && (
-                  <p className="text-sm text-slate-500 mt-1 line-clamp-2">
+                  <p className={`text-sm text-slate-500 mt-1 ${expanded ? "" : "line-clamp-2"}`}>
                     {step.description}
                   </p>
                 )}
@@ -319,17 +319,9 @@ export default function RoadmapStep({
                 {/* Inline flag summary when collapsed */}
                 {!expanded && stepFlags.length > 0 && (
                   <div className="mt-2 flex items-center gap-1.5 text-xs">
-                    <AlertTriangle size={12} className={
-                      stepFlags.some((f) => f.severity === "high")
-                        ? "text-red-500"
-                        : "text-amber-500"
-                    } />
-                    <span className={
-                      stepFlags.some((f) => f.severity === "high")
-                        ? "text-red-600 font-medium"
-                        : "text-amber-600 font-medium"
-                    }>
-                      {stepFlags.length} issue{stepFlags.length > 1 ? "s" : ""} detected
+                    <Search size={12} className="text-amber-500" />
+                    <span className="text-amber-600 font-medium">
+                      {stepFlags.length} item{stepFlags.length > 1 ? "s" : ""} to review
                     </span>
                   </div>
                 )}
