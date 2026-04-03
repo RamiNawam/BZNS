@@ -1,10 +1,17 @@
 import { create } from 'zustand'
 import { useProfileStore } from '@/stores/profile-store'
 import type { FundingMatch } from '@/types/funding'
+import { computeImmediateStats } from '@/lib/funding/classify'
+
 
 interface FundingStore {
   matches: FundingMatch[]
+  /** Total from all matched programs (server-computed) */
   totalPotential: string
+  /** Dollar total ONLY from programs you fully qualify for right now (empty if all "Varies") */
+  immediateTotal: string
+  /** Count of programs you fully qualify for right now */
+  immediateCount: number
   isLoading: boolean
   isGenerating: boolean
   error: string | null
@@ -18,6 +25,8 @@ interface FundingStore {
 export const useFundingStore = create<FundingStore>((set, get) => ({
   matches: [],
   totalPotential: '',
+  immediateTotal: '',
+  immediateCount: 0,
   isLoading: false,
   isGenerating: false,
   error: null,
@@ -30,7 +39,14 @@ export const useFundingStore = create<FundingStore>((set, get) => ({
       const res = await fetch(`/api/funding?profile_id=${profileId}`)
       if (!res.ok) throw new Error('Failed to load funding matches')
       const data = await res.json()
-      set({ matches: data.matches ?? [], totalPotential: data.total_potential_funding ?? '' })
+      const matches: FundingMatch[] = data.matches ?? []
+      const { total, count } = computeImmediateStats(matches)
+      set({
+        matches,
+        totalPotential: data.total_potential_funding ?? '',
+        immediateTotal: total,
+        immediateCount: count,
+      })
     } catch (err) {
       set({ error: err instanceof Error ? err.message : 'Unknown error' })
     } finally {
@@ -39,18 +55,25 @@ export const useFundingStore = create<FundingStore>((set, get) => ({
   },
 
   generateMatches: async () => {
-    const profileId = useProfileStore.getState().profile?.id
-    if (!profileId) return
+    const profile = useProfileStore.getState().profile
+    if (!profile?.id) return
     set({ isGenerating: true, error: null })
     try {
       const res = await fetch('/api/funding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ profile_id: profileId, force_refresh: true }),
+        body: JSON.stringify({ profile_id: profile.id, force_refresh: true }),
       })
       if (!res.ok) throw new Error('Failed to generate funding matches')
       const data = await res.json()
-      set({ matches: data.matches ?? [], totalPotential: data.total_potential_funding ?? '' })
+      const matches: FundingMatch[] = data.matches ?? []
+      const { total, count } = computeImmediateStats(matches)
+      set({
+        matches,
+        totalPotential: data.total_potential_funding ?? '',
+        immediateTotal: total,
+        immediateCount: count,
+      })
     } catch (err) {
       set({ error: err instanceof Error ? err.message : 'Unknown error' })
     } finally {
@@ -104,3 +127,4 @@ export const useFundingStore = create<FundingStore>((set, get) => ({
     }
   },
 }))
+

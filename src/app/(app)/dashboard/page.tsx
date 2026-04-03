@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useProfileStore } from '@/stores/profile-store';
 import { useRoadmapStore } from '@/stores/roadmap-store';
+import { useFundingStore } from '@/stores/funding-store';
 import SnapshotCard from '@/components/financial/snapshot-card';
 import type { ClusterComplexity } from '@/types/profile';
 
@@ -81,6 +82,7 @@ function StatCard({
 export default function DashboardPage() {
   const { profile, loadProfile, isLoading: profileLoading } = useProfileStore();
   const { steps, isLoading: roadmapLoading, error: roadmapError, loadRoadmap, generateRoadmap } = useRoadmapStore();
+  const { immediateCount, loadMatches } = useFundingStore();
 
   useEffect(() => {
     loadProfile();
@@ -89,8 +91,9 @@ export default function DashboardPage() {
   useEffect(() => {
     if (profile?.id) {
       loadRoadmap(profile.id);
+      loadMatches();
     }
-  }, [profile?.id, loadRoadmap]);
+  }, [profile?.id, loadRoadmap, loadMatches]);
 
   const completedSteps = steps.filter((s) => s.status === 'completed').length;
 
@@ -177,8 +180,12 @@ export default function DashboardPage() {
           iconBg="bg-emerald-50"
           iconColor="text-emerald-600"
           label="Funding Available"
-          value="$95K+"
-          sub="across matched programs"
+          value={immediateCount > 0 ? `${immediateCount}` : '—'}
+          sub={
+            immediateCount > 0
+              ? `program${immediateCount !== 1 ? 's' : ''} ready to apply`
+              : 'Complete intake to find matches'
+          }
           cta="View matches"
         />
         <StatCard

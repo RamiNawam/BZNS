@@ -33,6 +33,16 @@ export const FundingRepository = {
     return (data ?? []) as FundingMatch[]
   },
 
+  // Delete all matches for a profile (called before force-refresh to reset created_at)
+  async deleteByProfileId(profile_id: string): Promise<void> {
+    const supabase = createServerClient()
+    const { error } = await supabase
+      .from('funding_matches')
+      .delete()
+      .eq('profile_id', profile_id)
+    if (error) throw new Error(`FundingRepository.deleteByProfileId failed: ${error.message}`)
+  },
+
   // Upsert all scored matches at once (scorer runs all programs in one pass)
   async batchUpsert(matches: CreateFundingMatchDTO[]): Promise<FundingMatch[]> {
     const supabase = createServerClient()

@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { DollarSign } from 'lucide-react';
+import { DollarSign, CheckCircle2, Clock, RefreshCw } from 'lucide-react';
 import { useFundingStore } from '@/stores/funding-store';
 import { useProfileStore } from '@/stores/profile-store';
 import FundingCard from './funding-card';
+import { isFullyMatched, isAchievable } from '@/lib/funding/classify';
 import type { FundingMatch, ProgramType } from '@/types/funding';
 
 // ── Skeleton ──────────────────────────────────────────────────────────────────
@@ -54,7 +55,6 @@ function makeIsVisible(inferredStage: string) {
     for (const key of ALWAYS_IMMUTABLE_KEYS) {
       if (key in details && details[key] === false) return false;
     }
-    // Business stage: hide only when user can't advance (not pre-launch)
     if ('business_stage_eligible' in details && details.business_stage_eligible === false) {
       if (inferredStage !== 'pre_launch') return false;
     }
@@ -62,15 +62,56 @@ function makeIsVisible(inferredStage: string) {
   };
 }
 
+// ── Section header ────────────────────────────────────────────────────────────
+
+function SectionHeader({
+  icon: Icon,
+  iconClass,
+  title,
+  subtitle,
+  count,
+}: {
+  icon: typeof CheckCircle2;
+  iconClass: string;
+  title: string;
+  subtitle: string;
+  count: number;
+}) {
+  return (
+    <div className="flex items-center gap-3 mb-3">
+      <div className={`inline-flex items-center justify-center h-8 w-8 rounded-lg ${iconClass}`}>
+        <Icon size={15} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span className="font-heading font-semibold text-sm text-slate-900">{title}</span>
+          <span className="text-xs font-medium text-slate-400 bg-slate-100 rounded-full px-2 py-0.5">
+            {count}
+          </span>
+        </div>
+        <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>
+      </div>
+    </div>
+  );
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function FundingList() {
-  const { matches, isLoading, loadMatches } = useFundingStore();
+  const { matches, isLoading, isGenerating, loadMatches, generateMatches } = useFundingStore();
   const profile = useProfileStore((s) => s.profile);
   const [filter, setFilter] = useState<FilterKey>('all');
 
   useEffect(() => {
     loadMatches();
   }, [loadMatches]);
+
+  // Same pattern as RoadmapList: profile.updated_at > matches[0].created_at.
+  // This now works correctly because generateMatches (force_refresh) deletes all
+  // existing matches before inserting fresh ones — giving a guaranteed fresh created_at.
+  const fundingIsStale =
+    matches.length > 0 &&
+    !!profile?.updated_at &&
+    new Date(profile.updated_at) > new Date(matches[0].created_at);
 
   const inferredStage = !profile?.has_neq
     ? 'pre_launch'
@@ -80,18 +121,21 @@ export default function FundingList() {
 
   const isVisible = makeIsVisible(inferredStage);
 
-  // visible = not dismissed + passes immutability filter
   const visible = matches.filter((m) => !m.is_dismissed && isVisible(m));
 
-  const filtered = visible
-    .filter((m) =>
-      filter === 'all'
-        ? true
-        : filter === 'bookmarked'
-        ? m.is_bookmarked
-        : m.program_type === filter
-    )
-    .sort((a, b) => b.match_score - a.match_score);
+  const applyTypeFilter = (list: FundingMatch[]) =>
+    list
+      .filter((m) =>
+        filter === 'all'
+          ? true
+          : filter === 'bookmarked'
+          ? m.is_bookmarked
+          : m.program_type === filter
+      )
+      .sort((a, b) => b.match_score - a.match_score);
+
+  const readyNow   = applyTypeFilter(visible.filter(isFullyMatched));
+  const achievable = applyTypeFilter(visible.filter(isAchievable));
 
   if (isLoading) {
     return (
@@ -120,7 +164,29 @@ export default function FundingList() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Stale warning — same pattern as RoadmapList */}
+      {fundingIsStale && !isGenerating && (
+        <div className="flex items-center justify-between gap-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+          <div className="flex items-center gap-2.5 text-sm text-amber-800">
+            <RefreshCw size={15} className="shrink-0 text-amber-600" />
+            <span>Your settings changed since your funding was last scored.</span>
+          </div>
+          <button
+            onClick={generateMatches}
+            disabled={isGenerating}
+            className="shrink-0 text-xs font-semibold text-amber-700 border border-amber-300 bg-white hover:bg-amber-50 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50"
+          >
+            Refresh matches
+          </button>
+        </div>
+      )}
+
+      {/* Visible count */}
+      <p className="text-sm text-slate-500">
+        {visible.length} program{visible.length !== 1 ? 's' : ''} found
+      </p>
+
       {/* Filter tabs */}
       <div className="flex gap-1.5 flex-wrap">
         {FILTERS.map(({ key, label }) => {
@@ -152,16 +218,46 @@ export default function FundingList() {
         })}
       </div>
 
-      {/* Cards */}
-      {filtered.length === 0 ? (
+      {/* Section 1: Ready to apply now */}
+      {readyNow.length > 0 && (
+        <div>
+          <SectionHeader
+            icon={CheckCircle2}
+            iconClass="bg-emerald-50 text-emerald-600"
+            title="Ready to apply now"
+            subtitle="You meet all current eligibility requirements for these programs."
+            count={readyNow.length}
+          />
+          <div className="space-y-3">
+            {readyNow.map((match) => (
+              <FundingCard key={match.id} match={match} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Section 2: Achievable with extra steps */}
+      {achievable.length > 0 && (
+        <div>
+          <SectionHeader
+            icon={Clock}
+            iconClass="bg-amber-50 text-amber-600"
+            title="Unlock with a few more steps"
+            subtitle="You meet the core requirements. Complete the flagged steps in your Roadmap to qualify."
+            count={achievable.length}
+          />
+          <div className="space-y-3">
+            {achievable.map((match) => (
+              <FundingCard key={match.id} match={match} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Empty state for active filter */}
+      {readyNow.length === 0 && achievable.length === 0 && (
         <div className="card p-8 text-center">
           <p className="text-sm text-slate-500">No programs match this filter.</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {filtered.map((match) => (
-            <FundingCard key={match.id} match={match} />
-          ))}
         </div>
       )}
     </div>

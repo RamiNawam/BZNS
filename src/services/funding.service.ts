@@ -266,6 +266,13 @@ export const FundingService = {
     const scored = scorePrograms(programs, profile, profile_id)
     const filtered = scored.filter((m) => m.match_score > 0)
 
+    // Delete existing matches first on force_refresh so created_at is always fresh.
+    // This mirrors the roadmap's DELETE-then-INSERT pattern and makes timestamp-based
+    // stale detection reliable on the frontend.
+    if (force_refresh) {
+      await FundingRepository.deleteByProfileId(profile_id)
+    }
+
     const savedMatches = filtered.length > 0
       ? await FundingRepository.batchUpsert(filtered)
       : []

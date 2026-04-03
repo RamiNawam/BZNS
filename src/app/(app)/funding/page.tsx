@@ -7,7 +7,7 @@ import { useProfileStore } from '@/stores/profile-store';
 import FundingList from '@/components/funding/funding-list';
 
 export default function FundingPage() {
-  const { matches, totalPotential, isGenerating, generateMatches, loadMatches } = useFundingStore();
+  const { matches, immediateTotal, immediateCount, isGenerating, generateMatches, loadMatches } = useFundingStore();
   const { profile, loadProfile } = useProfileStore();
 
   useEffect(() => {
@@ -19,6 +19,10 @@ export default function FundingPage() {
   }, [profile?.id, loadMatches]);
 
   const hasMatches = matches.length > 0;
+
+  // Badge: always show count of fully-eligible programs
+  const badgeValue = immediateCount > 0 ? `${immediateCount}` : '';
+  const badgeLabel = immediateCount === 1 ? 'program ready to apply' : 'programs ready to apply';
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -37,12 +41,12 @@ export default function FundingPage() {
           </p>
         </div>
 
-        {/* Total potential badge */}
-        {totalPotential && (
+        {/* Immediately eligible badge */}
+        {badgeValue && (
           <div className="shrink-0 text-right">
-            <p className="text-xs text-slate-500 mb-0.5">Available for you</p>
+            <p className="text-xs text-slate-500 mb-0.5">{badgeLabel}</p>
             <p className="font-heading text-2xl font-bold text-emerald-600 tabular-nums">
-              {totalPotential}
+              {badgeValue}
             </p>
           </div>
         )}
@@ -60,7 +64,7 @@ export default function FundingPage() {
             </p>
             <p className="text-sm text-slate-500 mt-1 max-w-sm mx-auto">
               We&apos;ll score every Quebec and federal program against your profile and show you
-              exactly how much you could access.
+              exactly how much you could access right now.
             </p>
           </div>
           <button
@@ -87,24 +91,7 @@ export default function FundingPage() {
         </div>
       )}
 
-      {/* Regenerate button — when matches exist */}
-      {hasMatches && !isGenerating && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500">
-            {matches.filter((m) => !m.is_dismissed).length} programs found
-          </p>
-          <button
-            type="button"
-            onClick={generateMatches}
-            className="btn-secondary btn-sm gap-1.5 inline-flex"
-          >
-            <Sparkles size={12} />
-            Refresh matches
-          </button>
-        </div>
-      )}
-
-      {/* List */}
+      {/* List + stale banner live inside FundingList (same pattern as RoadmapList) */}
       {!isGenerating && <FundingList />}
 
     </div>
