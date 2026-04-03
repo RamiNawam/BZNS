@@ -6,7 +6,7 @@ import {
   RefreshCw,
   ShieldCheck,
   Sparkles,
-  AlertTriangle,
+  Search,
 } from "lucide-react";
 import { useRoadmapStore } from "@/stores/roadmap-store";
 import { useProfileStore } from "@/stores/profile-store";
@@ -51,15 +51,15 @@ function ConfidenceLegend({
         {verified} verified
       </span>
       {flagged > 0 && (
-        <span className="inline-flex items-center gap-1.5 text-red-600 font-medium">
-          <AlertTriangle size={13} />
-          {flagged} flagged
+        <span className="inline-flex items-center gap-1.5 text-amber-600 font-medium">
+          <Search size={13} />
+          {flagged} need{flagged === 1 ? "s" : ""} attention
         </span>
       )}
       {inferred > 0 && (
-        <span className="inline-flex items-center gap-1.5 text-amber-600">
+        <span className="inline-flex items-center gap-1.5 text-teal-600">
           <Sparkles size={13} />
-          {inferred} AI-added
+          {inferred} recommended for your business
         </span>
       )}
     </div>
@@ -77,22 +77,17 @@ function FlagSummaryBanner({
   if (highCount === 0 && mediumCount === 0) return null;
 
   return (
-    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+    <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
       <div className="flex items-start gap-2.5">
-        <AlertTriangle size={16} className="shrink-0 text-red-500 mt-0.5" />
+        <Search size={16} className="shrink-0 text-amber-600 mt-0.5" />
         <div>
-          <p className="text-sm font-semibold text-red-800">
-            Adversarial review found {highCount + mediumCount} issue
-            {highCount + mediumCount > 1 ? "s" : ""}
+          <p className="text-sm font-semibold text-amber-800">
+            We reviewed your roadmap for your specific business
           </p>
-          <p className="text-xs text-red-600 mt-0.5">
-            {highCount > 0 && (
-              <span className="font-semibold">{highCount} high severity</span>
-            )}
-            {highCount > 0 && mediumCount > 0 && " + "}
-            {mediumCount > 0 && <span>{mediumCount} medium severity</span>}{" "}
-            &mdash; expand flagged steps (red border) for details and
-            recommendations.
+          <p className="text-xs text-amber-700 mt-0.5">
+            {highCount + mediumCount} step{highCount + mediumCount > 1 ? "s" : ""}{" "}
+            need{highCount + mediumCount === 1 ? "s" : ""} your attention before
+            moving forward &mdash; tap the highlighted steps to see what to confirm.
           </p>
         </div>
       </div>

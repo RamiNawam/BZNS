@@ -267,7 +267,7 @@ Return ONLY a valid JSON array. Do not include any text or explanation outside t
 - Mark GST/QST registration as conditional if revenue is below $30,000 or unknown; required if above $30,000 — reflect this in why_needed
 - Include between 5 and 15 steps total. Skip steps that clearly do not apply (e.g. RACJ liquor permit for a daycare)
 - Keep descriptions specific to this user — their business type, location, or revenue situation
-- Do NOT include bookkeeping setup, bank account opening, tax savings strategies, accounting software setup, or financial management steps — those are handled by a separate financial feature. Only include steps required by law or government regulation to legally operate the business`;
+- Do NOT include bank account opening, accounting software recommendations, or general financial planning advice. DO include legally required registrations, permits, tax obligations, and compliance steps — those are handled by a separate financial feature. Only include steps required by law or government regulation to legally operate the business`;
 }
 
 // ---------------------------------------------------------------------------
@@ -348,6 +348,7 @@ Analyze the roadmap above against the FULL knowledge base and the user's SPECIFI
 - Check dependency ordering — are there steps that should depend on others but don't?
 - Look for missing municipal-level requirements
 - Consider immigration status implications if the user is a newcomer
+- Analyze the exact business idea, products, and ingredients described in the profile against every regulation and permit type present in the knowledge base, and identify any characteristics of this specific business that may trigger permits, restrictions, or requirements not currently covered in the roadmap
 - DO NOT flag things that are already correctly handled in the roadmap
 - DO NOT generate more than 8 flags — focus on the most critical issues
 - Every flag must cite specific evidence from the knowledge base
@@ -497,7 +498,13 @@ Return ONLY a valid JSON object with the following fields. Do not add any text o
 export function buildAssistantPrompt(
   profile: UserProfile,
   roadmap: RoadmapItem[],
-  funding: Array<{ id: string; program_name_en: string; plain_language_summary: string; amount: { minimum?: number; maximum?: number; note?: string }; application_url?: string }>,
+  funding: Array<{
+    id: string;
+    program_name_en: string;
+    plain_language_summary: string;
+    amount: { minimum?: number; maximum?: number; note?: string };
+    application_url?: string;
+  }>,
   snapshot: FinancialSnapshot,
   history: ChatMessage[],
   kbJson: string,
@@ -520,7 +527,7 @@ export function buildAssistantPrompt(
             const amountStr =
               f.amount.minimum != null && f.amount.maximum != null
                 ? `$${f.amount.minimum.toLocaleString()}–$${f.amount.maximum.toLocaleString()}`
-                : f.amount.note ?? "amount varies";
+                : (f.amount.note ?? "amount varies");
             return `- ${f.program_name_en} (${amountStr}): ${f.plain_language_summary}${f.application_url ? ` — ${f.application_url}` : ""}`;
           })
           .join("\n")
@@ -529,7 +536,9 @@ export function buildAssistantPrompt(
   const historyBlock =
     history.length > 0
       ? history
-          .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
+          .map(
+            (m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`,
+          )
           .join("\n\n")
       : "(No previous messages in this session.)";
 

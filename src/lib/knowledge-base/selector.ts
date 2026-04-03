@@ -43,9 +43,13 @@ export type BusinessType =
   | "other";
 
 // ---------------------------------------------------------------------------
-// The KB map from the project plan (Section 8), extended with new files.
-// Keys are the file paths in /data/ — must match KBFileKey exactly.
-// Funding files are NOT listed here — they go to the scorer, not Claude.
+// KB_MAP: non-funding documents for each business type.
+// - registration/cra.json is included in ALL types — federal tax obligations
+//   apply to every self-employed person regardless of business type.
+// - permits/racj.json is NOT hardcoded here — it is added conditionally via
+//   SelectionContext.servesAlcohol, which is inferred from the business
+//   description in contextFromProfile (not just the serves_alcohol profile flag).
+// - Funding files are excluded entirely — they go to the scorer, not Claude.
 // ---------------------------------------------------------------------------
 
 const KB_MAP: Record<BusinessType, KBFileKey[]> = {
@@ -54,6 +58,7 @@ const KB_MAP: Record<BusinessType, KBFileKey[]> = {
     "financial_constants.json",
     "registration/req.json",
     "registration/revenu_quebec.json",
+    "registration/cra.json",
     "permits/mapaq.json",
     "permits/municipal_montreal.json",
     "tax/gst_qst.json",
@@ -69,12 +74,12 @@ const KB_MAP: Record<BusinessType, KBFileKey[]> = {
     "financial_constants.json",
     "registration/req.json",
     "registration/revenu_quebec.json",
+    "registration/cra.json",
     "tax/gst_qst.json",
     "tax/qpp.json",
     "tax/deductions.json",
     "tax/installments.json",
     "compliance/bill96.json",
-    // professional_orders included conditionally below
   ],
 
   daycare: [
@@ -82,6 +87,7 @@ const KB_MAP: Record<BusinessType, KBFileKey[]> = {
     "financial_constants.json",
     "registration/req.json",
     "registration/revenu_quebec.json",
+    "registration/cra.json",
     "permits/famille.json",
     "permits/municipal_montreal.json",
     "tax/gst_qst.json",
@@ -95,6 +101,7 @@ const KB_MAP: Record<BusinessType, KBFileKey[]> = {
     "financial_constants.json",
     "registration/req.json",
     "registration/revenu_quebec.json",
+    "registration/cra.json",
     "permits/municipal_montreal.json",
     "tax/gst_qst.json",
     "tax/qpp.json",
@@ -109,6 +116,7 @@ const KB_MAP: Record<BusinessType, KBFileKey[]> = {
     "financial_constants.json",
     "registration/req.json",
     "registration/revenu_quebec.json",
+    "registration/cra.json",
     "permits/municipal_montreal.json",
     "permits/professional_orders.json",
     "tax/gst_qst.json",
@@ -123,6 +131,7 @@ const KB_MAP: Record<BusinessType, KBFileKey[]> = {
     "financial_constants.json",
     "registration/req.json",
     "registration/revenu_quebec.json",
+    "registration/cra.json",
     "tax/gst_qst.json",
     "tax/qpp.json",
     "tax/deductions.json",
@@ -132,16 +141,54 @@ const KB_MAP: Record<BusinessType, KBFileKey[]> = {
 };
 
 // ---------------------------------------------------------------------------
+// Products and industry terms that imply alcohol content or serving.
+// Used by contextFromProfile to set servesAlcohol correctly even when
+// the user does not explicitly mention alcohol in their business description.
+// This list covers both businesses that SELL alcohol and food products that
+// CONTAIN alcohol as an ingredient — both trigger RACJ consideration.
+// ---------------------------------------------------------------------------
+
+const ALCOHOL_INDICATORS = [
+  // Businesses primarily selling alcohol
+  "bar",
+  "tavern",
+  "brewery",
+  "winery",
+  "distillery",
+  "pub",
+  "brasserie",
+  "microbrasserie",
+  // Catering and restaurants that commonly serve alcohol
+  "restaurant",
+  "catering",
+  "traiteur",
+  // Food products that traditionally contain alcohol as an ingredient
+  "tiramisu",
+  "rum cake",
+  "gâteau au rhum",
+  "trifle",
+  "beer batter",
+  "wine sauce",
+  "brandy",
+  "liqueur",
+  "baileys",
+  "kahlua",
+  "marsala",
+  "champagne",
+  "prosecco",
+  "sangria",
+  "kombucha", // may contain trace alcohol depending on fermentation
+];
+
+// ---------------------------------------------------------------------------
 // Optional context flags — add extra files based on profile details
 // ---------------------------------------------------------------------------
 
 export interface SelectionContext {
   businessType: BusinessType;
-  // Add these when known from the user's profile
   isHomeBased?: boolean; // adds municipal_montreal if not already present
   servesAlcohol?: boolean; // adds racj.json
   isRegulatedProfession?: boolean; // adds professional_orders.json
-  hasCRAQuestion?: boolean; // adds cra.json
 }
 
 // ---------------------------------------------------------------------------
@@ -152,30 +199,28 @@ export function selectForPrompt(
   kb: KnowledgeBase,
   context: SelectionContext | BusinessType,
 ): Array<KBDocument | FundingProgram> {
-  // Accept either a plain BusinessType string or a full context object
   const ctx: SelectionContext =
     typeof context === "string" ? { businessType: context } : context;
 
   const { businessType } = ctx;
 
-  // Start with the base file list for this business type
   const fileKeys = new Set<KBFileKey>(KB_MAP[businessType] ?? KB_MAP.other);
 
-  // Add optional files based on context flags
+  // Add municipal rules for any home-based business not already covered
   if (ctx.isHomeBased && !fileKeys.has("permits/municipal_montreal.json")) {
     fileKeys.add("permits/municipal_montreal.json");
   }
+
+  // Add RACJ for any business that sells or uses alcohol as an ingredient
   if (ctx.servesAlcohol) {
     fileKeys.add("permits/racj.json");
   }
+
+  // Add professional orders for regulated professions not already covered
   if (ctx.isRegulatedProfession) {
     fileKeys.add("permits/professional_orders.json");
   }
-  if (ctx.hasCRAQuestion) {
-    fileKeys.add("registration/cra.json");
-  }
 
-  // Resolve each key to its KB document, skip nulls
   const docs: Array<KBDocument | FundingProgram> = [];
   for (const key of fileKeys) {
     const doc = kb.getByKey(key);
@@ -187,7 +232,6 @@ export function selectForPrompt(
 
 // ---------------------------------------------------------------------------
 // PRIMARY: cluster-based selector — replaces KB_MAP logic for all new code.
-// Takes a ClusterID, reads CLUSTERS[id].kb_files, resolves each to a doc.
 // ---------------------------------------------------------------------------
 
 export function selectByClusterId(
@@ -203,8 +247,7 @@ export function selectByClusterId(
   return docs;
 }
 
-// Cluster-aware assistant selector: use cluster files + always add the extras
-// that are useful for open-ended chat (cra, installments, signage).
+// Cluster-aware assistant selector: cluster files + always-useful extras.
 export function selectForClusterAssistant(
   kb: KnowledgeBase,
   clusterId: ClusterID,
@@ -216,7 +259,9 @@ export function selectForClusterAssistant(
     "registration/cra.json",
     "tax/installments.json",
     "compliance/signage.json",
+    "permits/racj.json",
   ];
+
   for (const key of extras) {
     const doc = kb.getByKey(key);
     if (doc && !seen.has((doc as KBDocument).id)) {
@@ -227,8 +272,7 @@ export function selectForClusterAssistant(
 }
 
 // ---------------------------------------------------------------------------
-// Funding selector — returns ALL active funding programs for the scorer.
-// The scorer itself handles filtering by profile — we load everything here.
+// Funding selector — ALL active funding programs for the scorer.
 // ---------------------------------------------------------------------------
 
 export function selectFundingForScorer(kb: KnowledgeBase): FundingProgram[] {
@@ -236,23 +280,21 @@ export function selectFundingForScorer(kb: KnowledgeBase): FundingProgram[] {
 }
 
 // ---------------------------------------------------------------------------
-// Assistant selector — broader context, includes more files.
-// The assistant chat has more tokens to work with and answers open questions.
+// Assistant selector — broader context for open-ended chat.
 // ---------------------------------------------------------------------------
 
 export function selectForAssistant(
   kb: KnowledgeBase,
   context: SelectionContext,
 ): Array<KBDocument | FundingProgram> {
-  // Start with the standard prompt selection
   const base = selectForPrompt(kb, context);
   const keys = new Set(base.map((d) => (d as KBDocument).id));
 
-  // Always add these for the assistant — users ask about anything
   const extras: KBFileKey[] = [
     "registration/cra.json",
     "tax/installments.json",
     "compliance/signage.json",
+    "permits/racj.json",
   ];
 
   for (const key of extras) {
@@ -266,41 +308,69 @@ export function selectForAssistant(
 }
 
 // ---------------------------------------------------------------------------
-// Utility: infer SelectionContext from a user profile
-// Call this in the API routes instead of building context manually
+// Utility: infer SelectionContext from a user profile.
+// This is the single source of truth for context flag inference.
+// Always call this instead of building SelectionContext manually.
 // ---------------------------------------------------------------------------
 
 export interface UserProfile {
-  industry_sector?: string;
   business_type: BusinessType;
+  industry_sector?: string;
+  business_summary?: string;
   is_home_based?: boolean;
-  // Extend with other profile fields as needed
+  serves_alcohol?: boolean;
+  is_regulated_profession?: boolean;
 }
 
 export function contextFromProfile(profile: UserProfile): SelectionContext {
+  // Combine industry_sector and business_summary for alcohol detection.
+  // This catches cases where the user describes an alcohol-containing product
+  // (e.g. "tiramisu") without explicitly saying "I serve alcohol".
+  const searchText = [
+    profile.industry_sector ?? "",
+    profile.business_summary ?? "",
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  const inferredAlcohol =
+    // Explicit flag from profile classification
+    profile.serves_alcohol === true ||
+    // Implicit: product or industry description contains alcohol indicators
+    ALCOHOL_INDICATORS.some((term) => searchText.includes(term));
+
+  const inferredRegulatedProfession =
+    profile.is_regulated_profession === true ||
+    profile.business_type === "personal_care" ||
+    [
+      "lawyer",
+      "notaire",
+      "engineer",
+      "ingénieur",
+      "accountant",
+      "comptable",
+      "architect",
+      "architecte",
+      "psychologist",
+      "psychologue",
+      "nurse",
+      "infirmière",
+      "physiotherapist",
+      "physiothérapeute",
+      "pharmacist",
+      "pharmacien",
+      "optometrist",
+      "optométriste",
+      "dentist",
+      "dentiste",
+      "veterinarian",
+      "vétérinaire",
+    ].some((p) => searchText.includes(p));
+
   return {
     businessType: profile.business_type,
     isHomeBased: profile.is_home_based ?? false,
-    // Heuristics — extend as you learn more about your users
-    isRegulatedProfession:
-      profile.business_type === "personal_care" ||
-      [
-        "lawyer",
-        "engineer",
-        "accountant",
-        "architect",
-        "psychologist",
-        "nurse",
-        "physiotherapist",
-        "pharmacist",
-      ].some((p) => profile.industry_sector?.toLowerCase().includes(p)),
-    servesAlcohol: [
-      "bar",
-      "restaurant",
-      "catering",
-      "brewery",
-      "winery",
-      "distillery",
-    ].some((p) => profile.industry_sector?.toLowerCase().includes(p)),
+    servesAlcohol: inferredAlcohol,
+    isRegulatedProfession: inferredRegulatedProfession,
   };
 }
