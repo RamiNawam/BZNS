@@ -311,15 +311,15 @@ const C4_QUESTIONS: ClusterQuestionSet = {
   },
 };
 
-// ── C5: Retail / product sales ─────────────────────────────────────────────
+// ── C5: Online retail (dropshipping, Etsy, Shopify) ────────────────────────
 const C5_QUESTIONS: ClusterQuestionSet = {
-  title: 'Retail & Product Sales',
-  description: 'Tell us about your products so we can estimate inventory costs and revenue.',
+  title: 'Online Retail Business',
+  description: 'Tell us about your online store so we can estimate your revenue, platform costs, and margins.',
   questions: [
     {
       key: 'avg_product_price',
-      label: 'Average product selling price',
-      description: 'The average price a customer pays for one item.',
+      label: 'Average selling price per item',
+      description: 'The average price a customer pays for one item on your store.',
       type: 'currency',
       placeholder: '35',
       defaultValue: 35,
@@ -336,31 +336,42 @@ const C5_QUESTIONS: ClusterQuestionSet = {
     },
     {
       key: 'cost_per_unit',
-      label: 'Cost per unit (wholesale / materials)',
-      description: 'What does each unit cost you to acquire or make?',
+      label: 'Cost per unit (wholesale / supplier)',
+      description: 'What does each unit cost you to buy or produce?',
       type: 'currency',
       placeholder: '15',
       defaultValue: 15,
       min: 0,
     },
     {
-      key: 'sells_online',
-      label: 'Sales channel',
-      description: 'Platform fees vary: Shopify ~$40/mo, Etsy ~$0.20/listing + 6.5% fees.',
+      key: 'platform',
+      label: 'Selling platform',
+      description: 'Where do you mainly sell? Platform fees differ.',
       type: 'select',
       options: [
-        { value: 'online', label: 'Online only (Shopify, Etsy, etc.)' },
-        { value: 'inperson', label: 'In-person only (market, pop-up)' },
-        { value: 'both', label: 'Both online and in-person' },
+        { value: 'shopify', label: 'Shopify (~$40/mo + payment fees)' },
+        { value: 'etsy', label: 'Etsy ($0.20/listing + 6.5% fees)' },
+        { value: 'amazon', label: 'Amazon (~15% referral fee)' },
+        { value: 'own_site', label: 'Own website (Stripe / PayPal fees only)' },
+        { value: 'social', label: 'Social media (Instagram, Facebook)' },
       ],
-      defaultValue: 'both',
+      defaultValue: 'shopify',
     },
     {
       key: 'ships_products',
-      label: 'Do you ship products?',
+      label: 'Do you handle shipping yourself?',
       description: 'Shipping costs average $8-15 per package within Canada.',
       type: 'boolean',
       defaultValue: true,
+    },
+    {
+      key: 'monthly_ad_spend',
+      label: 'Monthly advertising budget',
+      description: 'Facebook/Instagram ads, Google Ads, influencer sponsorships, etc.',
+      type: 'currency',
+      placeholder: '100',
+      defaultValue: 100,
+      min: 0,
     },
   ],
   computeFinancials: (a) => {
@@ -368,23 +379,112 @@ const C5_QUESTIONS: ClusterQuestionSet = {
     const units = Number(a.units_per_month) || 80;
     const cost = Number(a.cost_per_unit) || 15;
     const monthlyRevenue = price * units;
-    const channel = String(a.sells_online) || 'both';
+    const platform = String(a.platform) || 'shopify';
+
+    // Platform fees vary
+    const platformFees: Record<string, number> = {
+      shopify: 40 + monthlyRevenue * 0.029,   // $40/mo + 2.9% payment processing
+      etsy: units * 0.20 + monthlyRevenue * 0.065,  // listing + transaction fees
+      amazon: monthlyRevenue * 0.15,           // ~15% referral fee
+      own_site: monthlyRevenue * 0.029,        // Stripe ~2.9%
+      social: monthlyRevenue * 0.029,          // payment processing only
+    };
 
     return {
       monthlyRevenue: Math.round(monthlyRevenue),
       expenseOverrides: {
         inventory: Math.round(cost * units),
         shipping: a.ships_products ? Math.round(units * 10) : 0,
-        platform: channel === 'inperson' ? 0 : channel === 'online' ? 50 : 40,
-        marketing: 60,
+        platform_fees: Math.round(platformFees[platform] ?? 40),
+        advertising: Number(a.monthly_ad_spend) || 100,
+        packaging: Math.round(units * 1.5),
+        software: 20,  // accounting, email marketing
       },
     };
   },
 };
 
-// ── C6: Food service / hospitality ─────────────────────────────────────────
+// ── C6: Physical retail (brick-and-mortar, pop-up, market stall) ──────────
 const C6_QUESTIONS: ClusterQuestionSet = {
-  title: 'Food Service & Hospitality',
+  title: 'Physical Retail Store',
+  description: 'Tell us about your store so we can estimate rent, inventory, and operating costs.',
+  questions: [
+    {
+      key: 'avg_product_price',
+      label: 'Average selling price per item',
+      description: 'The average price a customer pays for one item.',
+      type: 'currency',
+      placeholder: '40',
+      defaultValue: 40,
+      min: 1,
+    },
+    {
+      key: 'units_per_month',
+      label: 'Expected units sold per month',
+      description: 'How many items do you expect to sell each month?',
+      type: 'number',
+      placeholder: '150',
+      defaultValue: 150,
+      min: 1,
+    },
+    {
+      key: 'cost_per_unit',
+      label: 'Cost per unit (wholesale / materials)',
+      description: 'What does each unit cost you to acquire or produce?',
+      type: 'currency',
+      placeholder: '18',
+      defaultValue: 18,
+      min: 0,
+    },
+    {
+      key: 'monthly_rent',
+      label: 'Monthly store rent',
+      description: 'Rent for your retail space, market stall, or pop-up location.',
+      type: 'currency',
+      placeholder: '1500',
+      defaultValue: 1500,
+      min: 0,
+    },
+    {
+      key: 'has_pos_system',
+      label: 'Do you use a POS system?',
+      description: 'Point-of-sale systems cost $30-80/mo (Square, Clover, Lightspeed).',
+      type: 'boolean',
+      defaultValue: true,
+    },
+    {
+      key: 'also_sells_online',
+      label: 'Do you also sell online?',
+      description: 'An online presence adds platform fees but broadens your market.',
+      type: 'boolean',
+      defaultValue: false,
+    },
+  ],
+  computeFinancials: (a) => {
+    const price = Number(a.avg_product_price) || 40;
+    const units = Number(a.units_per_month) || 150;
+    const cost = Number(a.cost_per_unit) || 18;
+    const rent = Number(a.monthly_rent) || 1500;
+    const monthlyRevenue = price * units;
+
+    return {
+      monthlyRevenue: Math.round(monthlyRevenue),
+      expenseOverrides: {
+        inventory: Math.round(cost * units),
+        rent: rent,
+        utilities: 150,
+        pos_system: a.has_pos_system ? 50 : 0,
+        insurance: 80,
+        signage_marketing: 75,
+        online_platform: a.also_sells_online ? 40 : 0,
+      },
+    };
+  },
+};
+
+// ── C7: Restaurant & food service ─────────────────────────────────────────
+const C7_QUESTIONS: ClusterQuestionSet = {
+  title: 'Restaurant & Food Service',
   description: 'Tell us about your restaurant or food service so we can estimate your costs accurately.',
   questions: [
     {
@@ -419,7 +519,7 @@ const C6_QUESTIONS: ClusterQuestionSet = {
     {
       key: 'num_seats',
       label: 'Number of seats / capacity',
-      description: 'Your restaurant seating capacity (for overhead estimation).',
+      description: 'Your restaurant seating capacity (for overhead estimation). 0 if takeout/delivery only.',
       type: 'number',
       placeholder: '20',
       defaultValue: 20,
@@ -452,8 +552,8 @@ const C6_QUESTIONS: ClusterQuestionSet = {
   },
 };
 
-// ── C7: Construction / trades ──────────────────────────────────────────────
-const C7_QUESTIONS: ClusterQuestionSet = {
+// ── C8: Construction & trades ──────────────────────────────────────────────
+const C8_QUESTIONS: ClusterQuestionSet = {
   title: 'Construction & Trades',
   description: 'Tell us about your contracting work so we can estimate your job revenue and material costs.',
   questions: [
@@ -523,23 +623,23 @@ const C7_QUESTIONS: ClusterQuestionSet = {
   },
 };
 
-// ── C8: Personal services ──────────────────────────────────────────────────
-const C8_QUESTIONS: ClusterQuestionSet = {
-  title: 'Personal Services',
-  description: 'Tell us about your service offerings so we can estimate your income and costs.',
+// ── C9: Personal care & beauty ─────────────────────────────────────────────
+const C9_QUESTIONS: ClusterQuestionSet = {
+  title: 'Personal Care & Beauty',
+  description: 'Tell us about your beauty or personal care services so we can estimate your income and costs.',
   questions: [
     {
       key: 'price_per_service',
-      label: 'Price per service / session',
-      description: 'Your standard price for one service (haircut, massage, treatment, etc.).',
+      label: 'Average price per service',
+      description: 'Your standard price for one service (haircut, lashes, nails, massage, etc.).',
       type: 'currency',
       placeholder: '60',
       defaultValue: 60,
       min: 10,
     },
     {
-      key: 'sessions_per_week',
-      label: 'Sessions per week',
+      key: 'clients_per_week',
+      label: 'Clients per week',
       description: 'How many clients do you serve per week?',
       type: 'number',
       placeholder: '20',
@@ -548,87 +648,229 @@ const C8_QUESTIONS: ClusterQuestionSet = {
       max: 50,
     },
     {
-      key: 'rents_chair',
-      label: 'Do you rent a chair or room?',
-      description: 'Salon chair rental or treatment room rental.',
-      type: 'boolean',
-      defaultValue: true,
+      key: 'workspace_type',
+      label: 'Where do you work?',
+      description: 'Your workspace affects rent and deduction eligibility.',
+      type: 'select',
+      options: [
+        { value: 'chair_rental', label: 'Salon chair / room rental' },
+        { value: 'own_salon', label: 'My own salon / studio' },
+        { value: 'home', label: 'Home-based' },
+        { value: 'mobile', label: 'Mobile / at client locations' },
+      ],
+      defaultValue: 'chair_rental',
     },
     {
-      key: 'chair_rent',
-      label: 'Monthly chair / room rental',
-      description: 'How much do you pay per month to rent your workspace?',
+      key: 'workspace_rent',
+      label: 'Monthly workspace cost',
+      description: 'Chair rental, studio lease, or home office portion. $0 if mobile.',
       type: 'currency',
-      placeholder: '300',
-      defaultValue: 300,
+      placeholder: '400',
+      defaultValue: 400,
       min: 0,
     },
     {
-      key: 'product_cost_monthly',
-      label: 'Monthly product / supply cost',
-      description: 'Hair products, oils, tools, disposables, etc.',
+      key: 'monthly_supplies',
+      label: 'Monthly product & supply cost',
+      description: 'Hair products, nail supplies, lash extensions, oils, disposables, etc.',
       type: 'currency',
-      placeholder: '150',
-      defaultValue: 150,
+      placeholder: '200',
+      defaultValue: 200,
       min: 0,
     },
   ],
   computeFinancials: (a) => {
     const price = Number(a.price_per_service) || 60;
-    const sessions = Number(a.sessions_per_week) || 20;
-    const monthlyRevenue = price * sessions * 4.33;
+    const clients = Number(a.clients_per_week) || 20;
+    const monthlyRevenue = price * clients * 4.33;
+    const workspaceType = String(a.workspace_type) || 'chair_rental';
 
     return {
       monthlyRevenue: Math.round(monthlyRevenue),
       expenseOverrides: {
-        products: Number(a.product_cost_monthly) || 150,
-        rent: a.rents_chair ? (Number(a.chair_rent) || 300) : 0,
-        insurance: 45,
+        supplies: Number(a.monthly_supplies) || 200,
+        rent: workspaceType === 'mobile' ? 0 : (Number(a.workspace_rent) || 400),
+        insurance: 55,
         tools: 40,
-        marketing: 30,
+        marketing: 40,
+        home_office: workspaceType === 'home' ? 150 : 0,
       },
     };
   },
 };
 
-// ── C9: General / unknown ──────────────────────────────────────────────────
-const C9_QUESTIONS: ClusterQuestionSet = {
-  title: 'General Micro-Business',
-  description: 'Tell us the basics so we can estimate your finances accurately.',
+// ── C10: Fitness & wellness ───────────────────────────────────────────────
+const C10_QUESTIONS: ClusterQuestionSet = {
+  title: 'Fitness & Wellness Business',
+  description: 'Tell us about your sessions and pricing so we can estimate your finances.',
   questions: [
     {
-      key: 'expected_monthly_revenue',
-      label: 'Expected monthly revenue',
-      description: 'Your best estimate of monthly gross revenue.',
+      key: 'fee_per_session',
+      label: 'Price per session / class',
+      description: 'How much do you charge per session, class, or appointment?',
       type: 'currency',
-      placeholder: '3000',
-      defaultValue: 3000,
+      placeholder: '60',
+      defaultValue: 60,
+      min: 10,
+    },
+    {
+      key: 'sessions_per_week',
+      label: 'Sessions per week',
+      description: 'How many sessions or classes do you expect to run each week?',
+      type: 'number',
+      placeholder: '15',
+      defaultValue: 15,
+      min: 1,
+    },
+    {
+      key: 'rents_studio',
+      label: 'Do you rent a studio or gym space?',
+      description: 'Monthly studio or space rental.',
+      type: 'boolean',
+      defaultValue: false,
+    },
+    {
+      key: 'studio_rent',
+      label: 'Monthly studio rent',
+      description: 'How much do you pay per month for your space?',
+      type: 'currency',
+      placeholder: '800',
+      defaultValue: 800,
       min: 0,
     },
     {
-      key: 'monthly_expenses_estimate',
-      label: 'Estimated monthly expenses',
-      description: 'Total business expenses you expect per month.',
-      type: 'currency',
-      placeholder: '500',
-      defaultValue: 500,
-      min: 0,
-    },
-    {
-      key: 'works_from_home',
-      label: 'Do you work from home?',
-      description: 'Home office expenses are partially deductible.',
+      key: 'has_equipment',
+      label: 'Do you need to buy equipment?',
+      description: 'Weights, mats, props, machines — amortized monthly.',
       type: 'boolean',
       defaultValue: true,
     },
   ],
   computeFinancials: (a) => {
+    const fee = Number(a.fee_per_session) || 60;
+    const sessions = Number(a.sessions_per_week) || 15;
+    const monthlyRevenue = fee * sessions * 4.33;
     return {
-      monthlyRevenue: Number(a.expected_monthly_revenue) || 3000,
+      monthlyRevenue: Math.round(monthlyRevenue),
       expenseOverrides: {
-        general: Number(a.monthly_expenses_estimate) || 500,
+        rent: a.rents_studio ? (Number(a.studio_rent) || 800) : 0,
+        equipment: a.has_equipment ? 150 : 0,
+        insurance: 80,
+        marketing: 60,
         phone: 45,
-        software: a.works_from_home ? 40 : 0,
+      },
+    };
+  },
+};
+
+// ── C11: Creative & media ────────────────────────────────────────────────
+const C11_QUESTIONS: ClusterQuestionSet = {
+  title: 'Creative & Media Business',
+  description: 'Tell us about your projects and pricing so we can estimate your finances.',
+  questions: [
+    {
+      key: 'avg_project_fee',
+      label: 'Average fee per project',
+      description: 'How much do you charge per project or gig?',
+      type: 'currency',
+      placeholder: '1500',
+      defaultValue: 1500,
+      min: 50,
+    },
+    {
+      key: 'projects_per_month',
+      label: 'Projects per month',
+      description: 'How many projects or gigs do you expect to complete each month?',
+      type: 'number',
+      placeholder: '3',
+      defaultValue: 3,
+      min: 1,
+    },
+    {
+      key: 'has_equipment_costs',
+      label: 'Do you have significant equipment costs?',
+      description: 'Camera, computer, software, instruments — amortized monthly.',
+      type: 'boolean',
+      defaultValue: true,
+    },
+    {
+      key: 'has_studio',
+      label: 'Do you rent a workspace or studio?',
+      description: 'Monthly rent for your creative space.',
+      type: 'boolean',
+      defaultValue: false,
+    },
+  ],
+  computeFinancials: (a) => {
+    const fee = Number(a.avg_project_fee) || 1500;
+    const projects = Number(a.projects_per_month) || 3;
+    const monthlyRevenue = fee * projects;
+    return {
+      monthlyRevenue: Math.round(monthlyRevenue),
+      expenseOverrides: {
+        equipment: a.has_equipment_costs ? 200 : 0,
+        software: 80,
+        rent: a.has_studio ? 600 : 0,
+        marketing: 50,
+        phone: 45,
+      },
+    };
+  },
+};
+
+// ── C12: Education & tutoring ────────────────────────────────────────────
+const C12_QUESTIONS: ClusterQuestionSet = {
+  title: 'Education & Tutoring Business',
+  description: 'Tell us about your students and pricing so we can estimate your finances.',
+  questions: [
+    {
+      key: 'fee_per_session',
+      label: 'Price per session or class',
+      description: 'How much do you charge per lesson, class, or workshop?',
+      type: 'currency',
+      placeholder: '50',
+      defaultValue: 50,
+      min: 10,
+    },
+    {
+      key: 'sessions_per_week',
+      label: 'Sessions per week',
+      description: 'How many sessions or classes do you expect to deliver each week?',
+      type: 'number',
+      placeholder: '12',
+      defaultValue: 12,
+      min: 1,
+    },
+    {
+      key: 'sells_courses',
+      label: 'Do you sell online courses or materials?',
+      description: 'Pre-recorded courses, ebooks, workbooks, etc.',
+      type: 'boolean',
+      defaultValue: false,
+    },
+    {
+      key: 'monthly_course_revenue',
+      label: 'Monthly passive income from courses',
+      description: 'Revenue from pre-recorded or digital products.',
+      type: 'currency',
+      placeholder: '300',
+      defaultValue: 300,
+      min: 0,
+    },
+  ],
+  computeFinancials: (a) => {
+    const fee = Number(a.fee_per_session) || 50;
+    const sessions = Number(a.sessions_per_week) || 12;
+    const sessionRevenue = fee * sessions * 4.33;
+    const courseRevenue = a.sells_courses ? (Number(a.monthly_course_revenue) || 300) : 0;
+    const monthlyRevenue = sessionRevenue + courseRevenue;
+    return {
+      monthlyRevenue: Math.round(monthlyRevenue),
+      expenseOverrides: {
+        materials: 60,
+        software: a.sells_courses ? 50 : 20,
+        marketing: 40,
+        phone: 45,
       },
     };
   },
@@ -646,11 +888,14 @@ export const CLUSTER_QUESTIONS: Record<ClusterID, ClusterQuestionSet> = {
   C7: C7_QUESTIONS,
   C8: C8_QUESTIONS,
   C9: C9_QUESTIONS,
+  C10: C10_QUESTIONS,
+  C11: C11_QUESTIONS,
+  C12: C12_QUESTIONS,
 };
 
 /**
  * Get the cluster-specific question set for a given cluster ID.
  */
 export function getClusterQuestions(clusterId: ClusterID): ClusterQuestionSet {
-  return CLUSTER_QUESTIONS[clusterId] ?? CLUSTER_QUESTIONS.C9;
+  return CLUSTER_QUESTIONS[clusterId] ?? CLUSTER_QUESTIONS.C2;  // fallback to freelance (lowest friction)
 }

@@ -63,32 +63,50 @@ const CLUSTER_DEDUCTIONS: Record<ClusterID, Deduction[]> = {
     { key: 'storage',        label: 'Storage / warehouse',          annualAmount: 1200, description: 'Inventory storage space rental',                             source: 'CRA T2125 — Rent' },
   ],
   C6: [
-    { key: 'food_cost',      label: 'Food & beverage cost',         annualAmount: 9600,  description: '~30% of revenue for ingredients and beverages',             source: 'CRA T2125 — Purchases' },
-    { key: 'rent',           label: 'Commercial rent',              annualAmount: 14400, description: 'Lease for commercial kitchen/restaurant space',              source: 'CRA T2125 — Rent' },
-    { key: 'utilities',      label: 'Utilities',                    annualAmount: 2400,  description: 'Hydro-Québec, gas, water for commercial kitchen',            source: 'CRA T2125 — Utilities' },
-    { key: 'equipment',      label: 'Equipment depreciation',       annualAmount: 1800,  description: 'CCA on commercial kitchen equipment',                       source: 'CRA CCA Schedule' },
-    { key: 'insurance',      label: 'Restaurant insurance',         annualAmount: 1200,  description: 'Liability + property insurance',                             source: 'CRA T2125 — Insurance' },
-    { key: 'permits',        label: 'Permits & licences',           annualAmount: 480,   description: 'MAPAQ, RACJ alcohol licence, municipal permits',             source: 'CRA T2125 — Licence fees' },
+    { key: 'inventory',      label: 'Inventory purchases',          annualAmount: 8400,  description: 'Wholesale inventory purchased for resale',                    source: 'CRA T2125 — Purchases' },
+    { key: 'rent',           label: 'Store rent',                   annualAmount: 18000, description: 'Lease for storefront, kiosk, or market location',                source: 'CRA T2125 — Rent' },
+    { key: 'utilities',      label: 'Utilities',                    annualAmount: 1800,  description: 'Hydro-Québec, internet, heating/cooling',                       source: 'CRA T2125 — Utilities' },
+    { key: 'pos_system',     label: 'POS fees & hardware',          annualAmount: 600,   description: 'Square/Lightspeed monthly fees and terminals',                source: 'CRA T2125 — Office expenses' },
+    { key: 'insurance',      label: 'Retail insurance',             annualAmount: 960,   description: 'General liability + contents coverage',                       source: 'CRA T2125 — Insurance' },
+    { key: 'marketing',      label: 'Signage & local advertising',  annualAmount: 900,   description: 'Store signage, flyers, local campaigns',                      source: 'CRA T2125 — Advertising' },
   ],
   C7: [
-    { key: 'materials',      label: 'Materials & supplies',         annualAmount: 6000,  description: 'Lumber, electrical, plumbing supplies',                      source: 'CRA T2125 — Purchases' },
-    { key: 'vehicle',        label: 'Vehicle expenses',             annualAmount: 4200,  description: 'Truck lease, fuel, maintenance for job sites',               source: 'CRA motor vehicle' },
-    { key: 'tools',          label: 'Tools & equipment',            annualAmount: 1440,  description: 'Tool replacement, repair, CCA on large equipment',           source: 'CRA CCA Schedule' },
-    { key: 'insurance',      label: 'Contractor insurance',         annualAmount: 2160,  description: 'General liability + RBQ requirements',                       source: 'CRA T2125 — Insurance' },
-    { key: 'rbq',            label: 'RBQ licence fee',              annualAmount: 540,   description: 'Annual RBQ contractor licence',                               source: 'CRA T2125 — Licence fees' },
+    { key: 'food_cost',      label: 'Food & beverage cost',         annualAmount: 28800, description: '~30% of sales for ingredients and beverages',                  source: 'CRA T2125 — Purchases' },
+    { key: 'rent',           label: 'Commercial kitchen rent',      annualAmount: 14400, description: 'Lease for kitchen, counter, or dining space',                    source: 'CRA T2125 — Rent' },
+    { key: 'utilities',      label: 'Utilities',                    annualAmount: 2400,  description: 'Hydro-Québec, gas, water for food operations',                  source: 'CRA T2125 — Utilities' },
+    { key: 'equipment',      label: 'Kitchen equipment (CCA)',      annualAmount: 1800,  description: 'Depreciation/maintenance for cooking equipment',                 source: 'CRA CCA Schedule' },
+    { key: 'insurance',      label: 'Hospitality insurance',        annualAmount: 1200,  description: 'Liability + property insurance for food service',                source: 'CRA T2125 — Insurance' },
+    { key: 'permits',        label: 'MAPAQ/RACJ permit fees',       annualAmount: 480,   description: 'Food permits and alcohol permit fees (where applicable)',      source: 'CRA T2125 — Licence fees' },
   ],
   C8: [
-    { key: 'products',       label: 'Products & supplies',          annualAmount: 1800,  description: 'Hair products, massage oils, esthetics supplies',             source: 'CRA T2125 — Supplies' },
-    { key: 'rent',           label: 'Chair / room rental',          annualAmount: 3600,  description: 'Salon chair or treatment room rental',                        source: 'CRA T2125 — Rent' },
-    { key: 'insurance',      label: 'Professional liability',       annualAmount: 540,   description: 'Insurance for personal service providers',                    source: 'CRA T2125 — Insurance' },
-    { key: 'tools',          label: 'Tools & equipment',            annualAmount: 480,   description: 'Scissors, machines, treatment equipment',                     source: 'CRA T2125 — Capital cost' },
-    { key: 'marketing',      label: 'Marketing & booking platform', annualAmount: 360,   description: 'Social media, booking software, business cards',              source: 'CRA T2125 — Advertising' },
+    { key: 'materials',      label: 'Materials & supplies',         annualAmount: 6000,  description: 'Lumber, fixtures, wiring, consumables by project',              source: 'CRA T2125 — Purchases' },
+    { key: 'vehicle',        label: 'Vehicle expenses',             annualAmount: 4200,  description: 'Truck/van lease, fuel, maintenance for job sites',               source: 'CRA motor vehicle' },
+    { key: 'tools',          label: 'Tools & equipment',            annualAmount: 1440,  description: 'Tool replacement, repair, and equipment depreciation',            source: 'CRA CCA Schedule' },
+    { key: 'insurance',      label: 'Contractor insurance',         annualAmount: 2160,  description: 'General liability + trade-specific coverage',                   source: 'CRA T2125 — Insurance' },
+    { key: 'rbq',            label: 'Trade licence fees',           annualAmount: 540,   description: 'RBQ/trade licence renewals and related fees',                 source: 'CRA T2125 — Licence fees' },
   ],
   C9: [
-    { key: 'general',        label: 'General business expenses',    annualAmount: 1200,  description: 'Varies by business type — adjust to your situation',          source: 'CRA T2125' },
+    { key: 'supplies',       label: 'Products & supplies',          annualAmount: 2160,  description: 'Hair products, skincare, nail supplies, etc.',                 source: 'CRA T2125 — Supplies' },
+    { key: 'rent',           label: 'Chair / booth rent',           annualAmount: 7200,  description: 'Salon chair rental or booth fee',                              source: 'CRA T2125 — Rent' },
+    { key: 'insurance',      label: 'Liability insurance',          annualAmount: 720,   description: 'Professional liability coverage',                              source: 'CRA T2125 — Insurance' },
     { key: 'phone',          label: 'Phone & internet',             annualAmount: 540,   description: 'Business portion of communications',                          source: 'CRA T2125 — Telephone' },
-    { key: 'software',       label: 'Software & tools',             annualAmount: 480,   description: 'Basic business software subscriptions',                       source: 'CRA T2125 — Office expenses' },
-    { key: 'insurance',      label: 'Basic insurance',              annualAmount: 360,   description: 'General liability coverage',                                  source: 'CRA T2125 — Insurance' },
+  ],
+  C10: [
+    { key: 'rent',           label: 'Studio / space rent',          annualAmount: 9600,  description: 'Gym, studio, or co-working space',                            source: 'CRA T2125 — Rent' },
+    { key: 'equipment',      label: 'Equipment (CCA)',              annualAmount: 1800,  description: 'Weights, mats, props — capital cost allowance',                source: 'CRA CCA Class 8' },
+    { key: 'insurance',      label: 'Liability insurance',          annualAmount: 960,   description: 'Fitness instructor coverage',                                 source: 'CRA T2125 — Insurance' },
+    { key: 'phone',          label: 'Phone & internet',             annualAmount: 540,   description: 'Business portion of communications',                          source: 'CRA T2125 — Telephone' },
+  ],
+  C11: [
+    { key: 'equipment',      label: 'Equipment (CCA)',              annualAmount: 2400,  description: 'Camera, computer, instruments — capital cost allowance',       source: 'CRA CCA Class 8/10' },
+    { key: 'software',       label: 'Software & licenses',          annualAmount: 960,   description: 'Adobe, editing tools, plugins',                               source: 'CRA T2125 — Office expenses' },
+    { key: 'marketing',      label: 'Portfolio & marketing',        annualAmount: 600,   description: 'Website hosting, social media ads',                           source: 'CRA T2125 — Advertising' },
+    { key: 'phone',          label: 'Phone & internet',             annualAmount: 540,   description: 'Business portion of communications',                          source: 'CRA T2125 — Telephone' },
+  ],
+  C12: [
+    { key: 'materials',      label: 'Teaching materials',           annualAmount: 720,   description: 'Workbooks, printing, supplies',                               source: 'CRA T2125 — Supplies' },
+    { key: 'software',       label: 'Software & platforms',         annualAmount: 600,   description: 'Zoom, LMS, course platform subscriptions',                    source: 'CRA T2125 — Office expenses' },
+    { key: 'phone',          label: 'Phone & internet',             annualAmount: 540,   description: 'Business portion of communications',                          source: 'CRA T2125 — Telephone' },
   ],
 };
 
@@ -96,7 +114,7 @@ const CLUSTER_DEDUCTIONS: Record<ClusterID, Deduction[]> = {
  * Get the deduction summary for a cluster, with estimated tax savings.
  */
 export function getDeductionSummary(clusterId: ClusterID): DeductionSummary {
-  const deductions = CLUSTER_DEDUCTIONS[clusterId] ?? CLUSTER_DEDUCTIONS.C9;
+  const deductions = CLUSTER_DEDUCTIONS[clusterId] ?? CLUSTER_DEDUCTIONS.C2;
   const totalAnnualDeductions = deductions.reduce((sum, d) => sum + d.annualAmount, 0);
   const estimatedTaxSavings = Math.round(totalAnnualDeductions * ESTIMATED_MARGINAL_RATE);
 

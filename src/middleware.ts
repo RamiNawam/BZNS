@@ -49,8 +49,26 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Always refresh the session — keeps the cookie alive
-  const { data: { user } } = await supabase.auth.getUser()
+  let user = null
+  try {
+    // Always refresh the session — keeps the cookie alive
+    const { data } = await supabase.auth.getUser()
+    user = data.user
+  } catch (error) {
+    // If the auth cookie is malformed/corrupted, clear it and continue as logged-out.
+    // This prevents requests from hanging when Supabase cannot parse session cookies.
+    const authCookieNames = request.cookies
+      .getAll()
+      .map((c) => c.name)
+      .filter((name) => name.includes('-auth-token'))
+
+    for (const name of authCookieNames) {
+      request.cookies.set({ name, value: '' } as never)
+      response.cookies.set({ name, value: '', maxAge: 0, path: '/' })
+    }
+
+    console.warn('[middleware] Supabase auth recovery failed; cleared auth cookies.', error)
+  }
 
   const isPublicRoute = PUBLIC_ROUTES.some(route => pathname === route || pathname.startsWith('/api/auth'))
 
