@@ -4,8 +4,23 @@
     "intake": "Profil d'entreprise",
     "roadmap": "Feuille de route",
     "funding": "Financement",
+    "finances": "Finances",
     "starterKit": "Trousse de démarrage",
-    "assistant": "Assistant IA"
+    "settings": "Paramètres",
+    "signOut": "Déconnexion",
+    "signingOut": "Déconnexion..."
+  },
+  "brand": {
+    "tagline": "Tremplin micro-entreprise"
+  },
+  "topbar": {
+    "dashboard": { "title": "Tableau de bord", "subtitle": "Vue d'ensemble de votre entreprise" },
+    "roadmap": { "title": "Feuille de route légale", "subtitle": "Guide d'immatriculation étape par étape" },
+    "funding": { "title": "Financement", "subtitle": "Programmes québécois auxquels vous êtes admissible" },
+    "financial": { "title": "Finances", "subtitle": "Votre portrait financier" },
+    "starterKit": { "title": "Trousse de démarrage", "subtitle": "Modèles prêts à télécharger" },
+    "intake": { "title": "Profil d'entreprise", "subtitle": "Parlez-nous de votre idée" },
+    "settings": { "title": "Paramètres", "subtitle": "Votre profil et vos préférences" }
   },
   "home": {
     "title": "BZNS — Tremplin pour micro-entreprises",
@@ -39,8 +54,21 @@
     }
   },
   "roadmap": {
-    "title": "Votre feuille de route",
+    "title": "Feuille de route légale",
+    "subtitle": "Étapes personnalisées et ordonnées pour lancer votre entreprise au Québec légalement.",
     "empty": "Complétez votre profil d'entreprise pour générer une feuille de route personnalisée.",
+    "noRoadmapTitle": "Aucune feuille de route",
+    "noRoadmapProfile": "Complétez d'abord votre profil d'entreprise.",
+    "noRoadmapGenerate": "Générez votre liste de vérification légale personnalisée.",
+    "generateBtn": "Générer ma feuille de route",
+    "staleWarning": "Vos paramètres ont changé depuis la génération de cette feuille de route.",
+    "updateBtn": "Mettre à jour",
+    "reviewBanner": "Nous avons vérifié votre feuille de route pour votre entreprise",
+    "reviewDetail": "nécessitent votre attention avant de continuer — cliquez sur les étapes surlignées pour voir les détails.",
+    "stepsCompleted": "étapes complétées",
+    "verified": "vérifiées",
+    "needsAttention": "à vérifier",
+    "recommendedForBusiness": "recommandées pour votre entreprise",
     "categories": {
       "registration": "Immatriculation",
       "permits": "Permis",
@@ -48,20 +76,92 @@
       "banking": "Services bancaires",
       "insurance": "Assurances",
       "other": "Autre"
-    }
+    },
+    "status": {
+      "pending": "À faire",
+      "in_progress": "En cours",
+      "completed": "Complété",
+      "skipped": "Ignoré"
+    },
+    "confidence": {
+      "verified": "Vérifié",
+      "needsAttention": "À vérifier",
+      "recommended": "Recommandé"
+    },
+    "itemsToReview": "éléments à vérifier",
+    "completeFirst": "Complétez « {step} » d'abord"
   },
   "funding": {
     "title": "Sources de financement",
+    "subtitle": "Programmes québécois auxquels vous êtes admissible",
     "empty": "Complétez votre profil d'entreprise pour voir les correspondances de financement.",
     "score": "Score de correspondance",
     "recommended": "Recommandé",
     "learnMore": "En savoir plus"
   },
+  "financial": {
+    "title": "Finances",
+    "subtitle": "Votre portrait financier"
+  },
   "assistant": {
-    "title": "Assistant IA",
-    "placeholder": "Posez-moi une question sur le démarrage de votre entreprise au Québec...",
+    "greeting": "Bonjour ! Comment puis-je vous aider ?",
+    "title": "Assistant BZNS",
+    "placeholder": "Posez une question sur l'immatriculation, les taxes, le financement...",
     "send": "Envoyer",
-    "thinking": "Réflexion en cours..."
+    "thinking": "Réflexion en cours...",
+    "clear": "Effacer",
+    "emptyState": "Posez-moi une question sur votre entreprise au Québec."
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérez votre profil et vos informations d'entreprise.",
+    "roadmapNotice": "Après avoir enregistré des modifications à votre type d'entreprise ou votre emplacement, allez sur votre tableau de bord et cliquez sur {bold} pour obtenir des étapes mises à jour.",
+    "roadmapNoticeBold": "Générer ma feuille de route",
+    "account": "Compte",
+    "email": "Courriel",
+    "emailHint": "Votre courriel de connexion — géré par lien magique.",
+    "fullName": "Nom complet",
+    "preferredLanguage": "Langue préférée",
+    "yourBusiness": "Votre entreprise",
+    "businessType": "Type d'entreprise",
+    "businessTypeHint": "Utilisé pour sélectionner les étapes légales et les programmes de financement pour votre feuille de route.",
+    "businessName": "Nom de l'entreprise",
+    "businessNameHint": "Laissez vide si vous n'avez pas encore choisi de nom.",
+    "businessDescription": "Description de l'entreprise",
+    "businessDescriptionHint": "Un court résumé de ce que vous faites. Utilisé pour personnaliser votre feuille de route.",
+    "location": "Emplacement",
+    "city": "Ville / Municipalité",
+    "borough": "Arrondissement",
+    "boroughHint": "Arrondissement de Montréal, si applicable (ex. Villeray, Plateau-Mont-Royal).",
+    "businessLocation": "Emplacement de l'entreprise",
+    "homeBased": "Entreprise à domicile",
+    "aboutYou": "À votre sujet",
+    "age": "Âge",
+    "immigrationStatus": "Statut d'immigration",
+    "revenue": "Revenus",
+    "expectedRevenue": "Revenu mensuel prévu (CAD)",
+    "expectedRevenueHint": "Utilisé pour calculer votre portrait fiscal et le seuil d'inscription TPS/TVQ.",
+    "changesSaved": "Modifications enregistrées",
+    "saveChanges": "Enregistrer",
+    "saving": "Enregistrement…"
+  },
+  "dashboard": {
+    "welcome": "Bon retour",
+    "completeIntakeTitle": "Commençons",
+    "completeIntakeSubtitle": "Complétez votre profil d'entreprise pour débloquer votre feuille de route personnalisée, vos correspondances de financement et votre portrait financier.",
+    "startIntake": "Créer mon profil d'entreprise",
+    "roadmapProgress": "Progrès de la feuille de route",
+    "stepsCompleted": "étapes complétées",
+    "completeIntakeToGenerate": "Complétez le profil pour générer",
+    "viewRoadmap": "Voir la feuille de route",
+    "fundingAvailable": "Financement disponible",
+    "acrossPrograms": "dans les programmes correspondants",
+    "viewMatches": "Voir les correspondances",
+    "financesLabel": "Finances",
+    "viewFinancialSnapshot": "votre portrait financier",
+    "viewFinances": "Voir les finances",
+    "staleWarning": "Vos paramètres ont changé depuis la génération de cette feuille de route.",
+    "updateRoadmap": "Mettre à jour"
   },
   "common": {
     "save": "Enregistrer",
@@ -69,6 +169,7 @@
     "next": "Suivant",
     "back": "Retour",
     "loading": "Chargement...",
-    "error": "Une erreur s'est produite. Veuillez réessayer."
+    "error": "Une erreur s'est produite. Veuillez réessayer.",
+    "of": "de"
   }
 }
