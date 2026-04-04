@@ -88,7 +88,7 @@ function HeroPreviewCard() {
   return (
     <div className="relative">
       <div className="absolute inset-0 -z-10 blur-3xl opacity-20 bg-brand-400 rounded-full scale-90 translate-y-6" />
-      <div className="card p-6 shadow-card-hover md:rotate-1">
+      <div className="card p-6 shadow-card-hover">
         <div className="flex items-center justify-between mb-4">
           <span className="inline-flex items-center bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">
             Your Roadmap — Food Business
