@@ -1284,7 +1284,7 @@ export default function FinancialPage() {
               <Wallet size={24} className="text-white" />
             </div>
           </div>
-          <div className="bg-white/10 rounded-xl p-4">
+          <div className="bg-white rounded-xl p-4">
             <WaterfallBar grossMonthly={monthlyRevenue} taxes={taxes} monthlyExpenses={monthlyExpenses} />
           </div>
         </div>
@@ -1524,7 +1524,6 @@ export default function FinancialPage() {
             })}
           </div>
         )}
-        <FundingImpactCard monthlyExpenses={monthlyExpenses} monthlyTakeHome={monthlyTakeHome} />
       </section>
 
     </div>
