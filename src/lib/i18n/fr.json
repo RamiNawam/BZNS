@@ -343,6 +343,9 @@
     "hideAnalysis": "Masquer l'analyse",
     "analyseEligibility": "Analyser mon admissibilité",
     "impact": "impact",
+    "impactHigh": "fort",
+    "impactMedium": "moyen",
+    "impactLow": "faible",
     "whatNeedToApply": "Documents nécessaires pour postuler",
     "removeBookmark": "Retirer le favori",
     "bookmarkProgram": "Ajouter aux favoris"

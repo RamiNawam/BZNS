@@ -343,6 +343,9 @@
     "hideAnalysis": "Hide analysis",
     "analyseEligibility": "Analyse my eligibility",
     "impact": "impact",
+    "impactHigh": "high",
+    "impactMedium": "medium",
+    "impactLow": "low",
     "whatNeedToApply": "What you'll need to apply",
     "removeBookmark": "Remove bookmark",
     "bookmarkProgram": "Bookmark this program"

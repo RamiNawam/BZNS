@@ -11,6 +11,7 @@ import type { Profile } from '@/types/profile';
 import { useFundingStore } from '@/stores/funding-store';
 import { useProfileStore } from '@/stores/profile-store';
 import { useTranslation } from '@/lib/i18n/useTranslation';
+import { localizeProgramName, localizeAmount, localizeDocument } from '@/lib/funding/locale';
 
 interface FundingCardProps {
   match: FundingMatch;
@@ -214,7 +215,7 @@ function ExplanationPanel({ exp }: { exp: FundingExplanation }) {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-medium text-slate-800">{f.label}</span>
                       <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full uppercase tracking-wide ${IMPACT_BADGE[f.impact] ?? IMPACT_BADGE.low}`}>
-                        {f.impact} {t('funding.impact')}
+                        {t(`funding.impact${f.impact.charAt(0).toUpperCase()}${f.impact.slice(1)}`)} {t('funding.impact')}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{f.detail}</p>
@@ -264,7 +265,7 @@ function ExplanationPanel({ exp }: { exp: FundingExplanation }) {
 export default function FundingCard({ match }: FundingCardProps) {
   const { toggleBookmark } = useFundingStore();
   const profile = useProfileStore((s) => s.profile);
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const TYPE_LABEL = useTypeLabel();
   const matchLabel = useMatchLabel();
   const [expanded, setExpanded] = useState(false);
@@ -316,7 +317,7 @@ export default function FundingCard({ match }: FundingCardProps) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap mb-1">
                   <span className="font-heading font-semibold text-sm text-slate-900 leading-snug">
-                    {match.program_name}
+                    {localizeProgramName(match.program_key, match.program_name, locale)}
                   </span>
                   <span className={TYPE_BADGE[match.program_type]}>
                     {TYPE_LABEL[match.program_type]}
@@ -325,7 +326,7 @@ export default function FundingCard({ match }: FundingCardProps) {
                 </div>
                 {match.amount_description && (
                   <p className="text-sm font-semibold text-emerald-600">
-                    {match.amount_description}
+                    {localizeAmount(match.amount_description, locale)}
                   </p>
                 )}
               </div>
@@ -374,7 +375,7 @@ export default function FundingCard({ match }: FundingCardProps) {
                 {match.documents_required.map((doc, i) => (
                   <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700">
                     <div className="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0 mt-1.5" />
-                    {doc}
+                    {localizeDocument(doc, locale)}
                   </li>
                 ))}
               </ul>
