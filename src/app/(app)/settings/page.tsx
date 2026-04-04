@@ -5,41 +5,59 @@ import { useProfileStore } from "@/stores/profile-store";
 import { useRoadmapStore } from "@/stores/roadmap-store";
 import { useFundingStore } from "@/stores/funding-store";
 import { createClient } from "@/lib/supabase/client";
-import { Save, CheckCircle2, AlertCircle, Info } from "lucide-react";
-import { CLUSTERS, type ClusterID } from "@/lib/clusters";
+import { Save, CheckCircle2, AlertCircle } from "lucide-react";
+import { CLUSTERS } from "@/lib/clusters";
+import { classifyBusiness } from "@/lib/classifier";
 
 const immigrationOptions = [
-  { value: "citizen", label: "Canadian Citizen" },
-  { value: "permanent_resident", label: "Permanent Resident" },
-  { value: "work_permit", label: "Work Permit" },
-  { value: "student", label: "Student Visa" },
+  { value: "citizen", label: "Canadian citizen" },
+  { value: "permanent_resident", label: "Permanent resident" },
+  { value: "temporary_resident", label: "Temporary resident (work/study permit)" },
+  { value: "refugee", label: "Refugee claimant / protected person" },
+  { value: "prefer_not_to_say", label: "Prefer not to say" },
 ];
 
-const languageOptions = [
-  { value: "en", label: "English" },
-  { value: "fr", label: "French" },
+const businessActivityOptions = [
+  { value: "food", label: "Preparing or selling food" },
+  { value: "services", label: "Providing a service" },
+  { value: "professional", label: "Regulated profession" },
+  { value: "products", label: "Selling physical products" },
+  { value: "trades", label: "Construction or skilled trades" },
+  { value: "children", label: "Caring for children" },
 ];
 
-const businessTypeOptions = [
-  { value: "food", label: "Food & Bakery" },
-  { value: "freelance", label: "Freelance / Consulting" },
-  { value: "daycare", label: "Childcare" },
-  { value: "retail", label: "Retail" },
-  { value: "personal_care", label: "Personal Care" },
-  { value: "other", label: "Other" },
+const workLocationOptions = [
+  { value: "home", label: "From home" },
+  { value: "commercial", label: "Rented / commercial space" },
+  { value: "client_sites", label: "At client locations" },
+  { value: "online", label: "Online only" },
 ];
 
-/** Map business_type + is_home_based back to a default cluster for settings changes */
-function deriveCluster(businessType: string, isHomeBased: boolean): ClusterID {
-  switch (businessType) {
-    case "food":         return isHomeBased ? "C1" : "C7";
-    case "freelance":    return "C2";
-    case "daycare":      return "C3";
-    case "retail":       return isHomeBased ? "C5" : "C6";
-    case "personal_care": return "C9";
-    default:             return "C2";
-  }
-}
+const pricingModelOptions = [
+  { value: "per_item", label: "Per item / product" },
+  { value: "per_hour", label: "Per hour" },
+  { value: "per_session", label: "Per session / appointment" },
+  { value: "per_project", label: "Per project" },
+  { value: "subscription", label: "Monthly / recurring" },
+];
+
+const locationOptions = [
+  { value: "montreal", label: "Montréal" },
+  { value: "quebec_city", label: "Québec City" },
+  { value: "laval", label: "Laval" },
+  { value: "other_quebec", label: "Other Québec municipality" },
+];
+
+const spokenLanguageOptions = [
+  { code: "fr", label: "French" },
+  { code: "en", label: "English" },
+  { code: "es", label: "Spanish" },
+  { code: "ar", label: "Arabic" },
+  { code: "zh", label: "Mandarin / Cantonese" },
+  { code: "pt", label: "Portuguese" },
+  { code: "ht", label: "Haitian Creole" },
+  { code: "other", label: "Other" },
+];
 
 // ── Reusable form field wrappers ───────────────────────────────────────────
 
@@ -98,14 +116,16 @@ export default function SettingsPage() {
   const [form, setForm] = useState({
     full_name: "",
     business_name: "",
-    business_type: "other",
+    business_activity: "",
     business_description: "",
-    municipality: "",
+    work_location: "",
+    pricing_model: "",
+    location: "montreal",
     borough: "",
-    is_home_based: true,
-    expected_monthly_revenue: "",
+    has_partners: false,
     age: "",
     immigration_status: "citizen",
+    languages: ["en"] as string[],
     preferred_language: "en",
   });
 
@@ -119,20 +139,20 @@ export default function SettingsPage() {
   // Populate form from loaded profile
   useEffect(() => {
     if (profile) {
+      const intake = (profile.intake_answers ?? {}) as Record<string, unknown>;
       setForm({
         full_name: profile.full_name ?? "",
         business_name: profile.business_name ?? "",
-        business_type: profile.business_type ?? "other",
+        business_activity: (intake.business_activity as string) ?? "",
         business_description: profile.business_description ?? "",
-        municipality: profile.municipality ?? "",
+        work_location: (intake.work_location as string) ?? "",
+        pricing_model: (intake.pricing_model as string) ?? "",
+        location: profile.municipality ?? "montreal",
         borough: profile.borough ?? "",
-        is_home_based: profile.is_home_based ?? true,
-        expected_monthly_revenue:
-          profile.expected_monthly_revenue != null
-            ? String(profile.expected_monthly_revenue)
-            : "",
+        has_partners: profile.has_partners ?? false,
         age: profile.age != null ? String(profile.age) : "",
         immigration_status: profile.immigration_status ?? "citizen",
+        languages: profile.languages_spoken ?? ["en"],
         preferred_language: profile.preferred_language ?? "en",
       });
     }
@@ -150,10 +170,33 @@ export default function SettingsPage() {
     setSaved(false);
 
     try {
-      // Reclassify cluster when business type or location changes
-      const newClusterId = deriveCluster(form.business_type, form.is_home_based);
+      // Reclassify cluster from the new classification fields
+      const isHomeBased = form.work_location === "home";
+      const newClusterId = classifyBusiness({
+        business_activity: form.business_activity,
+        work_location: form.work_location,
+        pricing_model: form.pricing_model,
+      });
       const clusterMeta = CLUSTERS[newClusterId];
       const clusterChanged = newClusterId !== profile.cluster_id;
+
+      // Merge updated classification fields into intake_answers
+      const prevIntake = (profile.intake_answers ?? {}) as Record<string, unknown>;
+      const updatedIntakeAnswers = {
+        ...prevIntake,
+        business_name: form.business_name,
+        business_activity: form.business_activity,
+        work_location: form.work_location,
+        pricing_model: form.pricing_model,
+        business_idea: form.business_description,
+        location: form.location,
+        borough: form.borough,
+        has_partners: form.has_partners,
+        age: form.age ? Number(form.age) : null,
+        immigration_status: form.immigration_status,
+        languages: form.languages,
+        preferred_language: form.preferred_language,
+      };
 
       const res = await fetch("/api/profile", {
         method: "PATCH",
@@ -163,18 +206,17 @@ export default function SettingsPage() {
           updates: {
             full_name: form.full_name || null,
             business_name: form.business_name || null,
-            business_type: form.business_type,
             business_description: form.business_description || null,
-            municipality: form.municipality,
+            municipality: form.location,
             borough: form.borough || null,
-            is_home_based: form.is_home_based,
-            has_physical_location: !form.is_home_based,
-            expected_monthly_revenue: form.expected_monthly_revenue
-              ? Number(form.expected_monthly_revenue)
-              : null,
+            is_home_based: isHomeBased,
+            has_physical_location: !isHomeBased,
+            has_partners: form.has_partners,
             age: form.age ? Number(form.age) : null,
             immigration_status: form.immigration_status,
+            languages_spoken: form.languages,
             preferred_language: form.preferred_language,
+            intake_answers: updatedIntakeAnswers,
             cluster_id: newClusterId,
             cluster_label: clusterMeta.label,
             cluster_complexity: clusterMeta.complexity,
@@ -207,7 +249,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div>
         <h2 className="font-heading text-2xl font-bold text-slate-900">
@@ -218,18 +260,7 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      {/* Roadmap notice */}
-      <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        <Info size={15} className="mt-0.5 shrink-0 text-amber-600" />
-        <span>
-          After saving changes to your business type or location, go to your
-          dashboard and click
-          <strong className="font-semibold"> Generate My Roadmap</strong> to get
-          updated steps.
-        </span>
-      </div>
-
-      {/* Account */}
+      {/* Account & About You */}
       <Section title="Account">
         <Field
           label="Email"
@@ -249,33 +280,106 @@ export default function SettingsPage() {
             onChange={(e) => set("full_name", e.target.value)}
           />
         </Field>
-        <Field label="Preferred language">
-          <select
-            className={selectCls}
-            value={form.preferred_language}
-            onChange={(e) => set("preferred_language", e.target.value)}
-          >
-            {languageOptions.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Age" hint="Some grants target entrepreneurs under 35 or over 50.">
+            <input
+              className={inputCls}
+              type="number"
+              min={16}
+              max={99}
+              placeholder="e.g. 26"
+              value={form.age}
+              onChange={(e) => set("age", e.target.value)}
+            />
+          </Field>
+          <Field label="Immigration status">
+            <select
+              className={selectCls}
+              value={form.immigration_status}
+              onChange={(e) => set("immigration_status", e.target.value)}
+            >
+              {immigrationOptions.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
+        <Field label="Languages you work in">
+          <div className="flex flex-wrap gap-2 mt-1">
+            {spokenLanguageOptions.map((lang) => {
+              const selected = form.languages.includes(lang.code);
+              return (
+                <button
+                  key={lang.code}
+                  type="button"
+                  onClick={() => {
+                    const next = selected
+                      ? form.languages.filter((l) => l !== lang.code)
+                      : [...form.languages, lang.code];
+                    set("languages", next);
+                  }}
+                  className={`px-3 py-1.5 rounded-full border text-sm font-medium transition-all ${
+                    selected
+                      ? "bg-brand-600 text-white border-brand-600"
+                      : "bg-white text-slate-600 border-slate-200 hover:border-brand-300 hover:text-brand-700"
+                  }`}
+                >
+                  {lang.label}
+                </button>
+              );
+            })}
+          </div>
+        </Field>
+        <Field label="Preferred language for roadmap & AI assistant">
+          <div className="grid grid-cols-2 gap-3">
+            {(["en", "fr"] as const).map((lang) => (
+              <button
+                key={lang}
+                type="button"
+                onClick={() => set("preferred_language", lang)}
+                className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
+                  form.preferred_language === lang
+                    ? "border-brand-400 bg-brand-50 text-brand-900"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                }`}
+              >
+                {lang === "en" ? "English" : "Français"}
+              </button>
             ))}
-          </select>
+          </div>
         </Field>
       </Section>
 
       {/* Business */}
       <Section title="Your Business">
         <Field
-          label="Business type"
-          hint="Used to select the right legal steps and funding programs for your roadmap."
+          label="What does your business mainly involve?"
+          hint="Used to select the right legal steps and funding programs."
         >
           <select
             className={selectCls}
-            value={form.business_type}
-            onChange={(e) => set("business_type", e.target.value)}
+            value={form.business_activity}
+            onChange={(e) => set("business_activity", e.target.value)}
           >
-            {businessTypeOptions.map((o) => (
+            <option value="">Select…</option>
+            {businessActivityOptions.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field label="How will you charge your clients?">
+          <select
+            className={selectCls}
+            value={form.pricing_model}
+            onChange={(e) => set("pricing_model", e.target.value)}
+          >
+            <option value="">Select…</option>
+            {pricingModelOptions.map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
               </option>
@@ -309,90 +413,67 @@ export default function SettingsPage() {
         </Field>
       </Section>
 
-      {/* Location */}
-      <Section title="Location">
-        <Field label="City / Municipality">
-          <input
-            className={inputCls}
-            placeholder="e.g. Montreal"
-            value={form.municipality}
-            onChange={(e) => set("municipality", e.target.value)}
-          />
+      {/* Location & Setup */}
+      <Section title="Location & Setup">
+        <Field label="Which city or region are you in?">
+          <select
+            className={selectCls}
+            value={form.location}
+            onChange={(e) => set("location", e.target.value)}
+          >
+            {locationOptions.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
         </Field>
-        <Field
-          label="Borough"
-          hint="Montréal borough, if applicable (e.g. Villeray, Plateau-Mont-Royal)."
-        >
-          <input
-            className={inputCls}
-            placeholder="e.g. Villeray"
-            value={form.borough}
-            onChange={(e) => set("borough", e.target.value)}
-          />
-        </Field>
-        <Field label="Business location">
-          <label className="flex items-center gap-3 cursor-pointer select-none">
-            <div
-              onClick={() => set("is_home_based", !form.is_home_based)}
-              className={`relative h-5 w-9 rounded-full transition-colors ${form.is_home_based ? "bg-brand-500" : "bg-slate-200"}`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${form.is_home_based ? "translate-x-4" : "translate-x-0"}`}
-              />
-            </div>
-            <span className="text-sm text-slate-700">Home-based business</span>
-          </label>
-        </Field>
-      </Section>
 
-      {/* About you */}
-      <Section title="About You">
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Age">
+        {form.location === "montreal" && (
+          <Field
+            label="Borough"
+            hint="Helps match borough-specific grants and zoning info."
+          >
             <input
               className={inputCls}
-              type="number"
-              min={16}
-              max={99}
-              placeholder="e.g. 26"
-              value={form.age}
-              onChange={(e) => set("age", e.target.value)}
+              placeholder="e.g. Rosemont–La Petite-Patrie"
+              value={form.borough}
+              onChange={(e) => set("borough", e.target.value)}
             />
           </Field>
-          <Field label="Immigration status">
-            <select
-              className={selectCls}
-              value={form.immigration_status}
-              onChange={(e) => set("immigration_status", e.target.value)}
-            >
-              {immigrationOptions.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </Field>
-        </div>
-      </Section>
+        )}
 
-      {/* Revenue */}
-      <Section title="Revenue">
-        <Field
-          label="Expected monthly revenue (CAD)"
-          hint="Used to calculate your tax snapshot and GST/QST registration threshold."
-        >
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium">
-              $
-            </span>
-            <input
-              className={`${inputCls} pl-7`}
-              type="number"
-              min={0}
-              placeholder="e.g. 2000"
-              value={form.expected_monthly_revenue}
-              onChange={(e) => set("expected_monthly_revenue", e.target.value)}
-            />
+        <Field label="Where will you mainly work?">
+          <select
+            className={selectCls}
+            value={form.work_location}
+            onChange={(e) => set("work_location", e.target.value)}
+          >
+            <option value="">Select…</option>
+            {workLocationOptions.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field label="Will you have business partners or co-founders?">
+          <div className="grid grid-cols-2 gap-3">
+            {([true, false] as const).map((val) => (
+              <button
+                key={String(val)}
+                type="button"
+                onClick={() => set("has_partners", val)}
+                className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
+                  form.has_partners === val
+                    ? "border-brand-400 bg-brand-50 text-brand-900"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                }`}
+              >
+                {val ? "Yes" : "No"}
+              </button>
+            ))}
           </div>
         </Field>
       </Section>

@@ -29,7 +29,7 @@ export default function TopBar() {
   const initials = getInitials(profile);
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-end px-6 shrink-0">
+    <header className="fixed top-0 left-0 w-full h-16 flex items-center justify-end px-6 z-50">
       <div className="flex items-center gap-2">
         {/* Language toggle */}
         <button
@@ -42,22 +42,6 @@ export default function TopBar() {
         >
           {locale === "en" ? "EN" : "FR"}
         </button>
-
-        <button
-          type="button"
-          className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
-          aria-label="Notifications"
-        >
-          <Bell size={16} />
-        </button>
-
-        <Link
-          href="/settings"
-          className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
-          aria-label="Settings"
-        >
-          <Settings size={16} />
-        </Link>
 
         {/* Avatar → settings */}
         <Link

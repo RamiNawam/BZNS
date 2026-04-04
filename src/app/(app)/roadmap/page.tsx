@@ -15,7 +15,7 @@ export default function RoadmapPage() {
   }, [loadProfile]);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
 
       {/* Header */}
       <div>

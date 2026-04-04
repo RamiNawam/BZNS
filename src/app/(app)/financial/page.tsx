@@ -996,7 +996,7 @@ function FinancialQuestionnaire({
   const currentValue = answers[question.key];
 
   return (
-    <div className="max-w-lg mx-auto pt-4 pb-12">
+    <div className="max-w-4xl mx-auto pt-4 pb-12">
       {/* Header */}
       <div className="mb-8">
         <div className="inline-flex items-center gap-2 text-xs font-medium text-brand-700 bg-brand-50 border border-brand-200 rounded-full px-3 py-1 mb-3">
@@ -1240,7 +1240,7 @@ export default function FinancialPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8">
 
       {/* Page header */}
       <div className="flex items-start justify-between gap-4">
