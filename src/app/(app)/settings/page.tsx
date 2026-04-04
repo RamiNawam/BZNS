@@ -9,6 +9,17 @@ import { Save, CheckCircle2, AlertCircle } from "lucide-react";
 import { CLUSTERS } from "@/lib/clusters";
 import { classifyBusiness } from "@/lib/classifier";
 
+function computeAgeFromDob(dob: string): number | null {
+  if (!dob) return null;
+  const birth = new Date(dob);
+  if (isNaN(birth.getTime())) return null;
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  return age;
+}
+
 const immigrationOptions = [
   { value: "citizen", label: "Canadian citizen" },
   { value: "permanent_resident", label: "Permanent resident" },
@@ -123,7 +134,7 @@ export default function SettingsPage() {
     location: "montreal",
     borough: "",
     has_partners: false,
-    age: "",
+    date_of_birth: "",
     immigration_status: "citizen",
     languages: ["en"] as string[],
     preferred_language: "en",
@@ -150,7 +161,7 @@ export default function SettingsPage() {
         location: profile.municipality ?? "montreal",
         borough: profile.borough ?? "",
         has_partners: profile.has_partners ?? false,
-        age: profile.age != null ? String(profile.age) : "",
+        date_of_birth: (intake.date_of_birth as string) ?? "",
         immigration_status: profile.immigration_status ?? "citizen",
         languages: profile.languages_spoken ?? ["en"],
         preferred_language: profile.preferred_language ?? "en",
@@ -192,11 +203,13 @@ export default function SettingsPage() {
         location: form.location,
         borough: form.borough,
         has_partners: form.has_partners,
-        age: form.age ? Number(form.age) : null,
+        date_of_birth: form.date_of_birth || null,
         immigration_status: form.immigration_status,
         languages: form.languages,
         preferred_language: form.preferred_language,
       };
+
+      const computedAge = computeAgeFromDob(form.date_of_birth);
 
       const res = await fetch("/api/profile", {
         method: "PATCH",
@@ -212,7 +225,7 @@ export default function SettingsPage() {
             is_home_based: isHomeBased,
             has_physical_location: !isHomeBased,
             has_partners: form.has_partners,
-            age: form.age ? Number(form.age) : null,
+            age: computedAge,
             immigration_status: form.immigration_status,
             languages_spoken: form.languages,
             preferred_language: form.preferred_language,
@@ -281,15 +294,13 @@ export default function SettingsPage() {
           />
         </Field>
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Age" hint="Some grants target entrepreneurs under 35 or over 50.">
+          <Field label="Date of birth" hint="Some grants target entrepreneurs under 35 or over 50.">
             <input
               className={inputCls}
-              type="number"
-              min={16}
-              max={99}
-              placeholder="e.g. 26"
-              value={form.age}
-              onChange={(e) => set("age", e.target.value)}
+              type="date"
+              max={new Date().toISOString().split('T')[0]}
+              value={form.date_of_birth}
+              onChange={(e) => set("date_of_birth", e.target.value)}
             />
           </Field>
           <Field label="Immigration status">

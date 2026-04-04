@@ -24,7 +24,8 @@ export default function IntakeWizard() {
     updateIntakeField('is_home_based', profile.is_home_based ?? true);
     updateIntakeField('expected_monthly_revenue', profile.expected_monthly_revenue ?? null);
     updateIntakeField('has_partners', profile.has_partners ?? false);
-    updateIntakeField('age', profile.age ?? null);
+    const intake = (profile.intake_answers ?? {}) as Record<string, unknown>;
+    updateIntakeField('date_of_birth', (intake.date_of_birth as string) ?? '');
     if (profile.immigration_status) updateIntakeField('immigration_status', profile.immigration_status);
     if (profile.languages_spoken?.length) updateIntakeField('languages', profile.languages_spoken);
     updateIntakeField('preferred_language', profile.preferred_language ?? 'en');

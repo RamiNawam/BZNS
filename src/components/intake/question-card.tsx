@@ -324,21 +324,18 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
             </p>
           </div>
 
-          {/* Age */}
+          {/* Date of birth */}
           <div>
-            <FieldLabel htmlFor="age">Your age (optional)</FieldLabel>
+            <FieldLabel htmlFor="date_of_birth">Date of birth (optional)</FieldLabel>
             <input
-              id="age"
-              type="number"
-              inputMode="numeric"
-              min={16}
-              max={99}
-              placeholder="e.g., 28"
-              value={intakeForm.age ?? ''}
+              id="date_of_birth"
+              type="date"
+              max={new Date().toISOString().split('T')[0]}
+              value={intakeForm.date_of_birth ?? ''}
               onChange={(e) =>
-                updateField('age', e.target.value ? Number(e.target.value) : null)
+                updateField('date_of_birth', e.target.value)
               }
-              className="input w-32"
+              className="input w-48"
             />
             <Hint>Some grants target entrepreneurs under 35 or over 50.</Hint>
           </div>
