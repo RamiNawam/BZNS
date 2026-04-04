@@ -331,11 +331,10 @@ export default function HomePage() {
             <h1 className="font-heading text-5xl md:text-6xl font-bold text-slate-900 mb-5 leading-[1.1]">
               Start your business
               <br />
-              in Québec.{" "}
-              <span className="text-brand-600">The right way.</span>
+              in Québec. <span className="text-brand-600">The right way.</span>
             </h1>
             <p className="text-lg text-slate-500 mb-8 leading-relaxed">
-              Navigate 6+ government agencies, 80+ funding programs, and a tax
+              Navigate 6+ government agencies, 12+ funding programs, and a tax
               system that surprises every first-time entrepreneur — in plain
               language, in any language.
             </p>
@@ -512,20 +511,16 @@ export default function HomePage() {
             Grounded in official sources
           </p>
           <div className="flex flex-wrap gap-2 justify-center">
-            {[
-              "Revenu Québec",
-              "REQ",
-              "MAPAQ",
-              "Services Québec",
-              "BDCQ",
-            ].map((src) => (
-              <span
-                key={src}
-                className="bg-slate-100 text-slate-500 border border-slate-200 text-xs font-medium px-3 py-1.5 rounded-full"
-              >
-                {src}
-              </span>
-            ))}
+            {["Revenu Québec", "REQ", "MAPAQ", "Services Québec", "BDCQ"].map(
+              (src) => (
+                <span
+                  key={src}
+                  className="bg-slate-100 text-slate-500 border border-slate-200 text-xs font-medium px-3 py-1.5 rounded-full"
+                >
+                  {src}
+                </span>
+              ),
+            )}
           </div>
         </div>
 
