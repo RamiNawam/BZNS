@@ -102,12 +102,12 @@ export default function IntakeWizard() {
           {isLoading ? (
             <>
               <Loader2 size={15} className="animate-spin" />
-              Generating your roadmap…
+              Saving…
             </>
           ) : isLastStep ? (
             <>
               <Sparkles size={15} />
-              Generate my roadmap
+              Get Started
             </>
           ) : (
             <>
