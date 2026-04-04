@@ -309,11 +309,8 @@ export default function HomePage() {
             </a>
           </nav>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="btn-ghost text-sm">
-              Sign in
-            </Link>
             <Link href="/login" className="btn-primary text-sm">
-              Get started free
+              Sign in
             </Link>
           </div>
         </div>
