@@ -14,7 +14,7 @@ export interface IntakeFormState {
   location: string
   borough: string
   is_home_based: boolean
-  age: number | null
+  date_of_birth: string
   immigration_status: string
   expected_monthly_revenue: number | null
   has_partners: boolean
@@ -59,7 +59,7 @@ const DEFAULT_INTAKE: Partial<IntakeFormState> = {
   location: 'montreal',
   borough: '',
   is_home_based: true,
-  age: null,
+  date_of_birth: '',
   immigration_status: 'citizen',
   expected_monthly_revenue: null,
   has_partners: false,

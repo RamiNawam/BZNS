@@ -92,7 +92,7 @@ export interface IntakeAnswers {
   location: string
   borough?: string
   is_home_based: boolean
-  age: number
+  date_of_birth: string
   immigration_status: ImmigrationStatus
   expected_monthly_revenue: number
   has_partners: boolean

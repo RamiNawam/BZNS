@@ -13,6 +13,19 @@ import type {
 import { CLUSTERS } from '@/lib/clusters'
 import { classifyBusiness } from '@/lib/classifier'
 
+function computeAge(dateOfBirth: string | null | undefined): number | null {
+  if (!dateOfBirth) return null;
+  const birth = new Date(dateOfBirth);
+  if (isNaN(birth.getTime())) return null;
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+}
+
 export const ProfileService = {
 
   /**
@@ -63,7 +76,7 @@ export const ProfileService = {
       is_home_based: isHomeBased,
       has_physical_location: !isHomeBased,
       full_name: null,
-      age: answers.age,
+      age: computeAge(answers.date_of_birth),
       immigration_status: answers.immigration_status,
       gender: null,
       languages_spoken: answers.languages,
