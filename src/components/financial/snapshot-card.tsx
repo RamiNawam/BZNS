@@ -4,15 +4,16 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Wallet } from 'lucide-react';
 import { useProfileStore } from '@/stores/profile-store';
+import { useTranslation } from '@/lib/i18n/useTranslation';
 import { calculateTakeHome } from '@/lib/financial/tax-calculator';
 import { getExpenseDefaults } from '@/lib/financial/expense-defaults';
 import type { ClusterID } from '@/lib/clusters';
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
-
 export default function SnapshotCard() {
   const { profile } = useProfileStore();
+  const { t, locale } = useTranslation();
+  const fmt = (n: number) =>
+    new Intl.NumberFormat(locale === 'fr' ? 'fr-CA' : 'en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
   const monthlyRevenue  = profile?.expected_monthly_revenue ?? 0;
   const clusterId = (profile?.cluster_id ?? 'C2') as ClusterID;
   const monthlyExpenses = profile?.monthly_expenses ?? getExpenseDefaults(clusterId).total;
@@ -29,9 +30,9 @@ export default function SnapshotCard() {
   const total = monthlyRevenue || 1;
 
   const segments = [
-    { value: totalMonthlyTax, color: 'bg-red-400',    label: `Tax ${fmt(totalMonthlyTax)}/mo` },
-    { value: monthlyExpenses, color: 'bg-slate-300',  label: `Expenses ${fmt(monthlyExpenses)}/mo` },
-    { value: monthlyTakeHome, color: 'bg-brand-500',  label: `Keep ${fmt(monthlyTakeHome)}/mo` },
+    { value: totalMonthlyTax, color: 'bg-red-400',    label: `${t('financial.snapshotCard.tax')} ${fmt(totalMonthlyTax)}/mo` },
+    { value: monthlyExpenses, color: 'bg-slate-300',  label: `${t('financial.snapshotCard.expenses')} ${fmt(monthlyExpenses)}/mo` },
+    { value: monthlyTakeHome, color: 'bg-brand-500',  label: `${t('financial.snapshotCard.keep')} ${fmt(monthlyTakeHome)}/mo` },
   ];
 
   if (!monthlyRevenue) return null;
@@ -44,18 +45,18 @@ export default function SnapshotCard() {
           <div className="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-brand-50">
             <Wallet size={15} className="text-brand-600" />
           </div>
-          <span className="font-heading font-semibold text-slate-900 text-sm">Financial Snapshot</span>
+          <span className="font-heading font-semibold text-slate-900 text-sm">{t('financial.snapshotCard.title')}</span>
         </div>
         <Link href="/financial" className="text-xs font-medium text-brand-600 hover:text-brand-700 flex items-center gap-1 transition-colors">
-          Full breakdown <ArrowRight size={11} />
+          {t('financial.snapshotCard.fullBreakdown')} <ArrowRight size={11} />
         </Link>
       </div>
 
       {/* Take-home hero number */}
       <div>
-        <p className="text-xs text-slate-500 mb-0.5">Estimated monthly take-home</p>
+        <p className="text-xs text-slate-500 mb-0.5">{t('financial.snapshotCard.estimatedTakeHome')}</p>
         <p className="font-heading text-3xl font-bold text-slate-900 tabular-nums">{fmt(monthlyTakeHome)}</p>
-        <p className="text-xs text-slate-400 mt-0.5">after taxes, QPP &amp; ~{fmt(monthlyExpenses)} expenses</p>
+        <p className="text-xs text-slate-400 mt-0.5">{t('financial.snapshotCard.afterTaxes').replace('{expenses}', fmt(monthlyExpenses))}</p>
       </div>
 
       {/* Mini waterfall bar */}

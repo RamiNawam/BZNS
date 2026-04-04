@@ -14,6 +14,7 @@ import {
   RefreshCw,
   type LucideIcon,
 } from "lucide-react";
+import { useTranslation } from '@/lib/i18n/useTranslation';
 import { useProfileStore } from "@/stores/profile-store";
 import { useRoadmapStore } from "@/stores/roadmap-store";
 import { useFundingStore } from "@/stores/funding-store";
@@ -90,6 +91,7 @@ function StatCard({
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
+  const { t, locale } = useTranslation();
   const { profile, loadProfile, isLoading: profileLoading } = useProfileStore();
   const {
     steps,
@@ -126,7 +128,7 @@ export default function DashboardPage() {
   }, [monthlyRevenue, monthlyExpenses, businessStructure]);
 
   const fmt = (n: number) =>
-    new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
+    new Intl.NumberFormat(locale === 'fr' ? 'fr-CA' : 'en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
 
   // ── No profile yet ─────────────────────────────────────────────────────────
   if (!profileLoading && !profile?.intake_completed) {
@@ -138,12 +140,10 @@ export default function DashboardPage() {
           </div>
           <div>
             <h2 className="font-heading text-2xl font-bold text-slate-900 mb-2">
-              Welcome to BZNS
+              {t('dashboard.welcomeToBZNS')}
             </h2>
             <p className="text-slate-500 max-w-sm mx-auto text-sm leading-relaxed">
-              Answer 8 quick questions about your business idea. We&apos;ll
-              generate your personalized Québec roadmap, funding matches, and
-              tax snapshot.
+              {t('dashboard.intakePrompt')}
             </p>
           </div>
           <Link
@@ -151,7 +151,7 @@ export default function DashboardPage() {
             className="btn-primary btn-lg gap-2 inline-flex mx-auto"
           >
             <ArrowRight size={16} />
-            Start your business profile
+            {t('dashboard.startProfile')}
           </Link>
         </div>
       </div>
@@ -165,7 +165,7 @@ export default function DashboardPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold text-slate-900">
-            {profile?.business_name || "Your Business"}
+            {profile?.business_name || t('dashboard.yourBusiness')}
           </h1>
           <div className="flex items-center gap-2 mt-1.5 flex-wrap">
             {profile?.cluster_label && (
@@ -194,36 +194,36 @@ export default function DashboardPage() {
           icon={Map}
           iconBg="bg-brand-50"
           iconColor="text-brand-600"
-          label="Roadmap Progress"
+          label={t('dashboard.roadmapProgress')}
           value={steps.length > 0 ? `${completedSteps}/${steps.length}` : "—"}
           sub={
-            steps.length > 0 ? "steps completed" : "Complete intake to generate"
+            steps.length > 0 ? t('dashboard.stepsCompleted') : t('dashboard.completeIntakeToGenerate')
           }
-          cta="View roadmap"
+          cta={t('dashboard.viewRoadmap')}
         />
         <StatCard
           href="/funding"
           icon={DollarSign}
           iconBg="bg-emerald-50"
           iconColor="text-emerald-600"
-          label="Funding Available"
+          label={t('dashboard.fundingAvailable')}
           value={immediateCount > 0 ? `${immediateCount}` : "—"}
           sub={
             immediateCount > 0
-              ? `program${immediateCount !== 1 ? "s" : ""} ready to apply`
-              : "Complete intake to find matches"
+              ? immediateCount !== 1 ? t('dashboard.programsReady') : t('dashboard.programReady')
+              : t('dashboard.completeIntakeToFind')
           }
-          cta="View matches"
+          cta={t('dashboard.viewMatches')}
         />
         <StatCard
           href="/financial"
           icon={BarChart3}
           iconBg="bg-violet-50"
           iconColor="text-violet-600"
-          label="Monthly Take-Home"
+          label={t('dashboard.monthlyTakeHome')}
           value={monthlyRevenue > 0 ? fmt(monthlyTakeHome) : "—"}
-          sub={monthlyRevenue > 0 ? "after taxes & expenses" : "Set revenue to calculate"}
-          cta="View finances"
+          sub={monthlyRevenue > 0 ? t('dashboard.afterTaxes') : t('dashboard.setRevenue')}
+          cta={t('dashboard.viewFinances')}
         />
       </div>
 
@@ -233,8 +233,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2.5 text-sm text-amber-800">
             <RefreshCw size={15} className="shrink-0 text-amber-600" />
             <span>
-              Your settings changed since your roadmap was generated. Regenerate
-              to get updated steps.
+              {t('dashboard.staleDetail')}
             </span>
           </div>
           <button
@@ -242,7 +241,7 @@ export default function DashboardPage() {
             disabled={roadmapLoading}
             className="shrink-0 text-xs font-semibold text-amber-700 border border-amber-300 bg-white hover:bg-amber-50 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50"
           >
-            Update roadmap
+            {t('dashboard.updateRoadmap')}
           </button>
         </div>
       )}
@@ -250,7 +249,7 @@ export default function DashboardPage() {
       {/* Roadmap error */}
       {roadmapError && (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          <span className="font-medium">Roadmap error:</span> {roadmapError}
+          <span className="font-medium">{t('dashboard.roadmapError')}</span> {roadmapError}
         </div>
       )}
 
@@ -259,10 +258,10 @@ export default function DashboardPage() {
         <div className="card p-6 flex items-center justify-between gap-4">
           <div>
             <h3 className="font-heading font-semibold text-slate-900">
-              Ready to build your roadmap?
+              {t('dashboard.readyToBuild')}
             </h3>
             <p className="text-sm text-slate-500 mt-0.5">
-              Generate a personalized legal checklist for your business.
+              {t('dashboard.generateDesc')}
             </p>
           </div>
           <button
@@ -270,7 +269,7 @@ export default function DashboardPage() {
             disabled={roadmapLoading}
             className="btn-primary whitespace-nowrap disabled:opacity-50"
           >
-            {roadmapLoading ? "Generating…" : "Generate My Roadmap"}
+            {roadmapLoading ? t('dashboard.generating') : t('dashboard.generateMyRoadmap')}
           </button>
         </div>
       )}
@@ -280,13 +279,13 @@ export default function DashboardPage() {
         <div className="card p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-heading font-semibold text-slate-900">
-              Next steps
+              {t('dashboard.nextSteps')}
             </h3>
             <Link
               href="/roadmap"
               className="text-xs font-medium text-brand-600 hover:text-brand-700 flex items-center gap-1"
             >
-              View all <ArrowRight size={11} />
+              {t('dashboard.viewAll')} <ArrowRight size={11} />
             </Link>
           </div>
           <div className="space-y-2">

@@ -5,10 +5,12 @@ import { DollarSign, Loader2, Sparkles } from 'lucide-react';
 import { useFundingStore } from '@/stores/funding-store';
 import { useProfileStore } from '@/stores/profile-store';
 import FundingList from '@/components/funding/funding-list';
+import { useTranslation } from '@/lib/i18n/useTranslation';
 
 export default function FundingPage() {
   const { matches, immediateTotal, immediateCount, isGenerating, generateMatches, loadMatches } = useFundingStore();
   const { profile, loadProfile } = useProfileStore();
+  const { t } = useTranslation();
 
   useEffect(() => {
     loadProfile();
@@ -22,7 +24,7 @@ export default function FundingPage() {
 
   // Badge: always show count of fully-eligible programs
   const badgeValue = immediateCount > 0 ? `${immediateCount}` : '';
-  const badgeLabel = immediateCount === 1 ? 'program ready to apply' : 'programs ready to apply';
+  const badgeLabel = immediateCount === 1 ? t('funding.programReady') : t('funding.programsReady');
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -34,10 +36,10 @@ export default function FundingPage() {
             <div className="inline-flex items-center justify-center h-9 w-9 rounded-xl bg-brand-50">
               <DollarSign size={18} className="text-brand-600" />
             </div>
-            <h1 className="page-title">Funding Matcher</h1>
+            <h1 className="page-title">{t('funding.pageTitle')}</h1>
           </div>
           <p className="page-subtitle">
-            Grants, loans, and programs matched to your business profile.
+            {t('funding.pageSubtitle')}
           </p>
         </div>
 
@@ -60,11 +62,10 @@ export default function FundingPage() {
           </div>
           <div>
             <p className="font-heading font-semibold text-slate-900">
-              Find your funding opportunities
+              {t('funding.findOpportunities')}
             </p>
             <p className="text-sm text-slate-500 mt-1 max-w-sm mx-auto">
-              We&apos;ll score every Quebec and federal program against your profile and show you
-              exactly how much you could access right now.
+              {t('funding.findDesc')}
             </p>
           </div>
           <button
@@ -73,7 +74,7 @@ export default function FundingPage() {
             className="btn-primary gap-2 inline-flex"
           >
             <Sparkles size={15} />
-            Find my funding
+            {t('funding.findBtn')}
           </button>
         </div>
       )}
@@ -83,9 +84,9 @@ export default function FundingPage() {
         <div className="card p-6 text-center space-y-3">
           <Loader2 size={28} className="animate-spin text-brand-500 mx-auto" />
           <div>
-            <p className="font-heading font-semibold text-slate-900">Scoring programs…</p>
+            <p className="font-heading font-semibold text-slate-900">{t('funding.scoring')}</p>
             <p className="text-sm text-slate-500 mt-1">
-              Matching your profile against all available programs.
+              {t('funding.scoringDesc')}
             </p>
           </div>
         </div>

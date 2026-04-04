@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import { useChatStore } from '@/stores/chat-store';
+import { useTranslation } from '@/lib/i18n/useTranslation';
 import MessageBubble from './message-bubble';
 import Button from '@/components/ui/button';
 
 export default function ChatPanel() {
   const { messages, isLoading, sendMessage, clearMessages } = useChatStore();
+  const { t } = useTranslation();
   const [input, setInput] = useState('');
 
   async function handleSend() {
@@ -29,14 +31,14 @@ export default function ChatPanel() {
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
         <div className="flex items-center gap-2">
           <span className="text-lg">🤖</span>
-          <span className="font-semibold text-gray-800">BZNS Assistant</span>
+          <span className="font-semibold text-gray-800">{t('assistant.title')}</span>
           <span className="h-2 w-2 rounded-full bg-green-400" />
         </div>
         <button
           onClick={clearMessages}
           className="text-xs text-gray-400 hover:text-gray-600"
         >
-          Clear
+          {t('assistant.clear')}
         </button>
       </div>
 
@@ -45,12 +47,12 @@ export default function ChatPanel() {
         {messages.length === 0 && (
           <div className="text-center text-gray-400 text-sm mt-8">
             <p className="text-2xl mb-2">👋</p>
-            <p>Ask me anything about starting your business in Quebec!</p>
+            <p>{t('assistant.emptyState')}</p>
             <div className="mt-4 space-y-2">
               {[
-                'How do I register a sole proprietorship in Quebec?',
-                'Do I need to collect GST/QST?',
-                'What funding is available for women entrepreneurs?',
+                t('assistant.suggestion1'),
+                t('assistant.suggestion2'),
+                t('assistant.suggestion3'),
               ].map((q) => (
                 <button
                   key={q}
@@ -86,12 +88,12 @@ export default function ChatPanel() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask about registration, taxes, funding..."
+          placeholder={t('assistant.placeholder')}
           rows={1}
           className="flex-1 resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
         <Button onClick={handleSend} disabled={!input.trim() || isLoading} size="sm">
-          Send
+          {t('assistant.send')}
         </Button>
       </div>
     </div>

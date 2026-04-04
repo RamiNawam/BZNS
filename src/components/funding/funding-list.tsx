@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { DollarSign, CheckCircle2, Clock, RefreshCw } from 'lucide-react';
 import { useFundingStore } from '@/stores/funding-store';
 import { useProfileStore } from '@/stores/profile-store';
+import { useTranslation } from '@/lib/i18n/useTranslation';
 import FundingCard from './funding-card';
 import { isFullyMatched, isAchievable } from '@/lib/funding/classify';
 import type { FundingMatch, ProgramType } from '@/types/funding';
@@ -31,13 +32,8 @@ function FundingCardSkeleton() {
 // ── Filter tabs ───────────────────────────────────────────────────────────────
 type FilterKey = 'all' | ProgramType | 'bookmarked';
 
-const FILTERS: { key: FilterKey; label: string }[] = [
-  { key: 'all',        label: 'All' },
-  { key: 'grant',      label: 'Grants' },
-  { key: 'loan',       label: 'Loans' },
-  { key: 'tax_credit', label: 'Tax Credits' },
-  { key: 'mentorship', label: 'Mentorship' },
-  { key: 'bookmarked', label: 'Bookmarked' },
+const FILTER_KEYS: FilterKey[] = [
+  'all', 'grant', 'loan', 'tax_credit', 'mentorship', 'bookmarked',
 ];
 
 // ── Visibility filter ─────────────────────────────────────────────────────────
@@ -100,6 +96,16 @@ export default function FundingList() {
   const { matches, isLoading, isGenerating, isStale, loadMatches, generateMatches } = useFundingStore();
   const profile = useProfileStore((s) => s.profile);
   const [filter, setFilter] = useState<FilterKey>('all');
+  const { t } = useTranslation();
+
+  const FILTER_LABELS: Record<FilterKey, string> = {
+    all: t('funding.filters.all'),
+    grant: t('funding.filters.grant'),
+    loan: t('funding.filters.loan'),
+    tax_credit: t('funding.filters.taxCredit'),
+    mentorship: t('funding.filters.mentorship'),
+    bookmarked: t('funding.filters.bookmarked'),
+  };
 
   useEffect(() => {
     loadMatches();
@@ -146,9 +152,9 @@ export default function FundingList() {
           <DollarSign size={24} className="text-slate-400" />
         </div>
         <div>
-          <p className="font-heading font-semibold text-slate-900">No funding matches yet</p>
+          <p className="font-heading font-semibold text-slate-900">{t('funding.noMatches')}</p>
           <p className="text-sm text-slate-500 mt-1">
-            Click &ldquo;Find my funding&rdquo; above to score programs against your profile.
+            {t('funding.noMatchesDesc')}
           </p>
         </div>
       </div>
@@ -162,26 +168,27 @@ export default function FundingList() {
         <div className="flex items-center justify-between gap-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
           <div className="flex items-center gap-2.5 text-sm text-amber-800">
             <RefreshCw size={15} className="shrink-0 text-amber-600" />
-            <span>Your settings changed since your funding was last scored.</span>
+            <span>{t('funding.staleWarning')}</span>
           </div>
           <button
             onClick={generateMatches}
             disabled={isGenerating}
             className="shrink-0 text-xs font-semibold text-amber-700 border border-amber-300 bg-white hover:bg-amber-50 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50"
           >
-            Refresh matches
+            {t('funding.refreshBtn')}
           </button>
         </div>
       )}
 
       {/* Visible count */}
       <p className="text-sm text-slate-500">
-        {visible.length} program{visible.length !== 1 ? 's' : ''} found
+        {visible.length} {visible.length !== 1 ? t('funding.programsFound') : t('funding.programFound')}
       </p>
 
       {/* Filter tabs */}
       <div className="flex gap-1.5 flex-wrap">
-        {FILTERS.map(({ key, label }) => {
+        {FILTER_KEYS.map((key) => {
+          const label = FILTER_LABELS[key];
           const count = key === 'all'
             ? visible.length
             : key === 'bookmarked'
@@ -216,8 +223,8 @@ export default function FundingList() {
           <SectionHeader
             icon={CheckCircle2}
             iconClass="bg-emerald-50 text-emerald-600"
-            title="Ready to apply now"
-            subtitle="You meet all current eligibility requirements for these programs."
+            title={t('funding.readyNow')}
+            subtitle={t('funding.readyNowDesc')}
             count={readyNow.length}
           />
           <div className="space-y-3">
@@ -234,8 +241,8 @@ export default function FundingList() {
           <SectionHeader
             icon={Clock}
             iconClass="bg-amber-50 text-amber-600"
-            title="Unlock with a few more steps"
-            subtitle="You meet the core requirements. Complete the flagged steps in your Roadmap to qualify."
+            title={t('funding.unlockMore')}
+            subtitle={t('funding.unlockMoreDesc')}
             count={achievable.length}
           />
           <div className="space-y-3">
@@ -249,7 +256,7 @@ export default function FundingList() {
       {/* Empty state for active filter */}
       {readyNow.length === 0 && achievable.length === 0 && (
         <div className="card p-8 text-center">
-          <p className="text-sm text-slate-500">No programs match this filter.</p>
+          <p className="text-sm text-slate-500">{t('funding.noFilter')}</p>
         </div>
       )}
     </div>

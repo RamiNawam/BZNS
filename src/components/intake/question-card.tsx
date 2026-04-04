@@ -1,6 +1,7 @@
 'use client';
 
 import type { IntakeFormState } from '@/stores/profile-store';
+import { useTranslation } from '@/lib/i18n/useTranslation';
 
 interface QuestionCardProps {
   step: number;
@@ -91,6 +92,8 @@ function ToggleChip({
 // ── Step cards ────────────────────────────────────────────────────────────────
 
 export default function QuestionCard({ step, intakeForm, updateField }: QuestionCardProps) {
+  const { t } = useTranslation();
+
   switch (step) {
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -100,36 +103,36 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
       return (
         <div className="card p-8 space-y-6">
           <div>
-            <h2 className="font-heading text-xl font-bold text-slate-900 mb-1">Your business</h2>
+            <h2 className="font-heading text-xl font-bold text-slate-900 mb-1">{t('intake.q0.title')}</h2>
             <p className="text-sm text-slate-500 leading-relaxed">
-              Let&apos;s start with the basics. We&apos;ll figure out the right permits, funding, and legal steps for you.
+              {t('intake.q0.subtitle')}
             </p>
           </div>
 
           {/* Business name */}
           <div>
-            <FieldLabel htmlFor="business_name">What&apos;s the name of your business?</FieldLabel>
+            <FieldLabel htmlFor="business_name">{t('intake.q0.nameLabel')}</FieldLabel>
             <input
               id="business_name"
               type="text"
-              placeholder="e.g., Yara's Kitchen, Studio Nova, QuickFix Reno…"
+              placeholder={t('intake.q0.namePlaceholder')}
               value={intakeForm.business_name ?? ''}
               onChange={(e) => updateField('business_name', e.target.value)}
               className="input"
             />
-            <Hint>Don&apos;t have one yet? Just type a working name — you can change it later.</Hint>
+            <Hint>{t('intake.q0.nameHint')}</Hint>
           </div>
 
           {/* Main activity */}
           <div className="space-y-2.5">
-            <FieldLabel>What does your business mainly involve?</FieldLabel>
+            <FieldLabel>{t('intake.q0.activityLabel')}</FieldLabel>
             {[
-              { value: 'food',         label: 'Preparing or selling food',          desc: 'Baking, cooking, catering, meal prep, jams, sauces' },
-              { value: 'services',     label: 'Providing a service',                desc: 'Consulting, design, coaching, beauty, fitness, cleaning' },
-              { value: 'professional', label: 'Regulated profession',               desc: 'Lawyer, accountant, engineer, architect, therapist, etc.' },
-              { value: 'products',     label: 'Selling physical products',           desc: 'Online store, boutique, handmade goods, reselling' },
-              { value: 'trades',       label: 'Construction or skilled trades',      desc: 'Plumbing, electrical, carpentry, painting, renovations' },
-              { value: 'children',     label: 'Caring for children',                 desc: 'Home daycare, nursery, babysitting' },
+              { value: 'food',         label: t('intake.q0.food'),         desc: t('intake.q0.foodDesc') },
+              { value: 'services',     label: t('intake.q0.services'),     desc: t('intake.q0.servicesDesc') },
+              { value: 'professional', label: t('intake.q0.professional'), desc: t('intake.q0.professionalDesc') },
+              { value: 'products',     label: t('intake.q0.products'),     desc: t('intake.q0.productsDesc') },
+              { value: 'trades',       label: t('intake.q0.trades'),       desc: t('intake.q0.tradesDesc') },
+              { value: 'children',     label: t('intake.q0.children'),     desc: t('intake.q0.childrenDesc') },
             ].map((opt) => (
               <RadioOption
                 key={opt.value}
@@ -152,20 +155,20 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
       return (
         <div className="card p-8 space-y-6">
           <div>
-            <h2 className="font-heading text-xl font-bold text-slate-900 mb-1">How you&apos;ll operate</h2>
+            <h2 className="font-heading text-xl font-bold text-slate-900 mb-1">{t('intake.q1.title')}</h2>
             <p className="text-sm text-slate-500 leading-relaxed">
-              This helps us match the right permits and zoning rules.
+              {t('intake.q1.subtitle')}
             </p>
           </div>
 
           {/* Work location */}
           <div className="space-y-2.5">
-            <FieldLabel>Where will you mainly work?</FieldLabel>
+            <FieldLabel>{t('intake.q1.locationLabel')}</FieldLabel>
             {[
-              { value: 'home',         label: 'From home',              desc: 'Kitchen, office, studio at your residence' },
-              { value: 'commercial',   label: 'Rented / commercial space', desc: 'Store, studio, restaurant, workshop' },
-              { value: 'client_sites', label: 'At client locations',    desc: 'You go to the client (renovations, cleaning, etc.)' },
-              { value: 'online',       label: 'Online only',            desc: 'Remote work, e-commerce, digital services' },
+              { value: 'home',         label: t('intake.q1.home'),         desc: t('intake.q1.homeDesc') },
+              { value: 'commercial',   label: t('intake.q1.commercial'),   desc: t('intake.q1.commercialDesc') },
+              { value: 'client_sites', label: t('intake.q1.clientSites'),  desc: t('intake.q1.clientSitesDesc') },
+              { value: 'online',       label: t('intake.q1.online'),       desc: t('intake.q1.onlineDesc') },
             ].map((opt) => (
               <RadioOption
                 key={opt.value}
@@ -189,21 +192,21 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
       return (
         <div className="card p-8 space-y-6">
           <div>
-            <h2 className="font-heading text-xl font-bold text-slate-900 mb-1">Your pricing &amp; idea</h2>
+            <h2 className="font-heading text-xl font-bold text-slate-900 mb-1">{t('intake.q2.title')}</h2>
             <p className="text-sm text-slate-500 leading-relaxed">
-              How you charge affects tax obligations and financial projections.
+              {t('intake.q2.subtitle')}
             </p>
           </div>
 
           {/* Pricing model */}
           <div className="space-y-2.5">
-            <FieldLabel>How will you charge your clients?</FieldLabel>
+            <FieldLabel>{t('intake.q2.pricingLabel')}</FieldLabel>
             {[
-              { value: 'per_item',        label: 'Per item / product',       desc: 'Each sale is a fixed price (pastries, crafts, goods)' },
-              { value: 'per_hour',        label: 'Per hour',                 desc: 'Hourly billing (consulting, freelance, tutoring)' },
-              { value: 'per_session',     label: 'Per session / appointment', desc: 'Fixed price per visit (haircut, massage, training)' },
-              { value: 'per_project',     label: 'Per project',              desc: 'Flat fee per job (photography, design, renovation)' },
-              { value: 'subscription',    label: 'Monthly / recurring',      desc: 'Subscriptions, memberships, retainers, courses' },
+              { value: 'per_item',        label: t('intake.q2.perItem'),        desc: t('intake.q2.perItemDesc') },
+              { value: 'per_hour',        label: t('intake.q2.perHour'),        desc: t('intake.q2.perHourDesc') },
+              { value: 'per_session',     label: t('intake.q2.perSession'),     desc: t('intake.q2.perSessionDesc') },
+              { value: 'per_project',     label: t('intake.q2.perProject'),     desc: t('intake.q2.perProjectDesc') },
+              { value: 'subscription',    label: t('intake.q2.subscription'),   desc: t('intake.q2.subscriptionDesc') },
             ].map((opt) => (
               <RadioOption
                 key={opt.value}
@@ -219,17 +222,17 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
 
           {/* Business description (for roadmap) */}
           <div>
-            <FieldLabel htmlFor="business_idea">Describe your business in a few sentences</FieldLabel>
+            <FieldLabel htmlFor="business_idea">{t('intake.q2.descLabel')}</FieldLabel>
             <textarea
               id="business_idea"
               rows={4}
-              placeholder="e.g., I want to sell homemade pastries from my kitchen and deliver in my neighbourhood…"
+              placeholder={t('intake.q2.descPlaceholder')}
               value={intakeForm.business_idea ?? ''}
               onChange={(e) => updateField('business_idea', e.target.value)}
               className="input resize-none"
             />
             <Hint>
-              This helps us generate your personalized legal roadmap. Be as specific or vague as you like.
+              {t('intake.q2.descHint')}
             </Hint>
           </div>
         </div>
@@ -242,20 +245,20 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
       return (
         <div className="card p-8 space-y-6">
           <div>
-            <h2 className="font-heading text-xl font-bold text-slate-900 mb-1">Location &amp; setup</h2>
+            <h2 className="font-heading text-xl font-bold text-slate-900 mb-1">{t('intake.q3.title')}</h2>
             <p className="text-sm text-slate-500 leading-relaxed">
-              Where and how you plan to operate affects which permits and programs apply to you.
+              {t('intake.q3.subtitle')}
             </p>
           </div>
 
           {/* City */}
           <div className="space-y-2.5">
-            <FieldLabel>Which city or region are you in?</FieldLabel>
+            <FieldLabel>{t('intake.q3.cityLabel')}</FieldLabel>
             {[
-              { value: 'montreal', label: 'Montréal', desc: 'Island of Montréal (CMM)' },
-              { value: 'quebec_city', label: 'Québec City', desc: 'Capitale-Nationale region' },
-              { value: 'laval', label: 'Laval', desc: 'North Shore suburb of Montréal' },
-              { value: 'other_quebec', label: 'Other Québec municipality', desc: 'Anywhere else in the province' },
+              { value: 'montreal', label: t('intake.q3.montreal'), desc: t('intake.q3.montrealDesc') },
+              { value: 'quebec_city', label: t('intake.q3.quebecCity'), desc: t('intake.q3.quebecCityDesc') },
+              { value: 'laval', label: t('intake.q3.laval'), desc: t('intake.q3.lavalDesc') },
+              { value: 'other_quebec', label: t('intake.q3.otherQuebec'), desc: t('intake.q3.otherQuebecDesc') },
             ].map((opt) => (
               <RadioOption
                 key={opt.value}
@@ -272,36 +275,36 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
           {/* Borough (Montréal only) */}
           {intakeForm.location === 'montreal' && (
             <div>
-              <FieldLabel htmlFor="borough">Which borough? (optional)</FieldLabel>
+              <FieldLabel htmlFor="borough">{t('intake.q3.boroughLabel')}</FieldLabel>
               <input
                 id="borough"
                 type="text"
-                placeholder="e.g., Rosemont–La Petite-Patrie, Plateau-Mont-Royal…"
+                placeholder={t('intake.q3.boroughPlaceholder')}
                 value={intakeForm.borough ?? ''}
                 onChange={(e) => updateField('borough', e.target.value)}
                 className="input"
               />
-              <Hint>Helps us match borough-specific grants and zoning info.</Hint>
+              <Hint>{t('intake.q3.boroughHint')}</Hint>
             </div>
           )}
 
           {/* Partners */}
           <div className="space-y-2.5">
-            <FieldLabel>Will you have business partners or co-founders?</FieldLabel>
+            <FieldLabel>{t('intake.q3.partnersLabel')}</FieldLabel>
             <div className="grid grid-cols-2 gap-3">
               <RadioOption
                 name="has_partners"
                 value="yes"
-                label="Yes"
-                desc="Partnership or multi-shareholder corp"
+                label={t('intake.q3.yes')}
+                desc={t('intake.q3.yesDesc')}
                 checked={intakeForm.has_partners === true}
                 onChange={() => updateField('has_partners', true)}
               />
               <RadioOption
                 name="has_partners"
                 value="no"
-                label="No"
-                desc="Sole founder / owner"
+                label={t('intake.q3.no')}
+                desc={t('intake.q3.noDesc')}
                 checked={intakeForm.has_partners === false}
                 onChange={() => updateField('has_partners', false)}
               />
@@ -317,16 +320,15 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
       return (
         <div className="card p-8 space-y-6">
           <div>
-            <h2 className="font-heading text-xl font-bold text-slate-900 mb-1">About you</h2>
+            <h2 className="font-heading text-xl font-bold text-slate-900 mb-1">{t('intake.q4.title')}</h2>
             <p className="text-sm text-slate-500 leading-relaxed">
-              Used to match funding programs and services you qualify for.
-              Everything is private and optional.
+              {t('intake.q4.subtitle')}
             </p>
           </div>
 
           {/* Age */}
           <div>
-            <FieldLabel htmlFor="age">Your age (optional)</FieldLabel>
+            <FieldLabel htmlFor="age">{t('intake.q4.ageLabel')}</FieldLabel>
             <input
               id="age"
               type="number"
@@ -340,18 +342,18 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
               }
               className="input w-32"
             />
-            <Hint>Some grants target entrepreneurs under 35 or over 50.</Hint>
+            <Hint>{t('intake.q4.ageHint')}</Hint>
           </div>
 
           {/* Immigration status */}
           <div className="space-y-2.5">
-            <FieldLabel>Immigration status</FieldLabel>
+            <FieldLabel>{t('intake.q4.immigrationLabel')}</FieldLabel>
             {[
-              { value: 'citizen', label: 'Canadian citizen' },
-              { value: 'permanent_resident', label: 'Permanent resident' },
-              { value: 'temporary_resident', label: 'Temporary resident (work/study permit)' },
-              { value: 'refugee', label: 'Refugee claimant / protected person' },
-              { value: 'prefer_not_to_say', label: 'Prefer not to say' },
+              { value: 'citizen', label: t('intake.q4.citizen') },
+              { value: 'permanent_resident', label: t('intake.q4.permanentResident') },
+              { value: 'temporary_resident', label: t('intake.q4.temporaryResident') },
+              { value: 'refugee', label: t('intake.q4.refugee') },
+              { value: 'prefer_not_to_say', label: t('intake.q4.preferNotToSay') },
             ].map((opt) => (
               <RadioOption
                 key={opt.value}
@@ -366,17 +368,17 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
 
           {/* Languages */}
           <div>
-            <FieldLabel>Languages you&apos;re comfortable working in</FieldLabel>
+            <FieldLabel>{t('intake.q4.languagesLabel')}</FieldLabel>
             <div className="flex flex-wrap gap-2 mt-2">
               {[
-                { code: 'fr', label: 'French' },
-                { code: 'en', label: 'English' },
-                { code: 'es', label: 'Spanish' },
-                { code: 'ar', label: 'Arabic' },
-                { code: 'zh', label: 'Mandarin / Cantonese' },
-                { code: 'pt', label: 'Portuguese' },
-                { code: 'ht', label: 'Haitian Creole' },
-                { code: 'other', label: 'Other' },
+                { code: 'fr', label: t('intake.q4.french') },
+                { code: 'en', label: t('intake.q4.english') },
+                { code: 'es', label: t('intake.q4.spanish') },
+                { code: 'ar', label: t('intake.q4.arabic') },
+                { code: 'zh', label: t('intake.q4.mandarin') },
+                { code: 'pt', label: t('intake.q4.portuguese') },
+                { code: 'ht', label: t('intake.q4.creole') },
+                { code: 'other', label: t('intake.q4.otherLang') },
               ].map((lang) => {
                 const langs = intakeForm.languages ?? [];
                 const selected = langs.includes(lang.code);
@@ -395,12 +397,12 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
                 );
               })}
             </div>
-            <Hint>Select all that apply. We&apos;ll surface resources in your languages.</Hint>
+            <Hint>{t('intake.q4.languagesHint')}</Hint>
           </div>
 
           {/* Preferred language */}
           <div className="space-y-2.5">
-            <FieldLabel>Preferred language for your roadmap &amp; AI assistant</FieldLabel>
+            <FieldLabel>{t('intake.q4.prefLangLabel')}</FieldLabel>
             <div className="grid grid-cols-2 gap-3">
               <RadioOption
                 name="preferred_language"

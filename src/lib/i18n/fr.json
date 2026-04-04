@@ -24,7 +24,77 @@
     "title": "BZNS — Tremplin pour micro-entreprises",
     "subtitle": "Votre guide IA pour lancer une micro-entreprise au Québec.",
     "cta": "Commencer",
-    "dashboard": "Tableau de bord"
+    "dashboard": "Tableau de bord",
+    "heroTitle1": "Lancez votre entreprise",
+    "heroTitle2": "au Québec.",
+    "heroTitle3": "Comme il faut.",
+    "heroSubtitle": "Naviguez 6+ organismes gouvernementaux, 80+ programmes de financement et un système fiscal qui surprend chaque premier entrepreneur — en langage simple, dans votre langue.",
+    "getRoadmap": "Obtenir ma feuille de route personnalisée",
+    "viewDemo": "Voir la démo",
+    "signIn": "Se connecter",
+    "getStartedFree": "Commencer gratuitement",
+    "features": "Fonctionnalités",
+    "whoFor": "Pour qui",
+    "everythingToLaunch": "Tout pour lancer légalement",
+    "onePlatform": "Une seule plateforme. Chaque étape couverte.",
+    "builtForReal": "Conçu pour de vraies personnes",
+    "builtForRealSub": "Pas des entrepreneurs hypothétiques — des situations réelles pour lesquelles nous avons conçu.",
+    "readyToLaunch": "Prêt à lancer ?",
+    "readyToLaunchSub": "8 questions. Votre feuille de route québécoise personnalisée. Gratuit.",
+    "startNow": "Commencer — ça prend 3 minutes",
+    "disclaimer": "Ceci ne constitue pas un avis juridique ou financier. Vérifiez toujours auprès des sources officielles et de professionnels qualifiés.",
+    "stats": {
+      "agencies": "Organismes gouvernementaux naviguées",
+      "programs": "Programmes de financement évalués",
+      "time": "Pour votre feuille de route personnalisée",
+      "price": "Toujours"
+    },
+    "bento": {
+      "roadmapTitle": "Feuille de route légale",
+      "roadmapDesc": "Étapes personnalisées et ordonnées. Chaque formulaire, frais et échéance pour votre entreprise exacte.",
+      "fundingTitle": "Correspondance de financement",
+      "fundingDesc": "15+ programmes québécois évalués de manière déterministe selon votre profil. Sans conjecture.",
+      "availableFor": "disponibles pour Yara",
+      "taxTitle": "Portrait fiscal",
+      "taxDesc": "Chiffres réels : brut → TPS/TVQ → RRQ → impôt → net. Taux 2026.",
+      "grossRevenue": "Revenu brut",
+      "taxesQPP": "Impôts + RRQ",
+      "takeHome": "Revenu net",
+      "aiTitle": "Assistant IA",
+      "aiDesc": "Posez des questions sur les permis, impôts ou la loi 96. Fondé sur une base de connaissances officielle. Sources citées.",
+      "docsTitle": "Documents de démarrage",
+      "docsDesc": "Contrat bilingue, modèle de facture, plan d'affaires — téléchargeable en .docx.",
+      "step1": "S'immatriculer au REQ",
+      "step2": "Permis MAPAQ alimentaire",
+      "step3": "Inscription TPS/TVQ",
+      "step4": "Ouvrir un compte bancaire d'entreprise"
+    },
+    "personas": {
+      "yara": {
+        "name": "Yara, 26 ans",
+        "role": "Pâtissière à domicile",
+        "city": "Villeray, Montréal",
+        "challenge": "Veut vendre des pâtisseries maison mais ne sait pas par où commencer légalement.",
+        "insight": "90 000 $+ en financement auquel elle est admissible",
+        "tag": "Entreprise alimentaire"
+      },
+      "marcus": {
+        "name": "Marcus, 23 ans",
+        "role": "Développeur pigiste",
+        "city": "Plateau, Montréal",
+        "challenge": "Pense qu'il fait « juste des contrats ». Sur le point de manquer son inscription au RRQ et devoir des impôts.",
+        "insight": "Surprise de 12,8 % du RRQ en fin d'année",
+        "tag": "Pigiste"
+      },
+      "fatima": {
+        "name": "Fatima, 41 ans",
+        "role": "Future garderie en milieu familial",
+        "city": "Rosemont, Montréal",
+        "challenge": "L'une des micro-entreprises les plus réglementées au QC — elle a besoin de 10 étapes qu'elle ignorait.",
+        "insight": "Programme STA de soutien au revenu pendant le démarrage",
+        "tag": "Garde d'enfants"
+      }
+    }
   },
   "intake": {
     "title": "Profil d'entreprise",
@@ -49,6 +119,112 @@
       "pre_launch": "Prélancement (planification)",
       "launched": "Lancée (moins d'un an)",
       "established": "Établie (1 an et plus)"
+    },
+    "wizard": {
+      "step0Title": "Votre entreprise",
+      "step1Title": "Votre fonctionnement",
+      "step2Title": "Tarification et idée",
+      "step3Title": "Emplacement",
+      "step4Title": "À votre sujet",
+      "back": "Retour",
+      "next": "Suivant",
+      "generating": "Génération de votre feuille de route…",
+      "generateBtn": "Générer ma feuille de route"
+    },
+    "q0": {
+      "title": "Votre entreprise",
+      "subtitle": "Commençons par les bases. Nous trouverons les bons permis, financements et étapes légales pour vous.",
+      "nameLabel": "Quel est le nom de votre entreprise ?",
+      "namePlaceholder": "ex. : Cuisine de Yara, Studio Nova, RénoRapide…",
+      "nameHint": "Vous n'en avez pas encore ? Tapez un nom provisoire — vous pourrez le changer plus tard.",
+      "activityLabel": "Que fait principalement votre entreprise ?",
+      "food": "Préparer ou vendre de la nourriture",
+      "foodDesc": "Pâtisserie, cuisine, traiteur, préparation de repas, confitures, sauces",
+      "services": "Fournir un service",
+      "servicesDesc": "Consultation, design, coaching, beauté, fitness, nettoyage",
+      "professional": "Profession réglementée",
+      "professionalDesc": "Avocat, comptable, ingénieur, architecte, thérapeute, etc.",
+      "products": "Vendre des produits physiques",
+      "productsDesc": "Boutique en ligne, magasin, produits artisanaux, revente",
+      "trades": "Construction ou métiers spécialisés",
+      "tradesDesc": "Plomberie, électricité, menuiserie, peinture, rénovations",
+      "children": "Garde d'enfants",
+      "childrenDesc": "Garderie en milieu familial, crèche, garde d'enfants"
+    },
+    "q1": {
+      "title": "Votre fonctionnement",
+      "subtitle": "Cela nous aide à trouver les bons permis et règles de zonage.",
+      "locationLabel": "Où allez-vous principalement travailler ?",
+      "home": "À domicile",
+      "homeDesc": "Cuisine, bureau, studio à votre résidence",
+      "commercial": "Local commercial / loué",
+      "commercialDesc": "Magasin, studio, restaurant, atelier",
+      "clientSites": "Chez les clients",
+      "clientSitesDesc": "Vous vous déplacez chez le client (rénovations, nettoyage, etc.)",
+      "online": "En ligne seulement",
+      "onlineDesc": "Travail à distance, commerce électronique, services numériques"
+    },
+    "q2": {
+      "title": "Votre tarification et idée",
+      "subtitle": "Votre mode de facturation affecte les obligations fiscales et les projections financières.",
+      "pricingLabel": "Comment allez-vous facturer vos clients ?",
+      "perItem": "Par article / produit",
+      "perItemDesc": "Chaque vente a un prix fixe (pâtisseries, artisanat, biens)",
+      "perHour": "À l'heure",
+      "perHourDesc": "Facturation horaire (consultation, pigiste, tutorat)",
+      "perSession": "Par séance / rendez-vous",
+      "perSessionDesc": "Prix fixe par visite (coupe, massage, entraînement)",
+      "perProject": "Par projet",
+      "perProjectDesc": "Forfait par mandat (photographie, design, rénovation)",
+      "subscription": "Mensuel / récurrent",
+      "subscriptionDesc": "Abonnements, adhésions, mandats récurrents, cours",
+      "descLabel": "Décrivez votre entreprise en quelques phrases",
+      "descPlaceholder": "ex. : Je veux vendre des pâtisseries maison depuis ma cuisine et livrer dans mon quartier…",
+      "descHint": "Cela nous aide à générer votre feuille de route légale personnalisée. Soyez aussi précis ou vague que vous le souhaitez."
+    },
+    "q3": {
+      "title": "Emplacement et configuration",
+      "subtitle": "L'endroit et la façon dont vous prévoyez opérer affectent les permis et programmes applicables.",
+      "cityLabel": "Dans quelle ville ou région êtes-vous ?",
+      "montreal": "Montréal",
+      "montrealDesc": "Île de Montréal (CMM)",
+      "quebecCity": "Québec",
+      "quebecCityDesc": "Région de la Capitale-Nationale",
+      "laval": "Laval",
+      "lavalDesc": "Banlieue nord de Montréal",
+      "otherQuebec": "Autre municipalité du Québec",
+      "otherQuebecDesc": "N'importe où ailleurs dans la province",
+      "boroughLabel": "Quel arrondissement ? (facultatif)",
+      "boroughPlaceholder": "ex. : Rosemont–La Petite-Patrie, Plateau-Mont-Royal…",
+      "boroughHint": "Aide à trouver les subventions et informations de zonage spécifiques à l'arrondissement.",
+      "partnersLabel": "Aurez-vous des associés ou cofondateurs ?",
+      "yes": "Oui",
+      "yesDesc": "Société en nom collectif ou société par actions à plusieurs actionnaires",
+      "no": "Non",
+      "noDesc": "Fondateur / propriétaire unique"
+    },
+    "q4": {
+      "title": "À votre sujet",
+      "subtitle": "Utilisé pour trouver les programmes de financement et services auxquels vous êtes admissible. Tout est privé et facultatif.",
+      "ageLabel": "Votre âge (facultatif)",
+      "ageHint": "Certaines subventions ciblent les entrepreneurs de moins de 35 ans ou de plus de 50 ans.",
+      "immigrationLabel": "Statut d'immigration",
+      "citizen": "Citoyen canadien",
+      "permanentResident": "Résident permanent",
+      "temporaryResident": "Résident temporaire (permis de travail/études)",
+      "refugee": "Demandeur d'asile / personne protégée",
+      "preferNotToSay": "Préfère ne pas répondre",
+      "languagesLabel": "Langues dans lesquelles vous êtes à l'aise",
+      "languagesHint": "Sélectionnez tout ce qui s'applique. Nous afficherons les ressources dans vos langues.",
+      "french": "Français",
+      "english": "Anglais",
+      "spanish": "Espagnol",
+      "arabic": "Arabe",
+      "mandarin": "Mandarin / Cantonais",
+      "portuguese": "Portugais",
+      "creole": "Créole haïtien",
+      "otherLang": "Autre",
+      "prefLangLabel": "Langue préférée pour votre feuille de route et assistant IA"
     }
   },
   "roadmap": {
@@ -87,7 +263,16 @@
       "recommended": "Recommandé"
     },
     "itemsToReview": "éléments à vérifier",
-    "completeFirst": "Complétez « {step} » d'abord"
+    "completeFirst": "Complétez « {step} » d'abord",
+    "stepDetail": {
+      "whyMatters": "Pourquoi c'est important",
+      "documentsRequired": "Documents requis",
+      "governmentPage": "Page officielle du gouvernement",
+      "yourNotes": "Vos notes",
+      "notesPlaceholder": "ex. : J'ai obtenu mon NEQ — le numéro est 1234567890",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré"
+    }
   },
   "funding": {
     "title": "Sources de financement",
@@ -95,11 +280,267 @@
     "empty": "Complétez votre profil d'entreprise pour voir les correspondances de financement.",
     "score": "Score de correspondance",
     "recommended": "Recommandé",
-    "learnMore": "En savoir plus"
+    "learnMore": "En savoir plus",
+    "pageTitle": "Correspondance de financement",
+    "pageSubtitle": "Subventions, prêts et programmes correspondant à votre profil d'entreprise.",
+    "programReady": "programme prêt à postuler",
+    "programsReady": "programmes prêts à postuler",
+    "findOpportunities": "Trouvez vos opportunités de financement",
+    "findDesc": "Nous évaluerons chaque programme québécois et fédéral selon votre profil et vous montrerons exactement combien vous pourriez obtenir maintenant.",
+    "findBtn": "Trouver mon financement",
+    "scoring": "Évaluation des programmes…",
+    "scoringDesc": "Correspondance de votre profil avec tous les programmes disponibles.",
+    "noMatches": "Aucune correspondance de financement",
+    "noMatchesDesc": "Cliquez sur « Trouver mon financement » ci-dessus pour évaluer les programmes selon votre profil.",
+    "staleWarning": "Vos paramètres ont changé depuis la dernière évaluation de votre financement.",
+    "refreshBtn": "Actualiser les correspondances",
+    "programsFound": "programmes trouvés",
+    "programFound": "programme trouvé",
+    "filters": {
+      "all": "Tous",
+      "grant": "Subventions",
+      "loan": "Prêts",
+      "taxCredit": "Crédits d'impôt",
+      "mentorship": "Mentorat",
+      "bookmarked": "Favoris"
+    },
+    "readyNow": "Prêt à postuler maintenant",
+    "readyNowDesc": "Vous répondez à toutes les conditions d'admissibilité actuelles de ces programmes.",
+    "unlockMore": "Débloquer avec quelques étapes de plus",
+    "unlockMoreDesc": "Vous répondez aux exigences de base. Complétez les étapes signalées dans votre feuille de route pour être admissible.",
+    "noFilter": "Aucun programme ne correspond à ce filtre.",
+    "types": {
+      "loan": "Prêt",
+      "grant": "Subvention",
+      "taxCredit": "Crédit d'impôt",
+      "mentorship": "Mentorat"
+    },
+    "matchLabels": {
+      "strong": "Forte correspondance",
+      "good": "Bonne correspondance",
+      "partial": "Correspondance partielle"
+    },
+    "requirements": "Conditions de candidature",
+    "required": "Requis",
+    "scoreBoosters": "Bonus au score",
+    "reqLabels": {
+      "age_eligible": "Critère d'âge",
+      "location_eligible": "Critère de localisation",
+      "immigration_status_eligible": "Statut d'immigration",
+      "business_type_eligible": "Secteur d'activité",
+      "business_stage_eligible": "Stade de l'entreprise",
+      "demographic_match": "Critères démographiques"
+    },
+    "roadmapHintNeq": "Complétez l'immatriculation au REQ dans votre feuille de route — cela fait passer votre stade de pré-lancement à lancement, améliorant votre score pour ce programme.",
+    "improveViaRoadmap": "Améliorer via votre feuille de route",
+    "aiAnalysis": "Analyse IA",
+    "aiVerified": "Vérifié par IA",
+    "whyQualify": "Pourquoi vous êtes admissible",
+    "whatRaiseScore": "Ce qui augmenterait votre score",
+    "nextStep": "Prochaine étape",
+    "applyNow": "Postuler maintenant",
+    "analysing": "Analyse en cours…",
+    "hideAnalysis": "Masquer l'analyse",
+    "analyseEligibility": "Analyser mon admissibilité",
+    "impact": "impact",
+    "whatNeedToApply": "Documents nécessaires pour postuler",
+    "removeBookmark": "Retirer le favori",
+    "bookmarkProgram": "Ajouter aux favoris"
   },
   "financial": {
     "title": "Finances",
-    "subtitle": "Votre portrait financier"
+    "subtitle": "Votre portrait financier",
+    "pageTitle": "Portrait financier",
+    "pageSubtitle": "Votre tableau de bord CFO personnel — impôts estimés, revenu net et points à surveiller. Mis à jour en temps réel.",
+    "businessType": "Type d'entreprise :",
+    "editInputs": "Modifier les données",
+    "savingSetup": "Enregistrement de votre configuration financière...",
+    "calculateBtn": "Calculer mes finances",
+    "skipDefaults": "Passer et utiliser les estimations par défaut",
+    "yourBusinessType": "Votre type d'entreprise :",
+    "section1": {
+      "kicker": "1 · Portrait financier",
+      "title": "Votre histoire financière",
+      "description": "Revenu net estimé après impôts et dépenses, avec un visuel rapide de la répartition de chaque dollar."
+    },
+    "section2": {
+      "kicker": "2 · En un coup d'œil",
+      "title": "Chiffres clés",
+      "description": "Revenus, charge fiscale, dépenses et ce que vous gardez — tout sur une ligne."
+    },
+    "section3": {
+      "kicker": "3 · Impôts",
+      "title": "Ventilation fiscale",
+      "description": "Impôt fédéral et québécois, RRQ et RQAP — estimé à partir de votre revenu net d'entreprise (hypothèses 2026)."
+    },
+    "section4": {
+      "kicker": "4 · Perspectives",
+      "title": "Graphiques et scénarios",
+      "description": "Voyez comment les revenus s'accumulent au fil de l'année et comment différents niveaux de revenus affectent votre net."
+    },
+    "section5": {
+      "kicker": "5 · Opérations",
+      "title": "Dépenses et seuil de rentabilité",
+      "description": "Ajustez les montants par catégorie pour refléter votre réalité, puis voyez où vous en êtes pour couvrir les coûts et impôts."
+    },
+    "section6": {
+      "kicker": "6 · Planification",
+      "title": "Calendrier fiscal",
+      "description": "Dates clés pour les acomptes et la déclaration — utilisez ceci comme rappel, pas comme conseil personnalisé."
+    },
+    "section7": {
+      "kicker": "7 · Déductions",
+      "title": "Déductions courantes",
+      "description": "Dépenses déductibles typiques pour votre type d'entreprise — les économies approximatives utilisent un taux marginal estimé."
+    },
+    "section8": {
+      "kicker": "8 · Prochaines étapes",
+      "title": "Points d'attention et financement",
+      "description": "Alertes adaptées à vos chiffres, plus comment le financement trouvé pourrait prolonger votre autonomie financière."
+    },
+    "estimatedTakeHome": "Revenu mensuel net estimé",
+    "ofRevenue": "du revenu",
+    "effectiveRate": "taux effectif",
+    "waterfall": {
+      "federalTax": "Impôt fédéral",
+      "quebecTax": "Impôt Québec",
+      "qpp": "RRQ",
+      "qpip": "RQAP",
+      "expenses": "Dépenses",
+      "takeHome": "Revenu net"
+    },
+    "cards": {
+      "grossRevenue": "Revenu brut",
+      "taxBurden": "Charge fiscale",
+      "effectiveRate": "taux effectif",
+      "businessExpenses": "Dépenses d'entreprise",
+      "monthlyTakeHome": "Revenu mensuel net",
+      "ofRevenue": "du revenu"
+    },
+    "taxTable": {
+      "grossRevenue": "Revenu brut",
+      "businessExpenses": "Dépenses d'entreprise",
+      "netIncome": "Revenu net d'entreprise",
+      "federalTax": "Impôt fédéral sur le revenu",
+      "quebecTax": "Impôt du Québec sur le revenu",
+      "qpp": "Cotisations au RRQ",
+      "qpip": "Prime RQAP",
+      "takeHome": "Revenu mensuel net",
+      "perMonth": "/mois"
+    },
+    "detailedBreakdown": "Ventilation fiscale détaillée",
+    "detailedBreakdownSub": "Impôt fédéral + QC, RRQ, RQAP — taux 2026",
+    "taxBrackets": "Vos paliers d'imposition",
+    "taxBracketNote": "Revenu imposable = revenu net moins montant personnel ({federal} fédéral, {qc} QC)",
+    "taxable": "Imposable :",
+    "you": "Vous",
+    "projection": {
+      "title": "Projection sur 12 mois",
+      "revenue": "Revenus",
+      "takeHome": "Revenu net",
+      "gstLimit": "Seuil TPS",
+      "gstCross": "Vous franchirez le seuil de 30 000 $ TPS/TVQ au mois {month} — inscrivez-vous avant.",
+      "gstSafe": "À ce niveau de revenu, vous restez sous le seuil de 30 000 $ — aucune inscription TPS/TVQ requise cette année."
+    },
+    "scenarios": {
+      "title": "Scénarios de revenus",
+      "subtitle": "Et si vous gagnez plus ou moins que prévu ?",
+      "takeHomeMo": "net/mois",
+      "taxBurden": "Charge fiscale",
+      "keepRate": "Taux de rétention",
+      "gstReq": "TPS requise ?",
+      "yes": "Oui",
+      "no": "Non",
+      "basedOn": "Basé sur 70 % / 100 % / 140 % de votre revenu prévu de {amount}/mois"
+    },
+    "breakEven": {
+      "title": "Seuil de rentabilité",
+      "subtitle": "Revenu minimum pour couvrir les dépenses + tous les impôts",
+      "youNeed": "Vous avez besoin d'au moins",
+      "yourProjection": "Votre projection",
+      "aboveMsg": "Vous êtes {amount}/mois au-dessus du seuil de rentabilité — marge saine.",
+      "growthMsg": "Avec une croissance mensuelle de 10 %, vous pourriez atteindre le seuil de rentabilité en ~{months} mois. Concentrez-vous sur des revenus supérieurs à {target}/mois.",
+      "belowMsg": "Vous êtes {amount}/mois sous le seuil de rentabilité. Envisagez de réduire les dépenses ou d'augmenter les prix."
+    },
+    "expenseBreakdown": "Ventilation des dépenses",
+    "expenseBreakdownSub": "{count} catégories — modifiez n'importe quel montant",
+    "perMonth": "/mois",
+    "pricing": {
+      "priceLabel": "Prix par unité / heure",
+      "unitsLabel": "Unités / heures par mois",
+      "grossRevenue": "Revenu brut",
+      "youKeep": "Vous gardez",
+      "perUnitProfit": "Profit par unité",
+      "afterTax": "après impôt",
+      "chargingMore": "Facturer {price} au lieu ajoute {amount}/mois à votre revenu net (approx)."
+    },
+    "calendar": {
+      "title": "Calendrier fiscal 2026",
+      "installment1": "1er acompte",
+      "balanceDue": "Solde dû",
+      "installment2": "2e acompte + Déclaration",
+      "installment3": "3e acompte",
+      "installment4": "4e acompte",
+      "note": "* Acomptes requis lorsque l'impôt total dépasse 1 800 $/an. La date limite de déclaration pour les travailleurs autonomes est le 15 juin, mais tout solde dû est payable le 30 avril."
+    },
+    "qpp": {
+      "title": "La double cotisation au RRQ",
+      "desc": "En tant que travailleur autonome, vous payez la part de l'employé ET celle de l'employeur au RRQ. Un employé au même revenu ne paierait que {employee}/mois — vous payez {selfEmployed}/mois.",
+      "employeeLabel": "Employé au même revenu",
+      "selfEmployedLabel": "Vous (travailleur autonome)",
+      "goodNews": "La bonne nouvelle : la moitié de votre RRQ est déductible d'impôt, réduisant votre revenu imposable."
+    },
+    "deductions": {
+      "title": "Suivi des déductions",
+      "subtitle": "Pré-chargé pour votre type d'entreprise",
+      "estimatedSavings": "Économies fiscales annuelles estimées",
+      "fromDeductions": "de {amount} en déductions à un taux marginal de ~{rate}",
+      "source": "Source :"
+    },
+    "fundingImpact": {
+      "title": "Impact du financement",
+      "subtitle": "Comment le financement correspondant prolonge votre autonomie",
+      "available": "Disponible",
+      "coversExpenses": "Couvre les dépenses",
+      "months": "mois",
+      "fullIncome": "Revenu complet",
+      "basedOn": "Basé sur vos programmes de financement correspondants",
+      "viewMatches": "Voir les correspondances"
+    },
+    "taxBracketFederal": "Fédéral",
+    "taxBracketQuebec": "Québec",
+    "perYear": "/an",
+    "flags": {
+      "gstApproaching": "Approche du seuil de TPS/TVQ",
+      "gstApproachingDetail": "Vous êtes à {remaining} du seuil d'inscription de 30 000 $. Prévoyez de vous inscrire avant de le franchir pour éviter les pénalités.",
+      "gstRequired": "Inscription TPS/TVQ requise",
+      "gstRequiredDetail": "À {revenueK} K$/an, vous devez vous inscrire à la TPS/TVQ dans les 30 jours suivant le franchissement du seuil et commencer à percevoir la taxe de vente.",
+      "quarterlyInstallments": "Acomptes trimestriels requis",
+      "quarterlyInstallmentsDetail": "Votre impôt estimé ({totalTax}/an) dépasse 1 800 $ — vous devez payer {installment} par trimestre à partir du 15 mars. Mettez cela de côté chaque mois.",
+      "qppBudget": "Prévoyez le RRQ — la plupart des débutants l'oublient",
+      "qppBudgetDetail": "Le RRQ coûte aux travailleurs autonomes 12,8 % du revenu net (les deux parts). C'est {qppMonthly}/mois que vous devez mettre de côté — ce n'est pas déduit automatiquement.",
+      "mileageTip": "Suivez votre kilométrage vers les marchés",
+      "mileageTipDetail": "Les déplacements vers les marchés, l'achat d'ingrédients et les livraisons sont déductibles. Au taux 2026 de 0,72 $/km, 200 km/mois = 144 $ en déductions — environ 36 $ d'économies fiscales.",
+      "homeOfficeTip": "Déduction pour bureau à domicile disponible",
+      "homeOfficeTipDetail": "Si vous travaillez de chez vous, vous pouvez déduire une part proportionnelle du loyer, des services publics et d'Internet. Un bureau de 10 m² dans un logement de 100 m² = 10 % des frais de logement déductibles.",
+      "staTip": "Soutien au revenu STA pendant le démarrage",
+      "staTipDetail": "Le programme STA du Service de garde en milieu familial fournit un soutien au revenu pendant que vous développez votre clientèle. Faites votre demande auprès de votre RCE avant l'ouverture.",
+      "belowBreakEven": "Revenus sous le seuil de rentabilité",
+      "belowBreakEvenDetail": "À ce niveau de revenu, votre net ({takeHome}/mois) ne couvre pas vos dépenses ({expenses}/mois). Vous avez besoin d'au moins {needed} brut/mois pour atteindre le seuil de rentabilité."
+    },
+    "questionnaireBusinessType": "Votre type d'entreprise :",
+    "questionnaireOf": "de",
+    "booleanYes": "Oui",
+    "booleanNo": "Non",
+    "snapshotCard": {
+      "title": "Portrait financier",
+      "fullBreakdown": "Ventilation complète",
+      "estimatedTakeHome": "Revenu mensuel net estimé",
+      "afterTaxes": "après impôts, RRQ et ~{expenses} de dépenses",
+      "tax": "Impôts",
+      "expenses": "Dépenses",
+      "keep": "Net"
+    }
   },
   "assistant": {
     "greeting": "Bonjour ! Comment puis-je vous aider ?",
@@ -108,7 +549,10 @@
     "send": "Envoyer",
     "thinking": "Réflexion en cours...",
     "clear": "Effacer",
-    "emptyState": "Posez-moi une question sur votre entreprise au Québec."
+    "emptyState": "Posez-moi une question sur votre entreprise au Québec !",
+    "suggestion1": "Comment enregistrer une entreprise individuelle au Québec ?",
+    "suggestion2": "Dois-je percevoir la TPS/TVQ ?",
+    "suggestion3": "Quel financement est disponible pour les femmes entrepreneures ?"
   },
   "settings": {
     "title": "Paramètres",
@@ -141,10 +585,31 @@
     "expectedRevenueHint": "Utilisé pour calculer votre portrait fiscal et le seuil d'inscription TPS/TVQ.",
     "changesSaved": "Modifications enregistrées",
     "saveChanges": "Enregistrer",
-    "saving": "Enregistrement…"
+    "saving": "Enregistrement…",
+    "businessTypes": {
+      "food": "Alimentation et pâtisserie",
+      "freelance": "Pigiste / Consultation",
+      "daycare": "Garde d'enfants",
+      "retail": "Commerce de détail",
+      "personalCare": "Soins personnels",
+      "other": "Autre"
+    },
+    "immigrationOptions": {
+      "citizen": "Citoyen canadien",
+      "permanentResident": "Résident permanent",
+      "workPermit": "Permis de travail",
+      "student": "Visa étudiant"
+    },
+    "languages": {
+      "en": "Anglais",
+      "fr": "Français"
+    }
   },
   "dashboard": {
     "welcome": "Bon retour",
+    "welcomeToBZNS": "Bienvenue sur BZNS",
+    "intakePrompt": "Répondez à 8 questions rapides sur votre idée d'entreprise. Nous générerons votre feuille de route québécoise personnalisée, vos correspondances de financement et votre portrait fiscal.",
+    "startProfile": "Créer mon profil d'entreprise",
     "completeIntakeTitle": "Commençons",
     "completeIntakeSubtitle": "Complétez votre profil d'entreprise pour débloquer votre feuille de route personnalisée, vos correspondances de financement et votre portrait financier.",
     "startIntake": "Créer mon profil d'entreprise",
@@ -153,13 +618,32 @@
     "completeIntakeToGenerate": "Complétez le profil pour générer",
     "viewRoadmap": "Voir la feuille de route",
     "fundingAvailable": "Financement disponible",
-    "acrossPrograms": "dans les programmes correspondants",
+    "programReady": "programme prêt à postuler",
+    "programsReady": "programmes prêts à postuler",
+    "completeIntakeToFind": "Complétez le profil pour trouver des correspondances",
     "viewMatches": "Voir les correspondances",
+    "monthlyTakeHome": "Revenu mensuel net",
+    "afterTaxes": "après impôts et dépenses",
+    "setRevenue": "Définir le revenu pour calculer",
+    "viewFinances": "Voir les finances",
     "financesLabel": "Finances",
     "viewFinancialSnapshot": "votre portrait financier",
-    "viewFinances": "Voir les finances",
     "staleWarning": "Vos paramètres ont changé depuis la génération de cette feuille de route.",
-    "updateRoadmap": "Mettre à jour"
+    "staleDetail": "Vos paramètres ont changé depuis la génération de votre feuille de route. Régénérez pour obtenir des étapes mises à jour.",
+    "updateRoadmap": "Mettre à jour",
+    "readyToBuild": "Prêt à créer votre feuille de route ?",
+    "generateDesc": "Générer une liste de vérification légale personnalisée pour votre entreprise.",
+    "generating": "Génération…",
+    "generateMyRoadmap": "Générer ma feuille de route",
+    "nextSteps": "Prochaines étapes",
+    "viewAll": "Voir tout",
+    "roadmapError": "Erreur de feuille de route :",
+    "yourBusiness": "Votre entreprise",
+    "acrossPrograms": "dans les programmes correspondants"
+  },
+  "appLayout": {
+    "welcomeToBZNS": "Bienvenue sur BZNS",
+    "intakePrompt": "Parlons de votre idée d'entreprise pour créer votre feuille de route personnalisée."
   },
   "common": {
     "save": "Enregistrer",

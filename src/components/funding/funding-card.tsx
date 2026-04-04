@@ -10,6 +10,7 @@ import type { FundingMatch, FundingExplanation, ProgramType } from '@/types/fund
 import type { Profile } from '@/types/profile';
 import { useFundingStore } from '@/stores/funding-store';
 import { useProfileStore } from '@/stores/profile-store';
+import { useTranslation } from '@/lib/i18n/useTranslation';
 
 interface FundingCardProps {
   match: FundingMatch;
@@ -50,17 +51,23 @@ const TYPE_BADGE: Record<ProgramType, string> = {
   mentorship: 'badge bg-amber-100 text-amber-700',
 };
 
-const TYPE_LABEL: Record<ProgramType, string> = {
-  loan:       'Loan',
-  grant:      'Grant',
-  tax_credit: 'Tax Credit',
-  mentorship: 'Mentorship',
-};
+function useTypeLabel(): Record<ProgramType, string> {
+  const { t } = useTranslation();
+  return {
+    loan:       t('funding.types.loan'),
+    grant:      t('funding.types.grant'),
+    tax_credit: t('funding.types.taxCredit'),
+    mentorship: t('funding.types.mentorship'),
+  };
+}
 
-function matchLabel(score: number): { text: string; cls: string } {
-  if (score >= 80) return { text: 'Strong Match', cls: 'badge bg-teal-100 text-teal-700' };
-  if (score >= 50) return { text: 'Good Match',   cls: 'badge bg-amber-100 text-amber-700' };
-  return               { text: 'Partial Match',  cls: 'badge bg-slate-100 text-slate-500' };
+function useMatchLabel() {
+  const { t } = useTranslation();
+  return (score: number): { text: string; cls: string } => {
+    if (score >= 80) return { text: t('funding.matchLabels.strong'), cls: 'badge bg-teal-100 text-teal-700' };
+    if (score >= 50) return { text: t('funding.matchLabels.good'),   cls: 'badge bg-amber-100 text-amber-700' };
+    return               { text: t('funding.matchLabels.partial'),  cls: 'badge bg-slate-100 text-slate-500' };
+  };
 }
 
 const IMPACT_BADGE: Record<string, string> = {
@@ -71,26 +78,19 @@ const IMPACT_BADGE: Record<string, string> = {
 
 // ── Requirements panel ────────────────────────────────────────────────────────
 
-interface RequirementMeta {
-  label: string;
+interface RequirementMetaStatic {
   mandatory: boolean;
-  // When this requirement fails AND this profile boolean is false, show a roadmap hint
   gatedBy?: keyof Profile;
-  roadmapHint?: string;
+  hasRoadmapHint?: boolean;
 }
 
-const REQUIREMENT_META: Record<string, RequirementMeta> = {
-  age_eligible:                { label: 'Age requirement',      mandatory: true },
-  location_eligible:           { label: 'Location requirement', mandatory: true },
-  immigration_status_eligible: { label: 'Immigration status',   mandatory: true },
-  business_type_eligible:      { label: 'Business sector',      mandatory: true },
-  business_stage_eligible: {
-    label: 'Business stage',
-    mandatory: false,
-    gatedBy: 'has_neq',
-    roadmapHint: 'Complete REQ Registration in your Roadmap — it advances your stage from pre-launch to launching, boosting your score for this program.',
-  },
-  demographic_match: { label: 'Demographic criteria', mandatory: false },
+const REQUIREMENT_META_STATIC: Record<string, RequirementMetaStatic> = {
+  age_eligible:                { mandatory: true },
+  location_eligible:           { mandatory: true },
+  immigration_status_eligible: { mandatory: true },
+  business_type_eligible:      { mandatory: true },
+  business_stage_eligible:     { mandatory: false, gatedBy: 'has_neq', hasRoadmapHint: true },
+  demographic_match:           { mandatory: false },
 };
 
 function RequirementsPanel({
@@ -100,25 +100,27 @@ function RequirementsPanel({
   eligibilityDetails: Record<string, boolean>;
   profile: Profile | null;
 }) {
+  const { t } = useTranslation();
   const entries = Object.entries(eligibilityDetails);
-  const mandatory = entries.filter(([k]) => REQUIREMENT_META[k]?.mandatory !== false);
-  const optional  = entries.filter(([k]) => REQUIREMENT_META[k]?.mandatory === false);
+  const mandatory = entries.filter(([k]) => REQUIREMENT_META_STATIC[k]?.mandatory !== false);
+  const optional  = entries.filter(([k]) => REQUIREMENT_META_STATIC[k]?.mandatory === false);
 
   const roadmapHints = entries.filter(([k, v]) => {
     if (v) return false;
-    const meta = REQUIREMENT_META[k];
-    if (!meta?.roadmapHint || !meta.gatedBy) return false;
+    const meta = REQUIREMENT_META_STATIC[k];
+    if (!meta?.hasRoadmapHint || !meta.gatedBy) return false;
     return profile?.[meta.gatedBy] === false;
   });
 
   const label = (key: string) =>
-    REQUIREMENT_META[key]?.label ??
-    key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    t(`funding.reqLabels.${key}`) !== `funding.reqLabels.${key}`
+      ? t(`funding.reqLabels.${key}`)
+      : key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
   return (
     <div>
       <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-        Application requirements
+        {t('funding.requirements')}
       </p>
 
       {/* Mandatory */}
@@ -134,7 +136,7 @@ function RequirementsPanel({
             </span>
             {!val && (
               <span className="ml-auto text-[10px] font-semibold bg-red-50 text-red-500 px-1.5 py-0.5 rounded-full uppercase tracking-wide shrink-0">
-                Required
+                {t('funding.required')}
               </span>
             )}
           </li>
@@ -145,7 +147,7 @@ function RequirementsPanel({
       {optional.length > 0 && (
         <>
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1.5">
-            Score boosters
+            {t('funding.scoreBoosters')}
           </p>
           <ul className="space-y-1.5">
             {optional.map(([key, val]) => (
@@ -166,10 +168,10 @@ function RequirementsPanel({
         <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 px-3.5 py-2.5 flex items-start gap-2">
           <ClipboardList size={13} className="text-amber-500 shrink-0 mt-0.5" />
           <div>
-            <p className="text-xs font-semibold text-amber-700 mb-1">Improve via your Roadmap</p>
+            <p className="text-xs font-semibold text-amber-700 mb-1">{t('funding.improveViaRoadmap')}</p>
             {roadmapHints.map(([key]) => (
               <p key={key} className="text-xs text-amber-600 leading-relaxed">
-                {REQUIREMENT_META[key]?.roadmapHint}
+                {t('funding.roadmapHintNeq')}
               </p>
             ))}
           </div>
@@ -182,14 +184,15 @@ function RequirementsPanel({
 // ── Structured AI explanation ─────────────────────────────────────────────────
 
 function ExplanationPanel({ exp }: { exp: FundingExplanation }) {
+  const { t } = useTranslation();
   return (
     <div className="rounded-xl border border-brand-200 bg-brand-50 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-brand-200 bg-brand-100/60">
         <span className="flex items-center gap-1.5 text-xs font-semibold text-brand-700 uppercase tracking-wide">
-          <Sparkles size={11} /> AI Analysis
+          <Sparkles size={11} /> {t('funding.aiAnalysis')}
         </span>
-        <span className="text-xs text-brand-500 font-medium">AI-verified</span>
+        <span className="text-xs text-brand-500 font-medium">{t('funding.aiVerified')}</span>
       </div>
 
       <div className="p-4 space-y-4">
@@ -201,7 +204,7 @@ function ExplanationPanel({ exp }: { exp: FundingExplanation }) {
         {exp.eligible_factors.length > 0 && (
           <div>
             <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-2">
-              Why you qualify
+              {t('funding.whyQualify')}
             </p>
             <ul className="space-y-2">
               {exp.eligible_factors.map((f, i) => (
@@ -211,7 +214,7 @@ function ExplanationPanel({ exp }: { exp: FundingExplanation }) {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-medium text-slate-800">{f.label}</span>
                       <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full uppercase tracking-wide ${IMPACT_BADGE[f.impact] ?? IMPACT_BADGE.low}`}>
-                        {f.impact} impact
+                        {f.impact} {t('funding.impact')}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{f.detail}</p>
@@ -226,7 +229,7 @@ function ExplanationPanel({ exp }: { exp: FundingExplanation }) {
         {exp.missing_factors.length > 0 && (
           <div>
             <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">
-              What would raise your score
+              {t('funding.whatRaiseScore')}
             </p>
             <ul className="space-y-2">
               {exp.missing_factors.map((f, i) => (
@@ -246,7 +249,7 @@ function ExplanationPanel({ exp }: { exp: FundingExplanation }) {
         <div className="rounded-lg bg-white border border-brand-200 px-3.5 py-3 flex items-start gap-2.5">
           <ArrowRight size={14} className="text-brand-600 shrink-0 mt-0.5" />
           <div>
-            <p className="text-xs font-semibold text-brand-700 uppercase tracking-wide mb-0.5">Next step</p>
+            <p className="text-xs font-semibold text-brand-700 uppercase tracking-wide mb-0.5">{t('funding.nextStep')}</p>
             <p className="text-sm text-slate-700 leading-relaxed">{exp.next_step}</p>
           </div>
         </div>
@@ -261,6 +264,9 @@ function ExplanationPanel({ exp }: { exp: FundingExplanation }) {
 export default function FundingCard({ match }: FundingCardProps) {
   const { toggleBookmark } = useFundingStore();
   const profile = useProfileStore((s) => s.profile);
+  const { t } = useTranslation();
+  const TYPE_LABEL = useTypeLabel();
+  const matchLabel = useMatchLabel();
   const [expanded, setExpanded] = useState(false);
   const [explaining, setExplaining] = useState(false);
   const [explanation, setExplanation] = useState<FundingExplanation | null>(null);
@@ -329,7 +335,7 @@ export default function FundingCard({ match }: FundingCardProps) {
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); toggleBookmark(match.id); }}
-                  aria-label={match.is_bookmarked ? 'Remove bookmark' : 'Bookmark this program'}
+                  aria-label={match.is_bookmarked ? t('funding.removeBookmark') : t('funding.bookmarkProgram')}
                   className="h-9 w-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-brand-600 hover:bg-brand-50 transition-colors"
                 >
                   {match.is_bookmarked
@@ -362,7 +368,7 @@ export default function FundingCard({ match }: FundingCardProps) {
           {match.documents_required && match.documents_required.length > 0 && (
             <div>
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2 flex items-center gap-1.5">
-                <FileText size={11} /> What you&apos;ll need to apply
+                <FileText size={11} /> {t('funding.whatNeedToApply')}
               </p>
               <ul className="space-y-1.5">
                 {match.documents_required.map((doc, i) => (
@@ -390,7 +396,7 @@ export default function FundingCard({ match }: FundingCardProps) {
                 className="btn-primary btn-sm gap-1.5 inline-flex"
                 onClick={(e) => e.stopPropagation()}
               >
-                Apply now <ExternalLink size={12} />
+                {t('funding.applyNow')} <ExternalLink size={12} />
               </a>
             )}
             <button
@@ -400,11 +406,11 @@ export default function FundingCard({ match }: FundingCardProps) {
               className="btn-secondary btn-sm gap-1.5 inline-flex"
             >
               {explaining ? (
-                <><Loader2 size={12} className="animate-spin" /> Analysing…</>
+                <><Loader2 size={12} className="animate-spin" /> {t('funding.analysing')}</>
               ) : explanation ? (
-                'Hide analysis'
+                t('funding.hideAnalysis')
               ) : (
-                <><Sparkles size={12} /> Analyse my eligibility</>
+                <><Sparkles size={12} /> {t('funding.analyseEligibility')}</>
               )}
             </button>
             {match.source_url && match.source_url !== match.application_url && (
@@ -415,7 +421,7 @@ export default function FundingCard({ match }: FundingCardProps) {
                 className="btn-secondary btn-sm gap-1.5 inline-flex"
                 onClick={(e) => e.stopPropagation()}
               >
-                Learn more <ExternalLink size={12} />
+                {t('funding.learnMore')} <ExternalLink size={12} />
               </a>
             )}
           </div>

@@ -5,10 +5,12 @@ import { ArrowLeft, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import IntakeProgress from './intake-progress';
 import QuestionCard from './question-card';
 import { useProfileStore } from '@/stores/profile-store';
-
-const STEPS = ['Your Business', 'How You Operate', 'Pricing & Idea', 'Location', 'About You'];
+import { useTranslation } from '@/lib/i18n/useTranslation';
 
 export default function IntakeWizard() {
+  const { t } = useTranslation();
+
+  const STEPS = [t('intake.wizard.step0Title'), t('intake.wizard.step1Title'), t('intake.wizard.step2Title'), t('intake.wizard.step3Title'), t('intake.wizard.step4Title')];
   const [currentStep, setCurrentStep] = useState(0);
   const { profile, intakeForm, updateIntakeField, submitIntake, isLoading, error } = useProfileStore();
 
@@ -73,7 +75,7 @@ export default function IntakeWizard() {
           className="btn-ghost gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <ArrowLeft size={15} />
-          Back
+          {t('intake.wizard.back')}
         </button>
 
         <div className="flex items-center gap-2">
@@ -101,16 +103,16 @@ export default function IntakeWizard() {
           {isLoading ? (
             <>
               <Loader2 size={15} className="animate-spin" />
-              Generating your roadmap…
+              {t('intake.wizard.generating')}
             </>
           ) : isLastStep ? (
             <>
               <Sparkles size={15} />
-              Generate my roadmap
+              {t('intake.wizard.generateBtn')}
             </>
           ) : (
             <>
-              Next
+              {t('intake.wizard.next')}
               <ArrowRight size={15} />
             </>
           )}

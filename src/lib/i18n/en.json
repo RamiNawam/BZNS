@@ -24,7 +24,77 @@
     "title": "BZNS — Micro-Business Launchpad",
     "subtitle": "Your AI-powered guide to launching a micro-business in Quebec.",
     "cta": "Get Started",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "heroTitle1": "Start your business",
+    "heroTitle2": "in Québec.",
+    "heroTitle3": "The right way.",
+    "heroSubtitle": "Navigate 6+ government agencies, 80+ funding programs, and a tax system that surprises every first-time entrepreneur — in plain language, in any language.",
+    "getRoadmap": "Get my personalized roadmap",
+    "viewDemo": "View live demo",
+    "signIn": "Sign in",
+    "getStartedFree": "Get started free",
+    "features": "Features",
+    "whoFor": "Who it's for",
+    "everythingToLaunch": "Everything to launch legally",
+    "onePlatform": "One platform. Every step covered.",
+    "builtForReal": "Built for real people",
+    "builtForRealSub": "Not hypothetical entrepreneurs — actual situations we designed for.",
+    "readyToLaunch": "Ready to launch?",
+    "readyToLaunchSub": "8 questions. Your personalized Quebec business roadmap. Free.",
+    "startNow": "Start now — takes 3 minutes",
+    "disclaimer": "Not legal or financial advice. Always verify with official government sources and qualified professionals.",
+    "stats": {
+      "agencies": "Government agencies navigated",
+      "programs": "Funding programs evaluated",
+      "time": "To your personalized roadmap",
+      "price": "Always"
+    },
+    "bento": {
+      "roadmapTitle": "Legal Roadmap",
+      "roadmapDesc": "Personalized, dependency-ordered steps. Every form, fee, and deadline for your exact business.",
+      "fundingTitle": "Funding Matcher",
+      "fundingDesc": "15+ Québec programs scored deterministically against your profile. No guesswork.",
+      "availableFor": "available for Yara",
+      "taxTitle": "Tax Snapshot",
+      "taxDesc": "Real numbers: gross → GST/QST → QPP → income tax → take-home. 2026 rates.",
+      "grossRevenue": "Gross revenue",
+      "taxesQPP": "Taxes + QPP",
+      "takeHome": "Take-home",
+      "aiTitle": "AI Assistant",
+      "aiDesc": "Ask anything about permits, taxes, or Bill 96. Grounded in official KB. Cites sources.",
+      "docsTitle": "Starter Documents",
+      "docsDesc": "Bilingual contract, invoice template, business pitch — download-ready .docx.",
+      "step1": "Register with the REQ",
+      "step2": "MAPAQ food permit",
+      "step3": "GST/QST registration",
+      "step4": "Open a business bank account"
+    },
+    "personas": {
+      "yara": {
+        "name": "Yara, 26",
+        "role": "Home Pastry Chef",
+        "city": "Villeray, Montréal",
+        "challenge": "Wants to sell baked goods from her kitchen but doesn't know where to start legally.",
+        "insight": "$90,000+ in funding she qualifies for",
+        "tag": "Food Business"
+      },
+      "marcus": {
+        "name": "Marcus, 23",
+        "role": "Freelance Developer",
+        "city": "Plateau, Montréal",
+        "challenge": "Thinks he's \"just doing side work.\" About to miss QPP registrations and owe back taxes.",
+        "insight": "12.8% QPP surprise coming at year-end",
+        "tag": "Freelancer"
+      },
+      "fatima": {
+        "name": "Fatima, 41",
+        "role": "Future Home Daycare",
+        "city": "Rosemont, Montréal",
+        "challenge": "One of the most regulated micro-businesses in QC — she needs 10 steps she never knew about.",
+        "insight": "STA income support program during startup",
+        "tag": "Childcare"
+      }
+    }
   },
   "intake": {
     "title": "Business Profile",
@@ -49,6 +119,112 @@
       "pre_launch": "Pre-launch (planning)",
       "launched": "Launched (under 1 year)",
       "established": "Established (1+ years)"
+    },
+    "wizard": {
+      "step0Title": "Your Business",
+      "step1Title": "How You Operate",
+      "step2Title": "Pricing & Idea",
+      "step3Title": "Location",
+      "step4Title": "About You",
+      "back": "Back",
+      "next": "Next",
+      "generating": "Generating your roadmap…",
+      "generateBtn": "Generate my roadmap"
+    },
+    "q0": {
+      "title": "Your business",
+      "subtitle": "Let's start with the basics. We'll figure out the right permits, funding, and legal steps for you.",
+      "nameLabel": "What's the name of your business?",
+      "namePlaceholder": "e.g., Yara's Kitchen, Studio Nova, QuickFix Reno…",
+      "nameHint": "Don't have one yet? Just type a working name — you can change it later.",
+      "activityLabel": "What does your business mainly involve?",
+      "food": "Preparing or selling food",
+      "foodDesc": "Baking, cooking, catering, meal prep, jams, sauces",
+      "services": "Providing a service",
+      "servicesDesc": "Consulting, design, coaching, beauty, fitness, cleaning",
+      "professional": "Regulated profession",
+      "professionalDesc": "Lawyer, accountant, engineer, architect, therapist, etc.",
+      "products": "Selling physical products",
+      "productsDesc": "Online store, boutique, handmade goods, reselling",
+      "trades": "Construction or skilled trades",
+      "tradesDesc": "Plumbing, electrical, carpentry, painting, renovations",
+      "children": "Caring for children",
+      "childrenDesc": "Home daycare, nursery, babysitting"
+    },
+    "q1": {
+      "title": "How you'll operate",
+      "subtitle": "This helps us match the right permits and zoning rules.",
+      "locationLabel": "Where will you mainly work?",
+      "home": "From home",
+      "homeDesc": "Kitchen, office, studio at your residence",
+      "commercial": "Rented / commercial space",
+      "commercialDesc": "Store, studio, restaurant, workshop",
+      "clientSites": "At client locations",
+      "clientSitesDesc": "You go to the client (renovations, cleaning, etc.)",
+      "online": "Online only",
+      "onlineDesc": "Remote work, e-commerce, digital services"
+    },
+    "q2": {
+      "title": "Your pricing & idea",
+      "subtitle": "How you charge affects tax obligations and financial projections.",
+      "pricingLabel": "How will you charge your clients?",
+      "perItem": "Per item / product",
+      "perItemDesc": "Each sale is a fixed price (pastries, crafts, goods)",
+      "perHour": "Per hour",
+      "perHourDesc": "Hourly billing (consulting, freelance, tutoring)",
+      "perSession": "Per session / appointment",
+      "perSessionDesc": "Fixed price per visit (haircut, massage, training)",
+      "perProject": "Per project",
+      "perProjectDesc": "Flat fee per job (photography, design, renovation)",
+      "subscription": "Monthly / recurring",
+      "subscriptionDesc": "Subscriptions, memberships, retainers, courses",
+      "descLabel": "Describe your business in a few sentences",
+      "descPlaceholder": "e.g., I want to sell homemade pastries from my kitchen and deliver in my neighbourhood…",
+      "descHint": "This helps us generate your personalized legal roadmap. Be as specific or vague as you like."
+    },
+    "q3": {
+      "title": "Location & setup",
+      "subtitle": "Where and how you plan to operate affects which permits and programs apply to you.",
+      "cityLabel": "Which city or region are you in?",
+      "montreal": "Montréal",
+      "montrealDesc": "Island of Montréal (CMM)",
+      "quebecCity": "Québec City",
+      "quebecCityDesc": "Capitale-Nationale region",
+      "laval": "Laval",
+      "lavalDesc": "North Shore suburb of Montréal",
+      "otherQuebec": "Other Québec municipality",
+      "otherQuebecDesc": "Anywhere else in the province",
+      "boroughLabel": "Which borough? (optional)",
+      "boroughPlaceholder": "e.g., Rosemont–La Petite-Patrie, Plateau-Mont-Royal…",
+      "boroughHint": "Helps us match borough-specific grants and zoning info.",
+      "partnersLabel": "Will you have business partners or co-founders?",
+      "yes": "Yes",
+      "yesDesc": "Partnership or multi-shareholder corp",
+      "no": "No",
+      "noDesc": "Sole founder / owner"
+    },
+    "q4": {
+      "title": "About you",
+      "subtitle": "Used to match funding programs and services you qualify for. Everything is private and optional.",
+      "ageLabel": "Your age (optional)",
+      "ageHint": "Some grants target entrepreneurs under 35 or over 50.",
+      "immigrationLabel": "Immigration status",
+      "citizen": "Canadian citizen",
+      "permanentResident": "Permanent resident",
+      "temporaryResident": "Temporary resident (work/study permit)",
+      "refugee": "Refugee claimant / protected person",
+      "preferNotToSay": "Prefer not to say",
+      "languagesLabel": "Languages you're comfortable working in",
+      "languagesHint": "Select all that apply. We'll surface resources in your languages.",
+      "french": "French",
+      "english": "English",
+      "spanish": "Spanish",
+      "arabic": "Arabic",
+      "mandarin": "Mandarin / Cantonese",
+      "portuguese": "Portuguese",
+      "creole": "Haitian Creole",
+      "otherLang": "Other",
+      "prefLangLabel": "Preferred language for your roadmap & AI assistant"
     }
   },
   "roadmap": {
@@ -87,7 +263,16 @@
       "recommended": "Recommended"
     },
     "itemsToReview": "items to review",
-    "completeFirst": "Complete \"{step}\" first"
+    "completeFirst": "Complete \"{step}\" first",
+    "stepDetail": {
+      "whyMatters": "Why this matters",
+      "documentsRequired": "Documents required",
+      "governmentPage": "Official government page",
+      "yourNotes": "Your notes",
+      "notesPlaceholder": "e.g., Got my NEQ — number is 1234567890",
+      "saving": "Saving…",
+      "saved": "Saved"
+    }
   },
   "funding": {
     "title": "Funding Matches",
@@ -95,11 +280,267 @@
     "empty": "Complete your business profile to see funding matches.",
     "score": "Match score",
     "recommended": "Recommended",
-    "learnMore": "Learn more"
+    "learnMore": "Learn more",
+    "pageTitle": "Funding Matcher",
+    "pageSubtitle": "Grants, loans, and programs matched to your business profile.",
+    "programReady": "program ready to apply",
+    "programsReady": "programs ready to apply",
+    "findOpportunities": "Find your funding opportunities",
+    "findDesc": "We'll score every Quebec and federal program against your profile and show you exactly how much you could access right now.",
+    "findBtn": "Find my funding",
+    "scoring": "Scoring programs…",
+    "scoringDesc": "Matching your profile against all available programs.",
+    "noMatches": "No funding matches yet",
+    "noMatchesDesc": "Click \"Find my funding\" above to score programs against your profile.",
+    "staleWarning": "Your settings changed since your funding was last scored.",
+    "refreshBtn": "Refresh matches",
+    "programsFound": "programs found",
+    "programFound": "program found",
+    "filters": {
+      "all": "All",
+      "grant": "Grants",
+      "loan": "Loans",
+      "taxCredit": "Tax Credits",
+      "mentorship": "Mentorship",
+      "bookmarked": "Bookmarked"
+    },
+    "readyNow": "Ready to apply now",
+    "readyNowDesc": "You meet all current eligibility requirements for these programs.",
+    "unlockMore": "Unlock with a few more steps",
+    "unlockMoreDesc": "You meet the core requirements. Complete the flagged steps in your Roadmap to qualify.",
+    "noFilter": "No programs match this filter.",
+    "types": {
+      "loan": "Loan",
+      "grant": "Grant",
+      "taxCredit": "Tax Credit",
+      "mentorship": "Mentorship"
+    },
+    "matchLabels": {
+      "strong": "Strong Match",
+      "good": "Good Match",
+      "partial": "Partial Match"
+    },
+    "requirements": "Application requirements",
+    "required": "Required",
+    "scoreBoosters": "Score boosters",
+    "reqLabels": {
+      "age_eligible": "Age requirement",
+      "location_eligible": "Location requirement",
+      "immigration_status_eligible": "Immigration status",
+      "business_type_eligible": "Business sector",
+      "business_stage_eligible": "Business stage",
+      "demographic_match": "Demographic criteria"
+    },
+    "roadmapHintNeq": "Complete REQ Registration in your Roadmap — it advances your stage from pre-launch to launching, boosting your score for this program.",
+    "improveViaRoadmap": "Improve via your Roadmap",
+    "aiAnalysis": "AI Analysis",
+    "aiVerified": "AI-verified",
+    "whyQualify": "Why you qualify",
+    "whatRaiseScore": "What would raise your score",
+    "nextStep": "Next step",
+    "applyNow": "Apply now",
+    "analysing": "Analysing…",
+    "hideAnalysis": "Hide analysis",
+    "analyseEligibility": "Analyse my eligibility",
+    "impact": "impact",
+    "whatNeedToApply": "What you'll need to apply",
+    "removeBookmark": "Remove bookmark",
+    "bookmarkProgram": "Bookmark this program"
   },
   "financial": {
     "title": "Finances",
-    "subtitle": "Your financial snapshot"
+    "subtitle": "Your financial snapshot",
+    "pageTitle": "Financial Snapshot",
+    "pageSubtitle": "Your personal CFO dashboard — estimated taxes, take-home, and what to watch for. Updated live.",
+    "businessType": "Business type:",
+    "editInputs": "Edit inputs",
+    "savingSetup": "Saving your financial setup...",
+    "calculateBtn": "Calculate my finances",
+    "skipDefaults": "Skip and use default estimates",
+    "yourBusinessType": "Your business type:",
+    "section1": {
+      "kicker": "1 · Financial insight",
+      "title": "Your money story",
+      "description": "Estimated take-home after taxes and expenses, with a quick visual of where each dollar goes."
+    },
+    "section2": {
+      "kicker": "2 · At a glance",
+      "title": "Key numbers",
+      "description": "Revenue, tax load, expenses, and what you keep — all on one row."
+    },
+    "section3": {
+      "kicker": "3 · Taxes",
+      "title": "Tax breakdown",
+      "description": "Federal and Québec income tax, QPP, and QPIP — estimated from your net business income (2026 assumptions)."
+    },
+    "section4": {
+      "kicker": "4 · Outlook",
+      "title": "Charts & scenarios",
+      "description": "See how revenue compounds over the year and how different income levels affect your take-home."
+    },
+    "section5": {
+      "kicker": "5 · Operations",
+      "title": "Expenses & break-even",
+      "description": "Adjust category amounts to match your reality, then see how close you are to covering costs and taxes."
+    },
+    "section6": {
+      "kicker": "6 · Planning",
+      "title": "Tax calendar",
+      "description": "Key dates for installments and filing — use this as a reminder, not personalized advice."
+    },
+    "section7": {
+      "kicker": "7 · Deductions",
+      "title": "Common write-offs",
+      "description": "Typical deductible costs for your business type — rough savings use a marginal rate estimate."
+    },
+    "section8": {
+      "kicker": "8 · Next steps",
+      "title": "Watch-outs & funding",
+      "description": "Flags tailored to your numbers, plus how matched funding could extend your runway."
+    },
+    "estimatedTakeHome": "Estimated monthly take-home",
+    "ofRevenue": "of revenue",
+    "effectiveRate": "effective rate",
+    "waterfall": {
+      "federalTax": "Federal Tax",
+      "quebecTax": "Quebec Tax",
+      "qpp": "QPP",
+      "qpip": "QPIP",
+      "expenses": "Expenses",
+      "takeHome": "Take-home"
+    },
+    "cards": {
+      "grossRevenue": "Gross Revenue",
+      "taxBurden": "Tax Burden",
+      "effectiveRate": "effective rate",
+      "businessExpenses": "Business Expenses",
+      "monthlyTakeHome": "Monthly Take-Home",
+      "ofRevenue": "of revenue"
+    },
+    "taxTable": {
+      "grossRevenue": "Gross Revenue",
+      "businessExpenses": "Business Expenses",
+      "netIncome": "Net Business Income",
+      "federalTax": "Federal Income Tax",
+      "quebecTax": "Quebec Income Tax",
+      "qpp": "QPP Contributions",
+      "qpip": "QPIP Premium",
+      "takeHome": "Monthly Take-Home",
+      "perMonth": "/month"
+    },
+    "detailedBreakdown": "Detailed tax breakdown",
+    "detailedBreakdownSub": "Federal + QC income tax, QPP, QPIP — 2026 rates",
+    "taxBrackets": "Your Tax Brackets",
+    "taxBracketNote": "Taxable income = net revenue minus personal amount ({federal} federal, {qc} QC)",
+    "taxable": "Taxable:",
+    "you": "You",
+    "projection": {
+      "title": "12-Month Projection",
+      "revenue": "Revenue",
+      "takeHome": "Take-home",
+      "gstLimit": "GST limit",
+      "gstCross": "You'll cross the $30,000 GST/QST threshold in month {month} — register before then.",
+      "gstSafe": "At this revenue level you stay under the $30,000 threshold — no GST/QST registration required this year."
+    },
+    "scenarios": {
+      "title": "Revenue scenarios",
+      "subtitle": "What if you earn more or less than expected?",
+      "takeHomeMo": "take-home/mo",
+      "taxBurden": "Tax burden",
+      "keepRate": "Keep rate",
+      "gstReq": "GST req?",
+      "yes": "Yes",
+      "no": "No",
+      "basedOn": "Based on 70% / 100% / 140% of your expected {amount}/month revenue"
+    },
+    "breakEven": {
+      "title": "Break-Even",
+      "subtitle": "Minimum revenue to cover expenses + all taxes",
+      "youNeed": "You need at least",
+      "yourProjection": "Your projection",
+      "aboveMsg": "You're {amount}/mo above break-even — healthy margin.",
+      "growthMsg": "At 10% monthly growth, you could reach break-even in ~{months} months. Focus on building revenue above {target}/mo.",
+      "belowMsg": "You're {amount}/mo below break-even. Consider reducing expenses or increasing prices."
+    },
+    "expenseBreakdown": "Expense breakdown",
+    "expenseBreakdownSub": "{count} categories — edit any amount",
+    "perMonth": "/month",
+    "pricing": {
+      "priceLabel": "Price per unit / hour",
+      "unitsLabel": "Units / hours per month",
+      "grossRevenue": "Gross Revenue",
+      "youKeep": "You Keep",
+      "perUnitProfit": "Per Unit Profit",
+      "afterTax": "after tax",
+      "chargingMore": "Charging {price} instead adds {amount}/month to your take-home (approx)."
+    },
+    "calendar": {
+      "title": "2026 Tax Calendar",
+      "installment1": "1st Installment",
+      "balanceDue": "Balance due",
+      "installment2": "2nd Install. + Return",
+      "installment3": "3rd Installment",
+      "installment4": "4th Installment",
+      "note": "* Installments required when total tax > $1,800/year. Self-employed filing deadline is June 15, but any balance owed is due April 30."
+    },
+    "qpp": {
+      "title": "The QPP Double Contribution",
+      "desc": "As a self-employed person, you pay both the employee AND employer share of QPP. An employee at the same income would pay only {employee}/mo — you pay {selfEmployed}/mo.",
+      "employeeLabel": "Employee at same income",
+      "selfEmployedLabel": "You (self-employed)",
+      "goodNews": "The good news: half of your QPP is tax-deductible, reducing your taxable income."
+    },
+    "deductions": {
+      "title": "Deduction tracker",
+      "subtitle": "Pre-loaded for your business type",
+      "estimatedSavings": "Estimated annual tax savings",
+      "fromDeductions": "from {amount} in deductions at ~{rate} marginal rate",
+      "source": "Source:"
+    },
+    "fundingImpact": {
+      "title": "Funding Impact",
+      "subtitle": "How matched funding extends your runway",
+      "available": "Available",
+      "coversExpenses": "Covers Expenses",
+      "months": "months",
+      "fullIncome": "Full Income",
+      "basedOn": "Based on your matched funding programs",
+      "viewMatches": "View matches"
+    },
+    "taxBracketFederal": "Federal",
+    "taxBracketQuebec": "Québec",
+    "perYear": "/year",
+    "flags": {
+      "gstApproaching": "Approaching GST/QST threshold",
+      "gstApproachingDetail": "You're {remaining} away from the $30,000 registration threshold. Plan to register before you cross it to avoid penalties.",
+      "gstRequired": "GST/QST registration required",
+      "gstRequiredDetail": "At ${revenueK}K/year, you must register for GST/QST within 30 days of crossing the threshold and start collecting sales tax.",
+      "quarterlyInstallments": "Quarterly tax installments apply",
+      "quarterlyInstallmentsDetail": "Your estimated tax ({totalTax}/yr) exceeds $1,800 — you must pay {installment} quarterly starting March 15. Set this aside monthly.",
+      "qppBudget": "Budget for QPP — most first-timers miss this",
+      "qppBudgetDetail": "QPP costs self-employed people 12.8% of net income (both shares). That's {qppMonthly}/month you need to set aside — it's not deducted automatically.",
+      "mileageTip": "Track mileage to markets",
+      "mileageTipDetail": "Driving to farmers markets, ingredient shopping, and deliveries is deductible. At the 2026 rate of $0.72/km, 200km/month = $144 in deductions — about $36 in tax savings.",
+      "homeOfficeTip": "Home office deduction available",
+      "homeOfficeTipDetail": "If you work from home, you can deduct a proportional share of rent, utilities, and internet. A 10m² office in a 100m² home = 10% of housing costs deductible.",
+      "staTip": "STA income support during startup",
+      "staTipDetail": "The Service de garde en milieu familial STA program provides income support while you build up your enrollment. Apply through your RCE before opening.",
+      "belowBreakEven": "Revenue below break-even",
+      "belowBreakEvenDetail": "At this revenue level your take-home ({takeHome}/mo) doesn't cover your expenses ({expenses}/mo). You need at least {needed} gross/mo to break even."
+    },
+    "questionnaireBusinessType": "Your business type:",
+    "questionnaireOf": "of",
+    "booleanYes": "Yes",
+    "booleanNo": "No",
+    "snapshotCard": {
+      "title": "Financial Snapshot",
+      "fullBreakdown": "Full breakdown",
+      "estimatedTakeHome": "Estimated monthly take-home",
+      "afterTaxes": "after taxes, QPP & ~{expenses} expenses",
+      "tax": "Tax",
+      "expenses": "Expenses",
+      "keep": "Keep"
+    }
   },
   "assistant": {
     "greeting": "Hey! How can I help you today?",
@@ -108,7 +549,10 @@
     "send": "Send",
     "thinking": "Thinking...",
     "clear": "Clear",
-    "emptyState": "Ask me anything about your business in Quebec."
+    "emptyState": "Ask me anything about starting your business in Quebec!",
+    "suggestion1": "How do I register a sole proprietorship in Quebec?",
+    "suggestion2": "Do I need to collect GST/QST?",
+    "suggestion3": "What funding is available for women entrepreneurs?"
   },
   "settings": {
     "title": "Settings",
@@ -141,10 +585,31 @@
     "expectedRevenueHint": "Used to calculate your tax snapshot and GST/QST registration threshold.",
     "changesSaved": "Changes saved",
     "saveChanges": "Save changes",
-    "saving": "Saving…"
+    "saving": "Saving…",
+    "businessTypes": {
+      "food": "Food & Bakery",
+      "freelance": "Freelance / Consulting",
+      "daycare": "Childcare",
+      "retail": "Retail",
+      "personalCare": "Personal Care",
+      "other": "Other"
+    },
+    "immigrationOptions": {
+      "citizen": "Canadian Citizen",
+      "permanentResident": "Permanent Resident",
+      "workPermit": "Work Permit",
+      "student": "Student Visa"
+    },
+    "languages": {
+      "en": "English",
+      "fr": "French"
+    }
   },
   "dashboard": {
     "welcome": "Welcome back",
+    "welcomeToBZNS": "Welcome to BZNS",
+    "intakePrompt": "Answer 8 quick questions about your business idea. We'll generate your personalized Québec roadmap, funding matches, and tax snapshot.",
+    "startProfile": "Start your business profile",
     "completeIntakeTitle": "Let's get started",
     "completeIntakeSubtitle": "Complete your business profile to unlock your personalized roadmap, funding matches, and financial snapshot.",
     "startIntake": "Start business profile",
@@ -153,13 +618,32 @@
     "completeIntakeToGenerate": "Complete intake to generate",
     "viewRoadmap": "View roadmap",
     "fundingAvailable": "Funding Available",
-    "acrossPrograms": "across matched programs",
+    "programReady": "program ready to apply",
+    "programsReady": "programs ready to apply",
+    "completeIntakeToFind": "Complete intake to find matches",
     "viewMatches": "View matches",
+    "monthlyTakeHome": "Monthly Take-Home",
+    "afterTaxes": "after taxes & expenses",
+    "setRevenue": "Set revenue to calculate",
+    "viewFinances": "View finances",
     "financesLabel": "Finances",
     "viewFinancialSnapshot": "your financial snapshot",
-    "viewFinances": "View finances",
     "staleWarning": "Your settings changed since this roadmap was generated.",
-    "updateRoadmap": "Update roadmap"
+    "staleDetail": "Your settings changed since your roadmap was generated. Regenerate to get updated steps.",
+    "updateRoadmap": "Update roadmap",
+    "readyToBuild": "Ready to build your roadmap?",
+    "generateDesc": "Generate a personalized legal checklist for your business.",
+    "generating": "Generating…",
+    "generateMyRoadmap": "Generate My Roadmap",
+    "nextSteps": "Next steps",
+    "viewAll": "View all",
+    "roadmapError": "Roadmap error:",
+    "yourBusiness": "Your Business",
+    "acrossPrograms": "across matched programs"
+  },
+  "appLayout": {
+    "welcomeToBZNS": "Welcome to BZNS",
+    "intakePrompt": "Let's learn about your business idea so we can build your personalised roadmap."
   },
   "common": {
     "save": "Save",

@@ -18,6 +18,7 @@ import type {
 } from "@/types/roadmap";
 import { useRoadmapStore } from "@/stores/roadmap-store";
 import { useProfileStore } from "@/stores/profile-store";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import StepDetail from "./step-detail";
 
 interface RoadmapStepProps {
@@ -48,13 +49,6 @@ const STATUS_BADGE: Record<StepStatus, string> = {
   skipped: "badge bg-slate-100 text-slate-400",
 };
 
-const STATUS_LABEL: Record<StepStatus, string> = {
-  pending: "To do",
-  in_progress: "In progress",
-  completed: "Done",
-  skipped: "Skipped",
-};
-
 // ── Confidence styling ───────────────────────────────────────────────────────
 
 const CONFIDENCE_BORDER: Record<StepConfidence, string> = {
@@ -63,23 +57,20 @@ const CONFIDENCE_BORDER: Record<StepConfidence, string> = {
   flagged: "border-l-amber-400",
 };
 
-const CONFIDENCE_BADGE: Record<
+const CONFIDENCE_STYLE: Record<
   StepConfidence,
-  { class: string; label: string; icon: typeof ShieldCheck }
+  { class: string; icon: typeof ShieldCheck }
 > = {
   verified: {
     class: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    label: "Verified",
     icon: ShieldCheck,
   },
   inferred: {
     class: "bg-teal-50 text-teal-700 border-teal-200",
-    label: "Recommended",
     icon: Sparkles,
   },
   flagged: {
     class: "bg-amber-50 text-amber-700 border-amber-200",
-    label: "Needs Attention",
     icon: Search,
   },
 };
@@ -185,12 +176,19 @@ export default function RoadmapStep({
   const [expanded, setExpanded] = useState(false);
   const { updateStepStatus } = useRoadmapStore();
   const { profile } = useProfileStore();
+  const { t } = useTranslation();
 
   const locked = isLocked(step, allSteps);
   const isCompleted = step.status === "completed";
   const confidence = step.confidence ?? "verified";
-  const confidenceInfo = CONFIDENCE_BADGE[confidence];
-  const ConfidenceIcon = confidenceInfo.icon;
+  const confidenceStyle = CONFIDENCE_STYLE[confidence];
+  const ConfidenceIcon = confidenceStyle.icon;
+
+  const CONFIDENCE_LABEL: Record<StepConfidence, string> = {
+    verified: t("roadmap.confidence.verified"),
+    inferred: t("roadmap.confidence.recommended"),
+    flagged: t("roadmap.confidence.needsAttention"),
+  };
   const stepFlags = step.flags ?? [];
 
   const blockingTitles = (step.depends_on ?? [])
@@ -280,21 +278,21 @@ export default function RoadmapStep({
                     {step.title}
                   </span>
                   <span className={STATUS_BADGE[step.status]}>
-                    {STATUS_LABEL[step.status]}
+                    {t(`roadmap.status.${step.status}`)}
                   </span>
 
                   {/* Confidence badge */}
                   <span
-                    className={`inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded border ${confidenceInfo.class}`}
+                    className={`inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded border ${confidenceStyle.class}`}
                   >
                     <ConfidenceIcon size={10} />
-                    {confidenceInfo.label}
+                    {CONFIDENCE_LABEL[confidence]}
                   </span>
                 </div>
 
                 {locked && blockingTitles.length > 0 && (
                   <p className="text-xs text-slate-400 mt-1">
-                    Complete &quot;{blockingTitles[0]}&quot; first
+                    {t("roadmap.completeFirst").replace("{step}", blockingTitles[0])}
                   </p>
                 )}
 
@@ -327,8 +325,7 @@ export default function RoadmapStep({
                   <div className="mt-2 flex items-center gap-1.5 text-xs">
                     <Search size={12} className="text-amber-500" />
                     <span className="text-amber-600 font-medium">
-                      {stepFlags.length} item{stepFlags.length > 1 ? "s" : ""}{" "}
-                      to review
+                      {stepFlags.length} {t("roadmap.itemsToReview")}
                     </span>
                   </div>
                 )}

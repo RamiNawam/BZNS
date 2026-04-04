@@ -23,6 +23,7 @@ import {
   Edit3,
 } from 'lucide-react';
 import { useProfileStore } from '@/stores/profile-store';
+import { useTranslation } from '@/lib/i18n/useTranslation';
 import { calculateTakeHome } from '@/lib/financial/tax-calculator';
 import { getExpenseDefaults } from '@/lib/financial/expense-defaults';
 import { generateScenarios, getBreakEvenResult, calculatePricing, calculateFundingImpact } from '@/lib/financial/projections';
@@ -41,13 +42,26 @@ import type { ExpenseCategory } from '@/lib/financial/expense-defaults';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
-
 const fmtPct = (n: number) => `${(n * 100).toFixed(1)}%`;
 
-const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const GST_THRESHOLD = 30_000;
+
+/** Create a locale-aware currency formatter */
+function makeFmt(locale: string) {
+  return (n: number) =>
+    new Intl.NumberFormat(locale === 'fr' ? 'fr-CA' : 'en-CA', {
+      style: 'currency',
+      currency: 'CAD',
+      maximumFractionDigits: 0,
+    }).format(n);
+}
+
+/** Create locale-aware month labels */
+function makeMonthLabels(locale: string) {
+  return Array.from({ length: 12 }, (_, i) =>
+    new Date(2026, i).toLocaleString(locale === 'fr' ? 'fr-CA' : 'en-CA', { month: 'short' }),
+  );
+}
 
 // ── Page section headings (Layout A) ─────────────────────────────────────────
 
@@ -130,13 +144,15 @@ function WaterfallBar({
   taxes: ReturnType<typeof calculateTakeHome>;
   monthlyExpenses: number;
 }) {
+  const { t, locale } = useTranslation();
+  const fmt = useMemo(() => makeFmt(locale), [locale]);
   const segments = [
-    { label: 'Federal Tax', value: taxes.federalTax / 12, color: 'bg-red-400', textColor: 'text-red-600' },
-    { label: 'Quebec Tax', value: taxes.quebecTax / 12, color: 'bg-orange-400', textColor: 'text-orange-600' },
-    { label: 'QPP', value: taxes.qpp / 12, color: 'bg-amber-400', textColor: 'text-amber-600' },
-    { label: 'QPIP', value: taxes.qpip / 12, color: 'bg-yellow-300', textColor: 'text-yellow-600' },
-    { label: 'Expenses', value: monthlyExpenses, color: 'bg-slate-300', textColor: 'text-slate-500' },
-    { label: 'Take-home', value: Math.max(0, taxes.estimatedTakeHome - monthlyExpenses), color: 'bg-brand-500', textColor: 'text-brand-700' },
+    { label: t('financial.waterfall.federalTax'), value: taxes.federalTax / 12, color: 'bg-red-400', textColor: 'text-red-600' },
+    { label: t('financial.waterfall.quebecTax'), value: taxes.quebecTax / 12, color: 'bg-orange-400', textColor: 'text-orange-600' },
+    { label: t('financial.waterfall.qpp'), value: taxes.qpp / 12, color: 'bg-amber-400', textColor: 'text-amber-600' },
+    { label: t('financial.waterfall.qpip'), value: taxes.qpip / 12, color: 'bg-yellow-300', textColor: 'text-yellow-600' },
+    { label: t('financial.waterfall.expenses'), value: monthlyExpenses, color: 'bg-slate-300', textColor: 'text-slate-500' },
+    { label: t('financial.waterfall.takeHome'), value: Math.max(0, taxes.estimatedTakeHome - monthlyExpenses), color: 'bg-brand-500', textColor: 'text-brand-700' },
   ];
   const total = grossMonthly || 1;
 
@@ -179,6 +195,8 @@ const DONUT_COLORS = [
 ];
 
 function ExpenseDonut({ categories, total }: { categories: ExpenseCategory[]; total: number }) {
+  const { t, locale } = useTranslation();
+  const fmt = useMemo(() => makeFmt(locale), [locale]);
   const R = 60;
   const CX = 80;
   const CY = 80;
@@ -216,7 +234,7 @@ function ExpenseDonut({ categories, total }: { categories: ExpenseCategory[]; to
           {fmt(total)}
         </text>
         <text x={CX} y={CY + 12} textAnchor="middle" className="fill-slate-400" fontSize="10">
-          /month
+          {t('financial.perMonth')}
         </text>
       </svg>
       {/* Legend */}
@@ -244,6 +262,8 @@ function PricingSlider({
   defaultPrice: number;
   defaultUnits: number;
 }) {
+  const { t, locale } = useTranslation();
+  const fmt = useMemo(() => makeFmt(locale), [locale]);
   const [price, setPrice] = useState(defaultPrice);
   const [units, setUnits] = useState(defaultUnits);
 
@@ -256,7 +276,7 @@ function PricingSlider({
     <div className="p-5 space-y-5">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="label">Price per unit / hour</label>
+          <label className="label">{t('financial.pricing.priceLabel')}</label>
           <div className="relative">
             <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">$</span>
             <input
@@ -278,7 +298,7 @@ function PricingSlider({
           />
         </div>
         <div>
-          <label className="label">Units / hours per month</label>
+          <label className="label">{t('financial.pricing.unitsLabel')}</label>
           <input
             type="number"
             min={0}
@@ -301,25 +321,26 @@ function PricingSlider({
       {/* Result */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-slate-50 rounded-xl p-3 text-center">
-          <div className="text-[10px] text-slate-500 uppercase font-medium tracking-wide">Gross Revenue</div>
+          <div className="text-[10px] text-slate-500 uppercase font-medium tracking-wide">{t('financial.pricing.grossRevenue')}</div>
           <div className="font-heading font-bold text-slate-900 text-lg tabular-nums mt-1">{fmt(result.grossMonthlyRevenue)}</div>
-          <div className="text-[10px] text-slate-400">/month</div>
+          <div className="text-[10px] text-slate-400">{t('financial.perMonth')}</div>
         </div>
         <div className="bg-brand-50 rounded-xl p-3 text-center border border-brand-200">
-          <div className="text-[10px] text-brand-700 uppercase font-medium tracking-wide">You Keep</div>
+          <div className="text-[10px] text-brand-700 uppercase font-medium tracking-wide">{t('financial.pricing.youKeep')}</div>
           <div className="font-heading font-bold text-brand-700 text-lg tabular-nums mt-1">{fmt(result.monthlyTakeHome)}</div>
-          <div className="text-[10px] text-brand-500">/month</div>
+          <div className="text-[10px] text-brand-500">{t('financial.perMonth')}</div>
         </div>
         <div className="bg-amber-50 rounded-xl p-3 text-center border border-amber-200">
-          <div className="text-[10px] text-amber-700 uppercase font-medium tracking-wide">Per Unit Profit</div>
+          <div className="text-[10px] text-amber-700 uppercase font-medium tracking-wide">{t('financial.pricing.perUnitProfit')}</div>
           <div className="font-heading font-bold text-amber-700 text-lg tabular-nums mt-1">{fmt(result.perUnitTakeHome)}</div>
-          <div className="text-[10px] text-amber-500">after tax</div>
+          <div className="text-[10px] text-amber-500">{t('financial.pricing.afterTax')}</div>
         </div>
       </div>
 
       <p className="text-xs text-slate-400 leading-relaxed">
-        Charging <strong className="text-slate-600">{fmt(price + 5)}</strong> instead adds{' '}
-        <strong className="text-brand-600">{fmt(5 * units * 0.65)}</strong>/month to your take-home (approx).
+        {t('financial.pricing.chargingMore')
+          .replace('{price}', fmt(price + 5))
+          .replace('{amount}', fmt(5 * units * 0.65))}
       </p>
     </div>
   );
@@ -345,6 +366,8 @@ function TaxBracketBar({
   personalAmount: number;
   label: string;
 }) {
+  const { t, locale } = useTranslation();
+  const fmt = useMemo(() => makeFmt(locale), [locale]);
   const lastBracketMin = brackets[brackets.length - 1].min;
   const visualMax = Math.max(lastBracketMin * 1.15, income * 1.1, 80000);
 
@@ -364,7 +387,7 @@ function TaxBracketBar({
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium text-slate-600">{label}</span>
         <span className="text-xs text-slate-500">
-          Taxable: <span className="font-semibold text-slate-700 tabular-nums">{fmt(income)}</span>
+          {t('financial.taxable')} <span className="font-semibold text-slate-700 tabular-nums">{fmt(income)}</span>
         </span>
       </div>
 
@@ -399,7 +422,7 @@ function TaxBracketBar({
           >
             <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap">
               <span className="text-[10px] font-semibold text-slate-900 bg-white/90 px-1 rounded shadow-sm">
-                You
+                {t('financial.you')}
               </span>
             </div>
           </div>
@@ -432,6 +455,9 @@ function ProjectionChart({
   monthlyRevenue: number;
   monthlyTakeHome: number;
 }) {
+  const { t, locale } = useTranslation();
+  const fmt = useMemo(() => makeFmt(locale), [locale]);
+  const monthLabels = useMemo(() => makeMonthLabels(locale), [locale]);
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
   const revData = months.map((m) => monthlyRevenue * m);
   const thData = months.map((m) => Math.max(0, monthlyTakeHome) * m);
@@ -451,14 +477,14 @@ function ProjectionChart({
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="font-heading font-semibold text-slate-900 text-sm">12-Month Projection</h3>
+        <h3 className="font-heading font-semibold text-slate-900 text-sm">{t('financial.projection.title')}</h3>
         <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1.5 text-xs text-slate-500"><span className="inline-block h-0.5 w-4 bg-brand-500 rounded" />Revenue</span>
-          <span className="flex items-center gap-1.5 text-xs text-slate-500"><span className="inline-block h-0.5 w-4 bg-emerald-400 rounded" style={{ borderTop: '2px dashed #34d399' }} />Take-home</span>
-          <span className="flex items-center gap-1.5 text-xs text-slate-500"><span className="inline-block h-0.5 w-4 border-t-2 border-dashed border-red-400" />GST limit</span>
+          <span className="flex items-center gap-1.5 text-xs text-slate-500"><span className="inline-block h-0.5 w-4 bg-brand-500 rounded" />{t('financial.projection.revenue')}</span>
+          <span className="flex items-center gap-1.5 text-xs text-slate-500"><span className="inline-block h-0.5 w-4 bg-emerald-400 rounded" style={{ borderTop: '2px dashed #34d399' }} />{t('financial.projection.takeHome')}</span>
+          <span className="flex items-center gap-1.5 text-xs text-slate-500"><span className="inline-block h-0.5 w-4 border-t-2 border-dashed border-red-400" />{t('financial.projection.gstLimit')}</span>
         </div>
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="12-month projection">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={t('financial.projection.title')}>
         {yTicks.map(({ v, y }) => (
           <g key={v}>
             <line x1={PL} y1={y} x2={W - PR} y2={y} stroke="#f1f5f9" strokeWidth="1" />
@@ -468,26 +494,26 @@ function ProjectionChart({
         {gstY > PT && gstY < PT + iH && (
           <>
             <line x1={PL} y1={gstY} x2={W - PR} y2={gstY} stroke="#ef4444" strokeWidth="1.5" strokeDasharray="5,3" opacity="0.7" />
-            <text x={W - PR - 2} y={gstY - 3} textAnchor="end" fill="#ef4444" fontSize="9" opacity="0.85">$30K GST/QST</text>
+            <text x={W - PR - 2} y={gstY - 3} textAnchor="end" fill="#ef4444" fontSize="9" opacity="0.85">{`$30K ${locale === 'fr' ? 'TPS/TVQ' : 'GST/QST'}`}</text>
           </>
         )}
         <path d={revPath} fill="none" stroke="#0d9488" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
         <path d={thPath} fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="6,3" />
         {revData.map((v, i) => <circle key={i} cx={xS(i + 1)} cy={yS(v)} r="2.5" fill="#0d9488" />)}
         {months.filter((_, i) => i % 2 === 0).map((m) => (
-          <text key={m} x={xS(m)} y={H - 6} textAnchor="middle" fill="#94a3b8" fontSize="10">{MONTH_LABELS[m - 1]}</text>
+          <text key={m} x={xS(m)} y={H - 6} textAnchor="middle" fill="#94a3b8" fontSize="10">{monthLabels[m - 1]}</text>
         ))}
       </svg>
       {crossMonth && (
         <div className="flex items-center gap-1.5 mt-2 text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
           <AlertTriangle size={12} className="shrink-0" />
-          You&apos;ll cross the $30,000 GST/QST threshold in <strong className="mx-0.5">month {crossMonth}</strong> — register before then.
+          {t('financial.projection.gstCross').replace('{month}', String(crossMonth))}
         </div>
       )}
       {!crossMonth && monthlyRevenue > 0 && (
         <div className="flex items-center gap-1.5 mt-2 text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
           <Info size={12} className="shrink-0" />
-          At this revenue level you stay under the $30,000 threshold — no GST/QST registration required this year.
+          {t('financial.projection.gstSafe')}
         </div>
       )}
     </div>
@@ -499,16 +525,22 @@ function ProjectionChart({
 // ══════════════════════════════════════════════════════════════════════════════
 
 function TaxCalendar({ quarterlyInstallment }: { quarterlyInstallment: number }) {
+  const { t, locale } = useTranslation();
+  const fmt = useMemo(() => makeFmt(locale), [locale]);
+  const dateFmt = useMemo(
+    () => new Intl.DateTimeFormat(locale === 'fr' ? 'fr-CA' : 'en-CA', { month: 'short', day: 'numeric' }),
+    [locale],
+  );
   const events = [
-    { date: 'Mar 15', label: '1st Installment', amount: quarterlyInstallment, color: 'bg-amber-500' },
-    { date: 'Apr 30', label: 'Balance due', amount: null, color: 'bg-red-500' },
-    { date: 'Jun 15', label: '2nd Install. + Return', amount: quarterlyInstallment, color: 'bg-amber-500' },
-    { date: 'Sep 15', label: '3rd Installment', amount: quarterlyInstallment, color: 'bg-amber-500' },
-    { date: 'Dec 15', label: '4th Installment', amount: quarterlyInstallment, color: 'bg-amber-500' },
+    { date: dateFmt.format(new Date(2026, 2, 15)), label: t('financial.calendar.installment1'), amount: quarterlyInstallment, color: 'bg-amber-500' },
+    { date: dateFmt.format(new Date(2026, 3, 30)), label: t('financial.calendar.balanceDue'), amount: null, color: 'bg-red-500' },
+    { date: dateFmt.format(new Date(2026, 5, 15)), label: t('financial.calendar.installment2'), amount: quarterlyInstallment, color: 'bg-amber-500' },
+    { date: dateFmt.format(new Date(2026, 8, 15)), label: t('financial.calendar.installment3'), amount: quarterlyInstallment, color: 'bg-amber-500' },
+    { date: dateFmt.format(new Date(2026, 11, 15)), label: t('financial.calendar.installment4'), amount: quarterlyInstallment, color: 'bg-amber-500' },
   ];
   return (
     <div className="p-5">
-      <h3 className="font-heading font-semibold text-slate-900 text-sm mb-5">2026 Tax Calendar</h3>
+      <h3 className="font-heading font-semibold text-slate-900 text-sm mb-5">{t('financial.calendar.title')}</h3>
       <div className="relative">
         <div className="absolute top-3.5 left-4 right-4 h-px bg-slate-200" />
         <div className="relative flex justify-between items-start">
@@ -529,7 +561,7 @@ function TaxCalendar({ quarterlyInstallment }: { quarterlyInstallment: number })
         </div>
       </div>
       <p className="text-xs text-slate-400 mt-4">
-        * Installments required when total tax &gt; $1,800/year. Self-employed filing deadline is June 15, but any balance owed is due April 30.
+        {t('financial.calendar.note')}
       </p>
     </div>
   );
@@ -540,32 +572,34 @@ function TaxCalendar({ quarterlyInstallment }: { quarterlyInstallment: number })
 // ══════════════════════════════════════════════════════════════════════════════
 
 function QPPShock({ qppMonthly }: { qppMonthly: number }) {
+  const { t, locale } = useTranslation();
+  const fmt = useMemo(() => makeFmt(locale), [locale]);
   const employeeEquiv = qppMonthly / 2;
   return (
     <div className="card-brand rounded-xl p-5 space-y-3">
       <div className="flex items-start gap-3">
         <AlertTriangle size={18} className="text-amber-600 shrink-0 mt-0.5" />
         <div>
-          <h4 className="font-heading font-semibold text-slate-900 text-sm">The QPP Double Contribution</h4>
+          <h4 className="font-heading font-semibold text-slate-900 text-sm">{t('financial.qpp.title')}</h4>
           <p className="text-sm text-slate-600 mt-1 leading-relaxed">
-            As a self-employed person, you pay <strong>both</strong> the employee AND employer share of QPP.
-            An employee at the same income would pay only {fmt(employeeEquiv)}/mo — you pay{' '}
-            <strong className="text-amber-700">{fmt(qppMonthly)}/mo</strong>.
+            {t('financial.qpp.desc')
+              .replace('{employee}', fmt(employeeEquiv))
+              .replace('{selfEmployed}', fmt(qppMonthly))}
           </p>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-white rounded-lg p-3 text-center border border-slate-100">
-          <div className="text-xs text-slate-500 mb-1">Employee at same income</div>
-          <div className="font-heading font-bold text-slate-700 tabular-nums">{fmt(employeeEquiv)}<span className="text-xs font-normal text-slate-400">/mo</span></div>
+          <div className="text-xs text-slate-500 mb-1">{t('financial.qpp.employeeLabel')}</div>
+          <div className="font-heading font-bold text-slate-700 tabular-nums">{fmt(employeeEquiv)}<span className="text-xs font-normal text-slate-400">{t('financial.perMonth')}</span></div>
         </div>
         <div className="bg-amber-50 rounded-lg p-3 text-center border border-amber-200">
-          <div className="text-xs text-amber-700 mb-1">You (self-employed)</div>
-          <div className="font-heading font-bold text-amber-700 tabular-nums">{fmt(qppMonthly)}<span className="text-xs font-normal text-amber-500">/mo</span></div>
+          <div className="text-xs text-amber-700 mb-1">{t('financial.qpp.selfEmployedLabel')}</div>
+          <div className="font-heading font-bold text-amber-700 tabular-nums">{fmt(qppMonthly)}<span className="text-xs font-normal text-amber-500">{t('financial.perMonth')}</span></div>
         </div>
       </div>
       <p className="text-xs text-slate-500">
-        The good news: half of your QPP is tax-deductible, reducing your taxable income.
+        {t('financial.qpp.goodNews')}
       </p>
     </div>
   );
@@ -582,6 +616,8 @@ function ScenarioComparison({
   monthlyRevenue: number;
   monthlyExpenses: number;
 }) {
+  const { t, locale } = useTranslation();
+  const fmt = useMemo(() => makeFmt(locale), [locale]);
   const scenarios = useMemo(
     () => generateScenarios(monthlyRevenue, monthlyExpenses),
     [monthlyRevenue, monthlyExpenses],
@@ -598,22 +634,22 @@ function ScenarioComparison({
         {scenarios.map((s, i) => (
           <div key={s.label} className={`rounded-xl border p-4 text-center ${colStyles[i]}`}>
             <div className="text-[10px] font-medium text-slate-500 uppercase tracking-wide">{s.label}</div>
-            <div className="text-xs text-slate-400 mt-0.5">{fmt(s.monthlyRevenue)}/mo</div>
+            <div className="text-xs text-slate-400 mt-0.5">{fmt(s.monthlyRevenue)}{t('financial.perMonth')}</div>
             <div className="font-heading text-2xl font-bold text-slate-900 tabular-nums mt-2">{fmt(s.monthlyTakeHome)}</div>
-            <div className="text-[10px] text-slate-500 mt-1">take-home/mo</div>
+            <div className="text-[10px] text-slate-500 mt-1">{t('financial.scenarios.takeHomeMo')}</div>
             <div className="mt-3 space-y-1">
               <div className="flex justify-between text-[10px]">
-                <span className="text-slate-400">Tax burden</span>
+                <span className="text-slate-400">{t('financial.scenarios.taxBurden')}</span>
                 <span className="text-red-600 font-medium">{fmt(s.taxes.total_deductions / 12)}</span>
               </div>
               <div className="flex justify-between text-[10px]">
-                <span className="text-slate-400">Keep rate</span>
+                <span className="text-slate-400">{t('financial.scenarios.keepRate')}</span>
                 <span className="text-brand-700 font-medium">{fmtPct(s.effectiveKeepRate)}</span>
               </div>
               <div className="flex justify-between text-[10px]">
-                <span className="text-slate-400">GST req?</span>
+                <span className="text-slate-400">{t('financial.scenarios.gstReq')}</span>
                 <span className={s.gstRequired ? 'text-red-600 font-medium' : 'text-emerald-600 font-medium'}>
-                  {s.gstRequired ? 'Yes' : 'No'}
+                  {s.gstRequired ? t('financial.scenarios.yes') : t('financial.scenarios.no')}
                 </span>
               </div>
             </div>
@@ -621,7 +657,7 @@ function ScenarioComparison({
         ))}
       </div>
       <p className="text-xs text-slate-400 text-center">
-        Based on 70% / 100% / 140% of your expected {fmt(monthlyRevenue)}/month revenue
+        {t('financial.scenarios.basedOn').replace('{amount}', fmt(monthlyRevenue))}
       </p>
     </div>
   );
@@ -638,6 +674,8 @@ function BreakEvenCard({
   monthlyRevenue: number;
   monthlyExpenses: number;
 }) {
+  const { t, locale } = useTranslation();
+  const fmt = useMemo(() => makeFmt(locale), [locale]);
   const result = useMemo(
     () => getBreakEvenResult(monthlyRevenue, monthlyExpenses),
     [monthlyRevenue, monthlyExpenses],
@@ -654,24 +692,24 @@ function BreakEvenCard({
           <Target size={17} className="text-violet-600" />
         </div>
         <div>
-          <h3 className="font-heading font-semibold text-slate-900 text-sm">Break-Even</h3>
+          <h3 className="font-heading font-semibold text-slate-900 text-sm">{t('financial.breakEven.title')}</h3>
           <p className="text-xs text-slate-500">
-            Minimum revenue to cover expenses + all taxes
+            {t('financial.breakEven.subtitle')}
           </p>
         </div>
       </div>
 
       <div className="flex items-end justify-between">
         <div>
-          <div className="text-xs text-slate-400">You need at least</div>
+          <div className="text-xs text-slate-400">{t('financial.breakEven.youNeed')}</div>
           <div className="font-heading text-xl font-bold text-slate-900 tabular-nums">
-            {fmt(result.breakEvenMonthlyRevenue)}<span className="text-sm font-normal text-slate-400">/mo</span>
+            {fmt(result.breakEvenMonthlyRevenue)}<span className="text-sm font-normal text-slate-400">{t('financial.perMonth')}</span>
           </div>
         </div>
         <div className="text-right">
-          <div className="text-xs text-slate-400">Your projection</div>
+          <div className="text-xs text-slate-400">{t('financial.breakEven.yourProjection')}</div>
           <div className={`font-heading text-xl font-bold tabular-nums ${result.isAboveBreakEven ? 'text-emerald-600' : 'text-red-600'}`}>
-            {fmt(monthlyRevenue)}<span className="text-sm font-normal text-slate-400">/mo</span>
+            {fmt(monthlyRevenue)}<span className="text-sm font-normal text-slate-400">{t('financial.perMonth')}</span>
           </div>
         </div>
       </div>
@@ -688,16 +726,17 @@ function BreakEvenCard({
 
       {result.isAboveBreakEven ? (
         <p className="text-xs text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2 border border-emerald-100">
-          You&apos;re <strong>{fmt(result.surplus)}</strong>/mo above break-even — healthy margin.
+          {t('financial.breakEven.aboveMsg').replace('{amount}', fmt(result.surplus))}
         </p>
       ) : result.monthsToBreakEven !== null ? (
         <p className="text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2 border border-amber-100">
-          At 10% monthly growth, you could reach break-even in ~<strong>{result.monthsToBreakEven} months</strong>.
-          Focus on building revenue above {fmt(result.breakEvenMonthlyRevenue)}/mo.
+          {t('financial.breakEven.growthMsg')
+            .replace('{months}', String(result.monthsToBreakEven))
+            .replace('{target}', fmt(result.breakEvenMonthlyRevenue))}
         </p>
       ) : (
         <p className="text-xs text-red-700 bg-red-50 rounded-lg px-3 py-2 border border-red-100">
-          You&apos;re {fmt(Math.abs(result.surplus))}/mo below break-even. Consider reducing expenses or increasing prices.
+          {t('financial.breakEven.belowMsg').replace('{amount}', fmt(Math.abs(result.surplus)))}
         </p>
       )}
     </div>
@@ -709,6 +748,8 @@ function BreakEvenCard({
 // ══════════════════════════════════════════════════════════════════════════════
 
 function DeductionTracker({ clusterId }: { clusterId: ClusterID }) {
+  const { t, locale } = useTranslation();
+  const fmt = useMemo(() => makeFmt(locale), [locale]);
   const summary = useMemo(() => getDeductionSummary(clusterId), [clusterId]);
 
   return (
@@ -716,11 +757,15 @@ function DeductionTracker({ clusterId }: { clusterId: ClusterID }) {
       {/* Savings headline */}
       <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200 flex items-center justify-between">
         <div>
-          <div className="text-xs text-emerald-600 font-medium">Estimated annual tax savings</div>
+          <div className="text-xs text-emerald-600 font-medium">{t('financial.deductions.estimatedSavings')}</div>
           <div className="font-heading text-2xl font-bold text-emerald-700 tabular-nums">{fmt(summary.estimatedTaxSavings)}</div>
-          <div className="text-[10px] text-emerald-500">from {fmt(summary.totalAnnualDeductions)} in deductions at ~{fmtPct(summary.marginalRateUsed)} marginal rate</div>
+          <div className="text-[10px] text-emerald-500">
+            {t('financial.deductions.fromDeductions')
+              .replace('{amount}', fmt(summary.totalAnnualDeductions))
+              .replace('{rate}', fmtPct(summary.marginalRateUsed))}
+          </div>
         </div>
-        <div className="font-heading text-4xl font-bold text-emerald-200">{fmt(summary.estimatedTaxSavings / 12)}<span className="text-sm font-normal">/mo</span></div>
+        <div className="font-heading text-4xl font-bold text-emerald-200">{fmt(summary.estimatedTaxSavings / 12)}<span className="text-sm font-normal">{t('financial.perMonth')}</span></div>
       </div>
 
       {/* Deduction list */}
@@ -730,11 +775,11 @@ function DeductionTracker({ clusterId }: { clusterId: ClusterID }) {
             <div className="min-w-0">
               <p className="text-sm font-medium text-slate-700">{d.label}</p>
               <p className="text-xs text-slate-400 mt-0.5">{d.description}</p>
-              <p className="text-[10px] text-slate-300 mt-0.5">Source: {d.source}</p>
+              <p className="text-[10px] text-slate-300 mt-0.5">{t('financial.deductions.source')} {d.source}</p>
             </div>
             <div className="text-right shrink-0 ml-4">
               <div className="text-sm font-bold text-slate-900 tabular-nums">{fmt(d.annualAmount)}</div>
-              <div className="text-[10px] text-emerald-600">saves ~{fmt(d.annualAmount * summary.marginalRateUsed)}</div>
+              <div className="text-[10px] text-emerald-600">~{fmt(d.annualAmount * summary.marginalRateUsed)}</div>
             </div>
           </div>
         ))}
@@ -754,6 +799,8 @@ function FundingImpactCard({
   monthlyExpenses: number;
   monthlyTakeHome: number;
 }) {
+  const { t, locale } = useTranslation();
+  const fmt = useMemo(() => makeFmt(locale), [locale]);
   // Placeholder — in production this would fetch from the funding store
   const estimatedFunding = 95000;
   const impact = useMemo(
@@ -768,32 +815,32 @@ function FundingImpactCard({
           <Banknote size={17} className="text-emerald-600" />
         </div>
         <div>
-          <h3 className="font-heading font-semibold text-slate-900 text-sm">Funding Impact</h3>
-          <p className="text-xs text-slate-500">How matched funding extends your runway</p>
+          <h3 className="font-heading font-semibold text-slate-900 text-sm">{t('financial.fundingImpact.title')}</h3>
+          <p className="text-xs text-slate-500">{t('financial.fundingImpact.subtitle')}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-3 mb-3">
         <div className="bg-emerald-50 rounded-xl p-3 text-center border border-emerald-200">
-          <div className="text-[10px] text-emerald-600 uppercase font-medium tracking-wide">Available</div>
+          <div className="text-[10px] text-emerald-600 uppercase font-medium tracking-wide">{t('financial.fundingImpact.available')}</div>
           <div className="font-heading text-xl font-bold text-emerald-700 tabular-nums mt-1">{fmt(impact.totalFundingAvailable)}</div>
         </div>
         <div className="bg-slate-50 rounded-xl p-3 text-center">
-          <div className="text-[10px] text-slate-500 uppercase font-medium tracking-wide">Covers Expenses</div>
-          <div className="font-heading text-xl font-bold text-slate-900 tabular-nums mt-1">{impact.monthsOfRunway}<span className="text-xs font-normal text-slate-400"> months</span></div>
+          <div className="text-[10px] text-slate-500 uppercase font-medium tracking-wide">{t('financial.fundingImpact.coversExpenses')}</div>
+          <div className="font-heading text-xl font-bold text-slate-900 tabular-nums mt-1">{impact.monthsOfRunway}<span className="text-xs font-normal text-slate-400"> {t('financial.fundingImpact.months')}</span></div>
         </div>
         <div className="bg-slate-50 rounded-xl p-3 text-center">
-          <div className="text-[10px] text-slate-500 uppercase font-medium tracking-wide">Full Income</div>
-          <div className="font-heading text-xl font-bold text-slate-900 tabular-nums mt-1">{impact.monthsOfFullIncome}<span className="text-xs font-normal text-slate-400"> months</span></div>
+          <div className="text-[10px] text-slate-500 uppercase font-medium tracking-wide">{t('financial.fundingImpact.fullIncome')}</div>
+          <div className="font-heading text-xl font-bold text-slate-900 tabular-nums mt-1">{impact.monthsOfFullIncome}<span className="text-xs font-normal text-slate-400"> {t('financial.fundingImpact.months')}</span></div>
         </div>
       </div>
 
       <p className="text-xs text-slate-500 leading-relaxed">{impact.effectiveRunwayMessage}</p>
 
       <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
-        <p className="text-xs text-slate-400">Based on your matched funding programs</p>
+        <p className="text-xs text-slate-400">{t('financial.fundingImpact.basedOn')}</p>
         <Link href="/funding" className="btn-secondary btn-sm gap-1.5 shrink-0">
-          View matches <ArrowRight size={13} />
+          {t('financial.fundingImpact.viewMatches')} <ArrowRight size={13} />
         </Link>
       </div>
     </div>
@@ -809,6 +856,8 @@ function generateFlags(
   monthlyRevenue: number,
   monthlyExpenses: number,
   businessType: string,
+  t: (key: string) => string,
+  fmt: (n: number) => string,
 ) {
   const flags: { type: 'warning' | 'info' | 'tip'; icon: typeof AlertTriangle; title: string; detail: string }[] = [];
   const annualRevenue = monthlyRevenue * 12;
@@ -816,28 +865,73 @@ function generateFlags(
   const totalTax = taxes.totalTax;
 
   if (annualRevenue >= 25000 && annualRevenue < 30000) {
-    flags.push({ type: 'warning', icon: AlertTriangle, title: 'Approaching GST/QST threshold', detail: `You're ${fmt(30000 - annualRevenue)} away from the $30,000 registration threshold. Plan to register before you cross it to avoid penalties.` });
+    flags.push({
+      type: 'warning',
+      icon: AlertTriangle,
+      title: t('financial.flags.gstApproaching'),
+      detail: t('financial.flags.gstApproachingDetail').replace('{remaining}', fmt(30000 - annualRevenue)),
+    });
   } else if (annualRevenue >= 30000) {
-    flags.push({ type: 'warning', icon: AlertTriangle, title: 'GST/QST registration required', detail: `At $${(annualRevenue / 1000).toFixed(0)}K/year, you must register for GST/QST within 30 days of crossing the threshold and start collecting sales tax.` });
+    flags.push({
+      type: 'warning',
+      icon: AlertTriangle,
+      title: t('financial.flags.gstRequired'),
+      detail: t('financial.flags.gstRequiredDetail').replace('{revenueK}', String(Math.round(annualRevenue / 1000))),
+    });
   }
 
   if (totalTax > 1800) {
     const installment = totalTax / 4;
-    flags.push({ type: 'info', icon: Info, title: 'Quarterly tax installments apply', detail: `Your estimated tax (${fmt(totalTax)}/yr) exceeds $1,800 — you must pay ${fmt(installment)} quarterly starting March 15. Set this aside monthly.` });
+    flags.push({
+      type: 'info',
+      icon: Info,
+      title: t('financial.flags.quarterlyInstallments'),
+      detail: t('financial.flags.quarterlyInstallmentsDetail')
+        .replace('{totalTax}', fmt(totalTax))
+        .replace('{installment}', fmt(installment)),
+    });
   }
 
-  flags.push({ type: 'warning', icon: AlertTriangle, title: 'Budget for QPP — most first-timers miss this', detail: `QPP costs self-employed people 12.8% of net income (both shares). That's ${fmt(taxes.qpp / 12)}/month you need to set aside — it's not deducted automatically.` });
+  flags.push({
+    type: 'warning',
+    icon: AlertTriangle,
+    title: t('financial.flags.qppBudget'),
+    detail: t('financial.flags.qppBudgetDetail').replace('{qppMonthly}', fmt(taxes.qpp / 12)),
+  });
 
   if (businessType === 'food') {
-    flags.push({ type: 'tip', icon: Lightbulb, title: 'Track mileage to markets', detail: 'Driving to farmers markets, ingredient shopping, and deliveries is deductible. At the 2026 rate of $0.72/km, 200km/month = $144 in deductions — about $36 in tax savings.' });
+    flags.push({
+      type: 'tip',
+      icon: Lightbulb,
+      title: t('financial.flags.mileageTip'),
+      detail: t('financial.flags.mileageTipDetail'),
+    });
   } else if (businessType === 'freelance' || businessType === 'tech') {
-    flags.push({ type: 'tip', icon: Lightbulb, title: 'Home office deduction available', detail: 'If you work from home, you can deduct a proportional share of rent, utilities, and internet. A 10m² office in a 100m² home = 10% of housing costs deductible.' });
+    flags.push({
+      type: 'tip',
+      icon: Lightbulb,
+      title: t('financial.flags.homeOfficeTip'),
+      detail: t('financial.flags.homeOfficeTipDetail'),
+    });
   } else if (businessType === 'daycare') {
-    flags.push({ type: 'tip', icon: Lightbulb, title: 'STA income support during startup', detail: 'The Service de garde en milieu familial STA program provides income support while you build up your enrollment. Apply through your RCE before opening.' });
+    flags.push({
+      type: 'tip',
+      icon: Lightbulb,
+      title: t('financial.flags.staTip'),
+      detail: t('financial.flags.staTipDetail'),
+    });
   }
 
   if (monthlyTakeHome < monthlyExpenses) {
-    flags.push({ type: 'warning', icon: AlertTriangle, title: 'Revenue below break-even', detail: `At this revenue level your take-home (${fmt(monthlyTakeHome)}/mo) doesn't cover your expenses (${fmt(monthlyExpenses)}/mo). You need at least ${fmt((monthlyExpenses * 2))} gross/mo to break even.` });
+    flags.push({
+      type: 'warning',
+      icon: AlertTriangle,
+      title: t('financial.flags.belowBreakEven'),
+      detail: t('financial.flags.belowBreakEvenDetail')
+        .replace('{takeHome}', fmt(monthlyTakeHome))
+        .replace('{expenses}', fmt(monthlyExpenses))
+        .replace('{needed}', fmt(monthlyExpenses * 2)),
+    });
   }
 
   return flags;
@@ -856,10 +950,11 @@ function QuestionInput({
   value: string | number | boolean;
   onChange: (v: string | number | boolean) => void;
 }) {
+  const { t } = useTranslation();
   if (question.type === 'boolean') {
     const opts = question.options ?? [
-      { value: 'true', label: 'Yes' },
-      { value: 'false', label: 'No' },
+      { value: 'true', label: t('financial.booleanYes') },
+      { value: 'false', label: t('financial.booleanNo') },
     ];
     // Normalise value: true/false booleans → 'true'/'false' strings
     const strVal = value === true ? 'true' : value === false ? 'false' : String(value);
@@ -957,6 +1052,7 @@ function FinancialQuestionnaire({
   initialAnswers?: Record<string, string | number | boolean>;
   onComplete: (answers: Record<string, string | number | boolean>) => void;
 }) {
+  const { t } = useTranslation();
   const questionSet = useMemo(() => getClusterQuestions(clusterId), [clusterId]);
   const questions = questionSet.questions;
 
@@ -1001,7 +1097,7 @@ function FinancialQuestionnaire({
       <div className="mb-8">
         <div className="inline-flex items-center gap-2 text-xs font-medium text-brand-700 bg-brand-50 border border-brand-200 rounded-full px-3 py-1 mb-3">
           <Calculator size={12} />
-          Your business type: <strong>{clusterLabel}</strong>
+          {t('financial.questionnaireBusinessType')} <strong>{clusterLabel}</strong>
         </div>
         <h1 className="font-heading text-2xl font-bold text-slate-900">
           {questionSet.title}
@@ -1025,12 +1121,12 @@ function FinancialQuestionnaire({
                 ? 'h-2 w-2 bg-brand-300 cursor-pointer'
                 : 'h-2 w-2 bg-slate-200 cursor-default'
             }`}
-            aria-label={`Question ${i + 1}`}
+            aria-label={`${t('common.of')} ${i + 1}`}
             disabled={i > currentStep}
           />
         ))}
         <span className="ml-2 text-xs text-slate-400">
-          {currentStep + 1} of {questions.length}
+          {currentStep + 1} {t('financial.questionnaireOf')} {questions.length}
         </span>
       </div>
 
@@ -1070,7 +1166,7 @@ function FinancialQuestionnaire({
           }`}
         >
           <ChevronLeft size={16} />
-          Back
+          {t('common.back')}
         </button>
 
         <button
@@ -1080,12 +1176,12 @@ function FinancialQuestionnaire({
         >
           {isLast ? (
             <>
-              Calculate my finances
+              {t('financial.calculateBtn')}
               <ArrowRight size={16} />
             </>
           ) : (
             <>
-              Next
+              {t('common.next')}
               <ArrowRight size={16} />
             </>
           )}
@@ -1099,7 +1195,7 @@ function FinancialQuestionnaire({
           onClick={() => onComplete(answers)}
           className="text-xs text-slate-400 hover:text-slate-600 underline-offset-2 hover:underline transition-colors"
         >
-          Skip and use default estimates
+          {t('financial.skipDefaults')}
         </button>
       </p>
     </div>
@@ -1111,6 +1207,8 @@ function FinancialQuestionnaire({
 // ══════════════════════════════════════════════════════════════════════════════
 
 export default function FinancialPage() {
+  const { t, locale } = useTranslation();
+  const fmt = useMemo(() => makeFmt(locale), [locale]);
   const { profile, loadProfile } = useProfileStore();
 
   useEffect(() => { loadProfile(); }, [loadProfile]);
@@ -1211,8 +1309,8 @@ export default function FinancialPage() {
   const effectiveRate = monthlyRevenue > 0 ? 1 - (monthlyTakeHome / monthlyRevenue) : 0;
 
   const flags = useMemo(
-    () => generateFlags(taxes, monthlyRevenue, monthlyExpenses, profile?.business_type ?? 'other'),
-    [taxes, monthlyRevenue, monthlyExpenses, profile?.business_type],
+    () => generateFlags(taxes, monthlyRevenue, monthlyExpenses, profile?.business_type ?? 'other', t, fmt),
+    [taxes, monthlyRevenue, monthlyExpenses, profile?.business_type, t, fmt],
   );
 
   // ── Update a single expense category amount ─────────────────
@@ -1233,7 +1331,7 @@ export default function FinancialPage() {
           onComplete={handleQuestionnaireComplete}
         />
         {isSubmittingQuestionnaire && (
-          <p className="text-center text-sm text-slate-500 -mt-6">Saving your financial setup...</p>
+          <p className="text-center text-sm text-slate-500 -mt-6">{t('financial.savingSetup')}</p>
         )}
       </div>
     );
@@ -1245,39 +1343,39 @@ export default function FinancialPage() {
       {/* Page header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="page-title">Financial Snapshot</h1>
-          <p className="page-subtitle">Your personal CFO dashboard — estimated taxes, take-home, and what to watch for. Updated live.</p>
+          <h1 className="page-title">{t('financial.pageTitle')}</h1>
+          <p className="page-subtitle">{t('financial.pageSubtitle')}</p>
           <div className="inline-flex items-center gap-1.5 mt-2 text-xs font-medium text-brand-700 bg-brand-50 border border-brand-200 rounded-full px-3 py-1">
             <Calculator size={11} />
-            Business type: <strong className="ml-0.5">{CLUSTERS[clusterId]?.label ?? 'General micro-business'}</strong>
+            {t('financial.businessType')} <strong className="ml-0.5">{CLUSTERS[clusterId]?.label ?? 'General micro-business'}</strong>
           </div>
         </div>
         <button
           type="button"
           onClick={handleResetQuestionnaire}
           className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-brand-700 border border-slate-200 hover:border-brand-300 rounded-lg px-3 py-1.5 transition-all shrink-0 mt-1"
-          title="Re-answer the setup questions"
+          title={t('financial.editInputs')}
         >
           <Edit3 size={12} />
-          Edit inputs
+          {t('financial.editInputs')}
         </button>
       </div>
 
       {/* ── 1. Financial insight ─────────────────────────────────────────── */}
       <section className="space-y-3" aria-labelledby="fin-section-insight">
         <PageSection
-          kicker="1 · Financial insight"
-          title="Your money story"
-          description="Estimated take-home after taxes and expenses, with a quick visual of where each dollar goes."
+          kicker={t('financial.section1.kicker')}
+          title={t('financial.section1.title')}
+          description={t('financial.section1.description')}
           id="fin-section-insight"
         />
         <div className="rounded-2xl bg-gradient-to-br from-brand-600 to-brand-700 p-6 text-white shadow-lg shadow-brand-900/10">
           <div className="flex items-start justify-between mb-6">
             <div>
-              <p className="text-brand-200 text-sm font-medium mb-1">Estimated monthly take-home</p>
+              <p className="text-brand-200 text-sm font-medium mb-1">{t('financial.estimatedTakeHome')}</p>
               <div className="font-heading text-5xl font-bold tabular-nums">{fmt(monthlyTakeHome)}</div>
               <p className="text-brand-200 text-sm mt-1">
-                {fmtPct(1 - effectiveRate)} of {fmt(monthlyRevenue)} revenue · effective rate {fmtPct(effectiveRate)}
+                {fmtPct(1 - effectiveRate)} {t('financial.ofRevenue')} {fmt(monthlyRevenue)} · {t('financial.effectiveRate')} {fmtPct(effectiveRate)}
               </p>
             </div>
             <div className="bg-white/10 rounded-xl p-3">
@@ -1293,17 +1391,17 @@ export default function FinancialPage() {
       {/* ── 2. At a glance ───────────────────────────────────────────────── */}
       <section className="space-y-3" aria-labelledby="fin-section-glance">
         <PageSection
-          kicker="2 · At a glance"
-          title="Key numbers"
-          description="Revenue, tax load, expenses, and what you keep — all on one row."
+          kicker={t('financial.section2.kicker')}
+          title={t('financial.section2.title')}
+          description={t('financial.section2.description')}
           id="fin-section-glance"
         />
         <div className="grid grid-cols-2 gap-4">
           {[
-            { label: 'Gross Revenue', value: fmt(monthlyRevenue), sub: `${fmt(monthlyRevenue * 12)}/year`, icon: TrendingUp, color: 'text-brand-600', bg: 'bg-brand-50' },
-            { label: 'Tax Burden', value: fmt(taxes.totalTax / 12), sub: `${fmtPct(taxes.effectiveTaxRate)} effective rate`, icon: DollarSign, color: 'text-red-600', bg: 'bg-red-50' },
-            { label: 'Business Expenses', value: fmt(monthlyExpenses), sub: `${fmt(monthlyExpenses * 12)}/year`, icon: PiggyBank, color: 'text-slate-600', bg: 'bg-slate-100' },
-            { label: 'Monthly Take-Home', value: fmt(monthlyTakeHome), sub: `${fmtPct(monthlyRevenue > 0 ? monthlyTakeHome / monthlyRevenue : 0)} of revenue`, icon: Wallet, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+            { label: t('financial.cards.grossRevenue'), value: fmt(monthlyRevenue), sub: `${fmt(monthlyRevenue * 12)}${t('financial.perYear')}`, icon: TrendingUp, color: 'text-brand-600', bg: 'bg-brand-50' },
+            { label: t('financial.cards.taxBurden'), value: fmt(taxes.totalTax / 12), sub: `${fmtPct(taxes.effectiveTaxRate)} ${t('financial.cards.effectiveRate')}`, icon: DollarSign, color: 'text-red-600', bg: 'bg-red-50' },
+            { label: t('financial.cards.businessExpenses'), value: fmt(monthlyExpenses), sub: `${fmt(monthlyExpenses * 12)}${t('financial.perYear')}`, icon: PiggyBank, color: 'text-slate-600', bg: 'bg-slate-100' },
+            { label: t('financial.cards.monthlyTakeHome'), value: fmt(monthlyTakeHome), sub: `${fmtPct(monthlyRevenue > 0 ? monthlyTakeHome / monthlyRevenue : 0)} ${t('financial.cards.ofRevenue')}`, icon: Wallet, color: 'text-emerald-600', bg: 'bg-emerald-50' },
           ].map((card) => (
             <div key={card.label} className="card p-5">
               <div className={`inline-flex items-center justify-center h-9 w-9 rounded-xl ${card.bg} mb-3`}>
@@ -1320,30 +1418,30 @@ export default function FinancialPage() {
       {/* ── 3. Tax section ────────────────────────────────────────────────── */}
       <section className="space-y-3" aria-labelledby="fin-section-tax">
         <PageSection
-          kicker="3 · Taxes"
-          title="Tax breakdown"
-          description="Federal and Québec income tax, QPP, and QPIP — estimated from your net business income (2026 assumptions)."
+          kicker={t('financial.section3.kicker')}
+          title={t('financial.section3.title')}
+          description={t('financial.section3.description')}
           id="fin-section-tax"
         />
         <Expandable
           icon={Calculator}
           iconBg="bg-orange-50"
           iconColor="text-orange-600"
-          title="Detailed tax breakdown"
-          subtitle="Federal + QC income tax, QPP, QPIP — 2026 rates"
+          title={t('financial.detailedBreakdown')}
+          subtitle={t('financial.detailedBreakdownSub')}
           defaultOpen
         >
           <table className="w-full text-sm">
             <tbody>
               {[
-                { label: 'Gross Revenue', value: monthlyRevenue, note: '/month' },
-                { label: 'Business Expenses', value: -monthlyExpenses, note: '/month', dimmed: true },
-                { label: 'Net Business Income', value: taxes.netBusinessIncome / 12, note: '/month', bold: true },
-                { label: 'Federal Income Tax', value: -(taxes.federalTax / 12), note: '/month', red: true },
-                { label: 'Quebec Income Tax', value: -(taxes.quebecTax / 12), note: '/month', red: true },
-                { label: 'QPP Contributions', value: -(taxes.qpp / 12), note: '/month', amber: true },
-                { label: 'QPIP Premium', value: -(taxes.qpip / 12), note: '/month', amber: true },
-                { label: 'Monthly Take-Home', value: monthlyTakeHome, note: '/month', bold: true, brand: true },
+                { label: t('financial.taxTable.grossRevenue'), value: monthlyRevenue, note: t('financial.taxTable.perMonth') },
+                { label: t('financial.taxTable.businessExpenses'), value: -monthlyExpenses, note: t('financial.taxTable.perMonth'), dimmed: true },
+                { label: t('financial.taxTable.netIncome'), value: taxes.netBusinessIncome / 12, note: t('financial.taxTable.perMonth'), bold: true },
+                { label: t('financial.taxTable.federalTax'), value: -(taxes.federalTax / 12), note: t('financial.taxTable.perMonth'), red: true },
+                { label: t('financial.taxTable.quebecTax'), value: -(taxes.quebecTax / 12), note: t('financial.taxTable.perMonth'), red: true },
+                { label: t('financial.taxTable.qpp'), value: -(taxes.qpp / 12), note: t('financial.taxTable.perMonth'), amber: true },
+                { label: t('financial.taxTable.qpip'), value: -(taxes.qpip / 12), note: t('financial.taxTable.perMonth'), amber: true },
+                { label: t('financial.taxTable.takeHome'), value: monthlyTakeHome, note: t('financial.taxTable.perMonth'), bold: true, brand: true },
               ].map((row) => (
                 <tr key={row.label} className={`border-b border-slate-50 ${row.bold ? 'bg-slate-50' : ''}`}>
                   <td className={`px-5 py-3 text-sm ${row.bold ? 'font-semibold text-slate-900' : row.dimmed ? 'text-slate-400' : 'text-slate-600'}`}>{row.label}</td>
@@ -1365,21 +1463,23 @@ export default function FinancialPage() {
         {/* Tax Bracket Bars */}
         {taxes.netBusinessIncome > 0 && (
           <div className="card p-5 space-y-5">
-            <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Your Tax Brackets</h3>
+            <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">{t('financial.taxBrackets')}</h3>
             <TaxBracketBar
               brackets={FEDERAL_TAX_BRACKETS}
               income={Math.max(0, taxes.netBusinessIncome - FEDERAL_BASIC_PERSONAL_AMOUNT)}
               personalAmount={FEDERAL_BASIC_PERSONAL_AMOUNT}
-              label="Federal"
+              label={t('financial.taxBracketFederal')}
             />
             <TaxBracketBar
               brackets={QUEBEC_TAX_BRACKETS}
               income={Math.max(0, taxes.netBusinessIncome - QUEBEC_BASIC_PERSONAL_AMOUNT)}
               personalAmount={QUEBEC_BASIC_PERSONAL_AMOUNT}
-              label="Québec"
+              label={t('financial.taxBracketQuebec')}
             />
             <p className="text-[10px] text-slate-400">
-              Taxable income = net revenue minus personal amount ({fmtK(FEDERAL_BASIC_PERSONAL_AMOUNT)} federal, {fmtK(QUEBEC_BASIC_PERSONAL_AMOUNT)} QC)
+              {t('financial.taxBracketNote')
+                .replace('{federal}', fmtK(FEDERAL_BASIC_PERSONAL_AMOUNT))
+                .replace('{qc}', fmtK(QUEBEC_BASIC_PERSONAL_AMOUNT))}
             </p>
           </div>
         )}
@@ -1391,9 +1491,9 @@ export default function FinancialPage() {
       {monthlyRevenue > 0 && (
         <section className="space-y-3" aria-labelledby="fin-section-charts">
           <PageSection
-            kicker="4 · Outlook"
-            title="Charts & scenarios"
-            description="See how revenue compounds over the year and how different income levels affect your take-home."
+            kicker={t('financial.section4.kicker')}
+            title={t('financial.section4.title')}
+            description={t('financial.section4.description')}
             id="fin-section-charts"
           />
           <div className="card p-5">
@@ -1403,8 +1503,8 @@ export default function FinancialPage() {
             icon={BarChart3}
             iconBg="bg-brand-50"
             iconColor="text-brand-600"
-            title="Revenue scenarios"
-            subtitle="What if you earn more or less than expected?"
+            title={t('financial.scenarios.title')}
+            subtitle={t('financial.scenarios.subtitle')}
             defaultOpen
           >
             <ScenarioComparison monthlyRevenue={monthlyRevenue} monthlyExpenses={monthlyExpenses} />
@@ -1415,9 +1515,9 @@ export default function FinancialPage() {
       {/* ── 5. Operations (expenses + break-even) ────────────────────────── */}
       <section className="space-y-3" aria-labelledby="fin-section-ops">
         <PageSection
-          kicker="5 · Operations"
-          title="Expenses & break-even"
-          description="Adjust category amounts to match your reality, then see how close you are to covering costs and taxes."
+          kicker={t('financial.section5.kicker')}
+          title={t('financial.section5.title')}
+          description={t('financial.section5.description')}
           id="fin-section-ops"
         />
         {monthlyRevenue > 0 && <BreakEvenCard monthlyRevenue={monthlyRevenue} monthlyExpenses={monthlyExpenses} />}
@@ -1425,8 +1525,8 @@ export default function FinancialPage() {
           icon={PiggyBank}
           iconBg="bg-slate-100"
           iconColor="text-slate-600"
-          title="Expense breakdown"
-          subtitle={`${expenseCategories.length} categories — edit any amount`}
+          title={t('financial.expenseBreakdown')}
+          subtitle={t('financial.expenseBreakdownSub').replace('{count}', String(expenseCategories.length))}
           defaultOpen
         >
           <div className="p-5 space-y-5">
@@ -1458,17 +1558,17 @@ export default function FinancialPage() {
       {/* ── 6. Planning (calendar) ───────────────────────────────────────── */}
       <section className="space-y-3" aria-labelledby="fin-section-planning">
         <PageSection
-          kicker="6 · Planning"
-          title="Tax calendar"
-          description="Key dates for installments and filing — use this as a reminder, not personalized advice."
+          kicker={t('financial.section6.kicker')}
+          title={t('financial.section6.title')}
+          description={t('financial.section6.description')}
           id="fin-section-planning"
         />
         <Expandable
           icon={Calendar}
           iconBg="bg-blue-50"
           iconColor="text-blue-600"
-          title="2026 tax calendar"
-          subtitle="Installment dates and estimated amounts"
+          title={t('financial.calendar.title')}
+          subtitle={t('financial.deductions.subtitle')}
         >
           <TaxCalendar quarterlyInstallment={quarterlyInstallment} />
         </Expandable>
@@ -1477,17 +1577,17 @@ export default function FinancialPage() {
       {/* ── 7. Deductions ──────────────────────────────────────────────────── */}
       <section className="space-y-3" aria-labelledby="fin-section-deductions">
         <PageSection
-          kicker="7 · Deductions"
-          title="Common write-offs"
-          description="Typical deductible costs for your business type — rough savings use a marginal rate estimate."
+          kicker={t('financial.section7.kicker')}
+          title={t('financial.section7.title')}
+          description={t('financial.section7.description')}
           id="fin-section-deductions"
         />
         <Expandable
           icon={Receipt}
           iconBg="bg-emerald-50"
           iconColor="text-emerald-600"
-          title="Deduction tracker"
-          subtitle="Pre-loaded for your business type"
+          title={t('financial.deductions.title')}
+          subtitle={t('financial.deductions.subtitle')}
         >
           <DeductionTracker clusterId={clusterId} />
         </Expandable>
@@ -1496,9 +1596,9 @@ export default function FinancialPage() {
       {/* ── 8. Risks & funding ─────────────────────────────────────────────── */}
       <section className="space-y-3" aria-labelledby="fin-section-risks">
         <PageSection
-          kicker="8 · Next steps"
-          title="Watch-outs & funding"
-          description="Flags tailored to your numbers, plus how matched funding could extend your runway."
+          kicker={t('financial.section8.kicker')}
+          title={t('financial.section8.title')}
+          description={t('financial.section8.description')}
           id="fin-section-risks"
         />
         {flags.length > 0 && (

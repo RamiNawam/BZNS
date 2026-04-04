@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { FileText, ExternalLink, Lightbulb, StickyNote, Loader2 } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n/useTranslation';
 import type { RoadmapStep } from '@/types/roadmap';
 import { useRoadmapStore } from '@/stores/roadmap-store';
 
@@ -11,6 +12,7 @@ interface StepDetailProps {
 
 export default function StepDetail({ step }: StepDetailProps) {
   const { updateStepStatus } = useRoadmapStore();
+  const { t } = useTranslation();
   const [notes, setNotes] = useState(step.notes ?? '');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -40,7 +42,7 @@ export default function StepDetail({ step }: StepDetailProps) {
           <Lightbulb size={16} className="text-brand-600 shrink-0 mt-0.5" />
           <div>
             <p className="text-xs font-semibold text-brand-700 uppercase tracking-wide mb-1">
-              Why this matters
+              {t('roadmap.stepDetail.whyMatters')}
             </p>
             <p className="text-sm text-brand-800 leading-relaxed">{step.why_needed}</p>
           </div>
@@ -51,7 +53,7 @@ export default function StepDetail({ step }: StepDetailProps) {
       {step.required_documents && step.required_documents.length > 0 && (
         <div>
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
-            Documents required
+            {t('roadmap.stepDetail.documentsRequired')}
           </p>
           <ul className="space-y-1.5">
             {step.required_documents.map((doc) => (
@@ -73,7 +75,7 @@ export default function StepDetail({ step }: StepDetailProps) {
           className="btn-secondary btn-sm gap-2 inline-flex"
         >
           <ExternalLink size={13} />
-          Official government page
+          {t('roadmap.stepDetail.governmentPage')}
         </a>
       )}
 
@@ -81,7 +83,7 @@ export default function StepDetail({ step }: StepDetailProps) {
       <div>
         <label htmlFor={`notes-${step.id}`} className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
           <StickyNote size={12} />
-          Your notes
+          {t('roadmap.stepDetail.yourNotes')}
         </label>
         <textarea
           id={`notes-${step.id}`}
@@ -89,15 +91,15 @@ export default function StepDetail({ step }: StepDetailProps) {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           onBlur={handleNotesSave}
-          placeholder="e.g., Got my NEQ — number is 1234567890"
+          placeholder={t('roadmap.stepDetail.notesPlaceholder')}
           className="input resize-none text-sm"
         />
         {(saving || saved) && (
           <p className="text-xs mt-1.5 flex items-center gap-1.5 text-slate-400">
             {saving ? (
-              <><Loader2 size={11} className="animate-spin" /> Saving…</>
+              <><Loader2 size={11} className="animate-spin" /> {t('roadmap.stepDetail.saving')}</>
             ) : (
-              <><span className="text-emerald-500">✓</span> Saved</>
+              <><span className="text-emerald-500">✓</span> {t('roadmap.stepDetail.saved')}</>
             )}
           </p>
         )}

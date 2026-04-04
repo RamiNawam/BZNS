@@ -1,33 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useProfileStore } from "@/stores/profile-store";
 import { useRoadmapStore } from "@/stores/roadmap-store";
 import { useFundingStore } from "@/stores/funding-store";
 import { createClient } from "@/lib/supabase/client";
 import { Save, CheckCircle2, AlertCircle, Info } from "lucide-react";
 import { CLUSTERS, type ClusterID } from "@/lib/clusters";
-
-const immigrationOptions = [
-  { value: "citizen", label: "Canadian Citizen" },
-  { value: "permanent_resident", label: "Permanent Resident" },
-  { value: "work_permit", label: "Work Permit" },
-  { value: "student", label: "Student Visa" },
-];
-
-const languageOptions = [
-  { value: "en", label: "English" },
-  { value: "fr", label: "French" },
-];
-
-const businessTypeOptions = [
-  { value: "food", label: "Food & Bakery" },
-  { value: "freelance", label: "Freelance / Consulting" },
-  { value: "daycare", label: "Childcare" },
-  { value: "retail", label: "Retail" },
-  { value: "personal_care", label: "Personal Care" },
-  { value: "other", label: "Other" },
-];
+import { useTranslation } from '@/lib/i18n/useTranslation';
 
 /** Map business_type + is_home_based back to a default cluster for settings changes */
 function deriveCluster(businessType: string, isHomeBased: boolean): ClusterID {
@@ -89,8 +69,30 @@ function Section({
 // ── Page ──────────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
+  const { t } = useTranslation();
   const { profile, loadProfile } = useProfileStore();
   const [email, setEmail] = useState<string | null>(null);
+
+  const immigrationOptions = useMemo(() => [
+    { value: "citizen", label: t('settings.immigrationOptions.citizen') },
+    { value: "permanent_resident", label: t('settings.immigrationOptions.permanentResident') },
+    { value: "work_permit", label: t('settings.immigrationOptions.workPermit') },
+    { value: "student", label: t('settings.immigrationOptions.student') },
+  ], [t]);
+
+  const languageOptions = useMemo(() => [
+    { value: "en", label: t('settings.languages.en') },
+    { value: "fr", label: t('settings.languages.fr') },
+  ], [t]);
+
+  const businessTypeOptions = useMemo(() => [
+    { value: "food", label: t('settings.businessTypes.food') },
+    { value: "freelance", label: t('settings.businessTypes.freelance') },
+    { value: "daycare", label: t('settings.businessTypes.daycare') },
+    { value: "retail", label: t('settings.businessTypes.retail') },
+    { value: "personal_care", label: t('settings.businessTypes.personalCare') },
+    { value: "other", label: t('settings.businessTypes.other') },
+  ], [t]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -211,10 +213,10 @@ export default function SettingsPage() {
       {/* Header */}
       <div>
         <h2 className="font-heading text-2xl font-bold text-slate-900">
-          Settings
+          {t('settings.title')}
         </h2>
         <p className="text-sm text-slate-500 mt-1">
-          Manage your profile and business information.
+          {t('settings.subtitle')}
         </p>
       </div>
 
@@ -222,18 +224,17 @@ export default function SettingsPage() {
       <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
         <Info size={15} className="mt-0.5 shrink-0 text-amber-600" />
         <span>
-          After saving changes to your business type or location, go to your
-          dashboard and click
-          <strong className="font-semibold"> Generate My Roadmap</strong> to get
-          updated steps.
+          {t('settings.roadmapNotice').split('{bold}')[0]}
+          <strong className="font-semibold"> {t('settings.roadmapNoticeBold')}</strong>
+          {t('settings.roadmapNotice').split('{bold}')[1]}
         </span>
       </div>
 
       {/* Account */}
-      <Section title="Account">
+      <Section title={t('settings.account')}>
         <Field
-          label="Email"
-          hint="Your login email — managed through magic link authentication."
+          label={t('settings.email')}
+          hint={t('settings.emailHint')}
         >
           <div
             className={`${inputCls} bg-slate-50 text-slate-500 cursor-default`}
@@ -241,7 +242,7 @@ export default function SettingsPage() {
             {email ?? "—"}
           </div>
         </Field>
-        <Field label="Full name">
+        <Field label={t('settings.fullName')}>
           <input
             className={inputCls}
             placeholder="e.g. John Doe"
@@ -249,7 +250,7 @@ export default function SettingsPage() {
             onChange={(e) => set("full_name", e.target.value)}
           />
         </Field>
-        <Field label="Preferred language">
+        <Field label={t('settings.preferredLanguage')}>
           <select
             className={selectCls}
             value={form.preferred_language}
@@ -265,10 +266,10 @@ export default function SettingsPage() {
       </Section>
 
       {/* Business */}
-      <Section title="Your Business">
+      <Section title={t('settings.yourBusiness')}>
         <Field
-          label="Business type"
-          hint="Used to select the right legal steps and funding programs for your roadmap."
+          label={t('settings.businessType')}
+          hint={t('settings.businessTypeHint')}
         >
           <select
             className={selectCls}
@@ -284,8 +285,8 @@ export default function SettingsPage() {
         </Field>
 
         <Field
-          label="Business name"
-          hint="Leave blank if you haven't chosen a name yet."
+          label={t('settings.businessName')}
+          hint={t('settings.businessNameHint')}
         >
           <input
             className={inputCls}
@@ -296,8 +297,8 @@ export default function SettingsPage() {
         </Field>
 
         <Field
-          label="Business description"
-          hint="A short summary of what you do. Used to personalize your roadmap."
+          label={t('settings.businessDescription')}
+          hint={t('settings.businessDescriptionHint')}
         >
           <textarea
             className={`${inputCls} resize-none`}
@@ -310,8 +311,8 @@ export default function SettingsPage() {
       </Section>
 
       {/* Location */}
-      <Section title="Location">
-        <Field label="City / Municipality">
+      <Section title={t('settings.location')}>
+        <Field label={t('settings.city')}>
           <input
             className={inputCls}
             placeholder="e.g. Montreal"
@@ -320,8 +321,8 @@ export default function SettingsPage() {
           />
         </Field>
         <Field
-          label="Borough"
-          hint="Montréal borough, if applicable (e.g. Villeray, Plateau-Mont-Royal)."
+          label={t('settings.borough')}
+          hint={t('settings.boroughHint')}
         >
           <input
             className={inputCls}
@@ -330,7 +331,7 @@ export default function SettingsPage() {
             onChange={(e) => set("borough", e.target.value)}
           />
         </Field>
-        <Field label="Business location">
+        <Field label={t('settings.businessLocation')}>
           <label className="flex items-center gap-3 cursor-pointer select-none">
             <div
               onClick={() => set("is_home_based", !form.is_home_based)}
@@ -340,15 +341,15 @@ export default function SettingsPage() {
                 className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${form.is_home_based ? "translate-x-4" : "translate-x-0"}`}
               />
             </div>
-            <span className="text-sm text-slate-700">Home-based business</span>
+            <span className="text-sm text-slate-700">{t('settings.homeBased')}</span>
           </label>
         </Field>
       </Section>
 
       {/* About you */}
-      <Section title="About You">
+      <Section title={t('settings.aboutYou')}>
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Age">
+          <Field label={t('settings.age')}>
             <input
               className={inputCls}
               type="number"
@@ -359,7 +360,7 @@ export default function SettingsPage() {
               onChange={(e) => set("age", e.target.value)}
             />
           </Field>
-          <Field label="Immigration status">
+          <Field label={t('settings.immigrationStatus')}>
             <select
               className={selectCls}
               value={form.immigration_status}
@@ -376,10 +377,10 @@ export default function SettingsPage() {
       </Section>
 
       {/* Revenue */}
-      <Section title="Revenue">
+      <Section title={t('settings.revenue')}>
         <Field
-          label="Expected monthly revenue (CAD)"
-          hint="Used to calculate your tax snapshot and GST/QST registration threshold."
+          label={t('settings.expectedRevenue')}
+          hint={t('settings.expectedRevenueHint')}
         >
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium">
@@ -403,7 +404,7 @@ export default function SettingsPage() {
           {saved && (
             <span className="flex items-center gap-1.5 text-emerald-600 font-medium">
               <CheckCircle2 size={15} />
-              Changes saved
+              {t('settings.changesSaved')}
             </span>
           )}
           {error && (
@@ -419,7 +420,7 @@ export default function SettingsPage() {
           className="btn-primary gap-2 disabled:opacity-50"
         >
           <Save size={15} />
-          {saving ? "Saving…" : "Save changes"}
+          {saving ? t('settings.saving') : t('settings.saveChanges')}
         </button>
       </div>
     </div>
