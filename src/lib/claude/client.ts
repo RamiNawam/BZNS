@@ -21,17 +21,19 @@ export function getAnthropicClient(): Anthropic {
 export async function askClaude(
   systemPrompt: string,
   userMessage: string,
-  model = 'claude-sonnet-4-6',
-  maxTokens = 4096
+  model = 'claude-haiku-4-5-20251001',
+  maxTokens = 4096,
+  temperature?: number
 ): Promise<string> {
   const client = getAnthropicClient();
 
-  console.log(`[Claude] Calling model=${model} max_tokens=${maxTokens} system_prompt_chars=${systemPrompt.length}`);
+  console.log(`[Claude] Calling model=${model} max_tokens=${maxTokens} temperature=${temperature ?? 'default'} system_prompt_chars=${systemPrompt.length}`);
   const start = Date.now();
 
   const response = await client.messages.create({
     model,
     max_tokens: maxTokens,
+    ...(temperature !== undefined && { temperature }),
     system: systemPrompt,
     messages: [{ role: 'user', content: userMessage }],
   });

@@ -97,21 +97,13 @@ function SectionHeader({
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function FundingList() {
-  const { matches, isLoading, isGenerating, loadMatches, generateMatches } = useFundingStore();
+  const { matches, isLoading, isGenerating, isStale, loadMatches, generateMatches } = useFundingStore();
   const profile = useProfileStore((s) => s.profile);
   const [filter, setFilter] = useState<FilterKey>('all');
 
   useEffect(() => {
     loadMatches();
   }, [loadMatches]);
-
-  // Same pattern as RoadmapList: profile.updated_at > matches[0].created_at.
-  // This now works correctly because generateMatches (force_refresh) deletes all
-  // existing matches before inserting fresh ones — giving a guaranteed fresh created_at.
-  const fundingIsStale =
-    matches.length > 0 &&
-    !!profile?.updated_at &&
-    new Date(profile.updated_at) > new Date(matches[0].created_at);
 
   const inferredStage = !profile?.has_neq
     ? 'pre_launch'
@@ -166,7 +158,7 @@ export default function FundingList() {
   return (
     <div className="space-y-6">
       {/* Stale warning — same pattern as RoadmapList */}
-      {fundingIsStale && !isGenerating && (
+      {isStale && !isGenerating && (
         <div className="flex items-center justify-between gap-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
           <div className="flex items-center gap-2.5 text-sm text-amber-800">
             <RefreshCw size={15} className="shrink-0 text-amber-600" />

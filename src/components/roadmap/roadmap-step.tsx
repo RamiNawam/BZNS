@@ -64,7 +64,10 @@ const CONFIDENCE_BORDER: Record<StepConfidence, string> = {
   flagged: "border-l-amber-400",
 };
 
-const CONFIDENCE_BADGE: Record<StepConfidence, { class: string; label: string; icon: typeof ShieldCheck }> = {
+const CONFIDENCE_BADGE: Record<
+  StepConfidence,
+  { class: string; label: string; icon: typeof ShieldCheck }
+> = {
   verified: {
     class: "bg-emerald-50 text-emerald-700 border-emerald-200",
     label: "Verified",
@@ -104,9 +107,7 @@ function FlagCard({ flag }: { flag: GapFlag }) {
             </span>
           </div>
           <p className="leading-relaxed">{flag.issue}</p>
-          <p className="font-medium">
-            {flag.recommendation}
-          </p>
+          <p className="font-medium">{flag.recommendation}</p>
         </div>
       </div>
     </div>
@@ -142,8 +143,8 @@ function StepNode({
 
   if (step.status === "in_progress") {
     return (
-      <div className="h-9 w-9 rounded-full border-2 border-brand-500 bg-white flex items-center justify-center">
-        <div className="h-2.5 w-2.5 rounded-full bg-brand-500 animate-pulse" />
+      <div className="h-9 w-9 rounded-full border-2 border-blue-500 bg-white flex items-center justify-center">
+        <div className="h-2.5 w-2.5 rounded-full bg-blue-500 animate-pulse" />
       </div>
     );
   }
@@ -295,7 +296,9 @@ export default function RoadmapStep({
                 )}
 
                 {!locked && step.description && (
-                  <p className={`text-sm text-slate-500 mt-1 ${expanded ? "" : "line-clamp-2"}`}>
+                  <p
+                    className={`text-sm text-slate-500 mt-1 ${expanded ? "" : "line-clamp-2"}`}
+                  >
                     {step.description}
                   </p>
                 )}
@@ -321,7 +324,8 @@ export default function RoadmapStep({
                   <div className="mt-2 flex items-center gap-1.5 text-xs">
                     <Search size={12} className="text-amber-500" />
                     <span className="text-amber-600 font-medium">
-                      {stepFlags.length} item{stepFlags.length > 1 ? "s" : ""} to review
+                      {stepFlags.length} item{stepFlags.length > 1 ? "s" : ""}{" "}
+                      to review
                     </span>
                   </div>
                 )}

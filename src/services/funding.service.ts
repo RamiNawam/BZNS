@@ -375,7 +375,7 @@ Rules:
 - impact values must be exactly "high", "medium", or "low".
 - Reference the user's real characteristics (age, city, immigration status). Never be generic.
 - next_step must be one concrete actionable sentence.`,
-      'claude-sonnet-4-6',
+      'claude-haiku-4-5-20251001',
       700
     )
 
@@ -409,7 +409,7 @@ Check: does any field contain amounts, dates, or eligibility rules that contradi
 - If all accurate: return the JSON unchanged.
 - If inaccurate: return corrected JSON with the same structure.
 Return ONLY valid JSON. No markdown, no commentary.`,
-      'claude-sonnet-4-6',
+      'claude-haiku-4-5-20251001',
       700
     )
 

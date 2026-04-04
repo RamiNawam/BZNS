@@ -148,13 +148,15 @@ export default function DashboardPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold text-slate-900">
-            {profile?.business_name || 'Your Business'}
+            {profile?.business_name || "Your Business"}
           </h1>
           <div className="flex items-center gap-2 mt-1.5 flex-wrap">
             {profile?.cluster_label && (
-              <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${
-                CLUSTER_COLORS[profile.cluster_complexity ?? 'medium']
-              }`}>
+              <span
+                className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${
+                  CLUSTER_COLORS[profile.cluster_complexity ?? "medium"]
+                }`}
+              >
                 {profile.cluster_label}
               </span>
             )}
@@ -166,12 +168,6 @@ export default function DashboardPage() {
             )}
           </div>
         </div>
-        <Link
-          href="/intake"
-          className="text-xs text-brand-600 hover:underline"
-        >
-          Edit profile
-        </Link>
       </div>
 
       {/* Stat cards */}
@@ -194,11 +190,11 @@ export default function DashboardPage() {
           iconBg="bg-emerald-50"
           iconColor="text-emerald-600"
           label="Funding Available"
-          value={immediateCount > 0 ? `${immediateCount}` : '—'}
+          value={immediateCount > 0 ? `${immediateCount}` : "—"}
           sub={
             immediateCount > 0
-              ? `program${immediateCount !== 1 ? 's' : ''} ready to apply`
-              : 'Complete intake to find matches'
+              ? `program${immediateCount !== 1 ? "s" : ""} ready to apply`
+              : "Complete intake to find matches"
           }
           cta="View matches"
         />

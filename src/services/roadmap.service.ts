@@ -188,10 +188,10 @@ export const RoadmapService = {
     let rawText: string
 
     try {
-      rawText = await askClaude(systemPrompt, 'Generate the roadmap now.', 'claude-haiku-4-5-20251001')
+      rawText = await askClaude(systemPrompt, 'Generate the roadmap now.', 'claude-haiku-4-5-20251001', 4096, 0)
     } catch (firstError) {
       console.warn('[RoadmapService.generate] [Layer 1] First Claude call failed, retrying:', firstError)
-      rawText = await askClaude(systemPrompt, 'Generate the roadmap now.', 'claude-haiku-4-5-20251001')
+      rawText = await askClaude(systemPrompt, 'Generate the roadmap now.', 'claude-haiku-4-5-20251001', 4096, 0)
     }
     console.log(`[RoadmapService.generate] [Layer 1] Claude raw response length: ${rawText.length} chars`)
     console.log(`[RoadmapService.generate] [Layer 1] Claude raw response preview: ${rawText.slice(0, 300)}`)
@@ -260,8 +260,9 @@ export const RoadmapService = {
       const gapRawText = await askClaude(
         gapPrompt,
         'Review the roadmap now. Find every gap, error, and edge case. Be adversarial.',
-        'claude-sonnet-4-20250514',
+        'claude-haiku-4-5-20251001',
         4096,
+        0,
       )
       console.log(`[RoadmapService.generate] [Layer 2] Gap detection response length: ${gapRawText.length} chars`)
       console.log(`[RoadmapService.generate] [Layer 2] Gap detection response preview: ${gapRawText.slice(0, 400)}`)

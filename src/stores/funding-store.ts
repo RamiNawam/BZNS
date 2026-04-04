@@ -14,12 +14,14 @@ interface FundingStore {
   immediateCount: number
   isLoading: boolean
   isGenerating: boolean
+  isStale: boolean
   error: string | null
 
   loadMatches: () => Promise<void>
   generateMatches: () => Promise<void>
   toggleBookmark: (matchId: string) => Promise<void>
   toggleDismiss: (matchId: string) => Promise<void>
+  markStale: () => void
 }
 
 export const useFundingStore = create<FundingStore>((set, get) => ({
@@ -29,6 +31,7 @@ export const useFundingStore = create<FundingStore>((set, get) => ({
   immediateCount: 0,
   isLoading: false,
   isGenerating: false,
+  isStale: false,
   error: null,
 
   loadMatches: async () => {
@@ -73,6 +76,7 @@ export const useFundingStore = create<FundingStore>((set, get) => ({
         totalPotential: data.total_potential_funding ?? '',
         immediateTotal: total,
         immediateCount: count,
+        isStale: false,
       })
     } catch (err) {
       set({ error: err instanceof Error ? err.message : 'Unknown error' })
@@ -103,6 +107,8 @@ export const useFundingStore = create<FundingStore>((set, get) => ({
       set({ matches: previous })
     }
   },
+
+  markStale: () => set({ isStale: true }),
 
   toggleDismiss: async (matchId: string) => {
     const previous = get().matches
