@@ -6,6 +6,7 @@ import { useRoadmapStore } from "@/stores/roadmap-store";
 import { useFundingStore } from "@/stores/funding-store";
 import { createClient } from "@/lib/supabase/client";
 import { Save, CheckCircle2, AlertCircle, Info } from "lucide-react";
+import { CLUSTERS, type ClusterID } from "@/lib/clusters";
 
 const immigrationOptions = [
   { value: "citizen", label: "Canadian Citizen" },
@@ -27,6 +28,18 @@ const businessTypeOptions = [
   { value: "personal_care", label: "Personal Care" },
   { value: "other", label: "Other" },
 ];
+
+/** Map business_type + is_home_based back to a default cluster for settings changes */
+function deriveCluster(businessType: string, isHomeBased: boolean): ClusterID {
+  switch (businessType) {
+    case "food":         return isHomeBased ? "C1" : "C7";
+    case "freelance":    return "C2";
+    case "daycare":      return "C3";
+    case "retail":       return isHomeBased ? "C5" : "C6";
+    case "personal_care": return "C9";
+    default:             return "C2";
+  }
+}
 
 // ── Reusable form field wrappers ───────────────────────────────────────────
 
@@ -137,6 +150,11 @@ export default function SettingsPage() {
     setSaved(false);
 
     try {
+      // Reclassify cluster when business type or location changes
+      const newClusterId = deriveCluster(form.business_type, form.is_home_based);
+      const clusterMeta = CLUSTERS[newClusterId];
+      const clusterChanged = newClusterId !== profile.cluster_id;
+
       const res = await fetch("/api/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -157,6 +175,14 @@ export default function SettingsPage() {
             age: form.age ? Number(form.age) : null,
             immigration_status: form.immigration_status,
             preferred_language: form.preferred_language,
+            cluster_id: newClusterId,
+            cluster_label: clusterMeta.label,
+            cluster_complexity: clusterMeta.complexity,
+            // Reset financial questionnaire when cluster changes so user gets new questions
+            ...(clusterChanged && {
+              financial_questionnaire_completed: false,
+              financial_questionnaire_answers: null,
+            }),
           },
         }),
       });

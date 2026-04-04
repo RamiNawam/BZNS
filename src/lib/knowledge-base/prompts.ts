@@ -265,7 +265,7 @@ Return ONLY a valid JSON array. Do not include any text or explanation outside t
 - Only include steps for which there is a corresponding KB document. Do not hallucinate requirements.
 - Order logically: entity registration → business permits → tax registrations → compliance steps
 - Mark GST/QST registration as conditional if revenue is below $30,000 or unknown; required if above $30,000 — reflect this in why_needed
-- Include between 5 and 15 steps total. Skip steps that clearly do not apply (e.g. RACJ liquor permit for a daycare)
+- Include between 5 and 25 steps total. Skip steps that clearly do not apply (e.g. RACJ liquor permit for a daycare)
 - Keep descriptions specific to this user — their business type, location, or revenue situation
 - Do NOT include bank account opening, accounting software recommendations, or general financial planning advice. DO include legally required registrations, permits, tax obligations, and compliance steps — those are handled by a separate financial feature. Only include steps required by law or government regulation to legally operate the business`;
 }
@@ -584,11 +584,11 @@ When projecting, multiply monthly figures by the number of months requested. Alw
 
 ## Current page
 
-The user is currently ${pageContext ?? 'browsing the app'}.
+The user is currently ${pageContext ?? "browsing the app"}.
 
 ## Spending intelligence
 
-${spendingContext ?? 'No financial data available yet.'}
+${spendingContext ?? "No financial data available yet."}
 
 ## Proactive flags
 

@@ -6,7 +6,22 @@ import {
   User, MapPin, DollarSign, Globe, Pencil, Check, X, Loader2, ChevronLeft,
 } from 'lucide-react';
 import { useProfileStore } from '@/stores/profile-store';
+import { useRoadmapStore } from '@/stores/roadmap-store';
+import { useFundingStore } from '@/stores/funding-store';
+import { CLUSTERS, type ClusterID } from '@/lib/clusters';
 import type { Profile } from '@/types/profile';
+
+/** Map business_type + is_home_based back to a default cluster */
+function deriveCluster(businessType: string, isHomeBased: boolean): ClusterID {
+  switch (businessType) {
+    case 'food':          return isHomeBased ? 'C1' : 'C7';
+    case 'freelance':     return 'C2';
+    case 'daycare':       return 'C3';
+    case 'retail':        return isHomeBased ? 'C5' : 'C6';
+    case 'personal_care': return 'C9';
+    default:              return 'C2';
+  }
+}
 
 // ── Inline editable field ─────────────────────────────────────────────────────
 
@@ -184,14 +199,38 @@ export default function ProfilePage() {
   async function patchProfile(update: Partial<Profile>) {
     setSaving(true);
     try {
+      // Reclassify cluster when business type or home-based changes
+      const nextType = (update.business_type ?? profile!.business_type) as string;
+      const nextHome = update.is_home_based ?? profile!.is_home_based;
+      const newClusterId = deriveCluster(nextType, nextHome);
+      const clusterChanged = newClusterId !== profile!.cluster_id;
+
+      const fullUpdate: Partial<Profile> = {
+        ...update,
+        ...(clusterChanged && {
+          cluster_id: newClusterId,
+          cluster_label: CLUSTERS[newClusterId].label,
+          cluster_complexity: CLUSTERS[newClusterId].complexity,
+          financial_questionnaire_completed: false,
+          financial_questionnaire_answers: null,
+        }),
+      };
+
       const res = await fetch('/api/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ profile_id: profile!.id, updates: update }),
+        body: JSON.stringify({ profile_id: profile!.id, updates: fullUpdate }),
       });
       if (!res.ok) throw new Error('Save failed');
       const data = await res.json();
       useProfileStore.setState({ profile: data.profile });
+
+      // Mark dependent data as stale
+      if (update.business_type || update.is_home_based || update.municipality) {
+        useRoadmapStore.getState().markStale();
+        useFundingStore.getState().markStale();
+      }
+
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } finally {

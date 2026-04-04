@@ -3,7 +3,6 @@
 import { useState } from "react";
 import {
   Check,
-  Lock,
   ChevronDown,
   ChevronUp,
   Search,
@@ -128,7 +127,9 @@ function StepNode({
   if (locked) {
     return (
       <div className="h-9 w-9 rounded-full bg-slate-100 border-2 border-slate-200 flex items-center justify-center">
-        <Lock size={13} className="text-slate-400" />
+        <span className="text-xs font-bold text-slate-300 tabular-nums">
+          {step.step_order}
+        </span>
       </div>
     );
   }
@@ -231,7 +232,7 @@ export default function RoadmapStep({
             CONFIDENCE_BORDER[confidence]
           } ${
             locked
-              ? "opacity-50 cursor-not-allowed"
+              ? "cursor-default"
               : isCompleted
                 ? "border-l-emerald-400 bg-emerald-50/30"
                 : confidence === "flagged"
@@ -247,31 +248,33 @@ export default function RoadmapStep({
             className="w-full text-left p-5"
           >
             <div className="flex items-start gap-3">
-              {/* Checkbox */}
-              <div
-                onClick={handleCheck}
-                className={`mt-0.5 h-5 w-5 rounded border-2 flex items-center justify-center ${
-                  locked
-                    ? "border-slate-200 bg-slate-50"
-                    : isCompleted
+              {/* Checkbox — hidden for locked steps */}
+              {!locked && (
+                <div
+                  onClick={handleCheck}
+                  className={`mt-0.5 h-5 w-5 rounded border-2 flex items-center justify-center ${
+                    isCompleted
                       ? "border-brand-600 bg-brand-600"
                       : "border-slate-300 hover:border-brand-400"
-                }`}
-              >
-                {isCompleted && <Check size={11} className="text-white" />}
-                {step.status === "in_progress" && (
-                  <div className="h-2 w-2 rounded-full bg-blue-500" />
-                )}
-              </div>
+                  }`}
+                >
+                  {isCompleted && <Check size={11} className="text-white" />}
+                  {step.status === "in_progress" && (
+                    <div className="h-2 w-2 rounded-full bg-blue-500" />
+                  )}
+                </div>
+              )}
 
               {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span
                     className={`font-heading font-semibold text-sm ${
-                      isCompleted
-                        ? "line-through text-slate-400"
-                        : "text-slate-900"
+                      locked
+                        ? "text-slate-400"
+                        : isCompleted
+                          ? "line-through text-slate-400"
+                          : "text-slate-900"
                     }`}
                   >
                     {step.title}

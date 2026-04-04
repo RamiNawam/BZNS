@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import Link from "next/link";
 import {
   Map,
@@ -18,7 +18,10 @@ import { useProfileStore } from "@/stores/profile-store";
 import { useRoadmapStore } from "@/stores/roadmap-store";
 import { useFundingStore } from "@/stores/funding-store";
 import SnapshotCard from "@/components/financial/snapshot-card";
+import { calculateTakeHome } from "@/lib/financial/tax-calculator";
+import { getExpenseDefaults } from "@/lib/financial/expense-defaults";
 import type { ClusterComplexity } from "@/types/profile";
+import type { ClusterID } from "@/lib/clusters";
 
 const CLUSTER_COLORS: Record<ClusterComplexity, string> = {
   low: "bg-green-50 text-green-800 border-green-200",
@@ -110,6 +113,20 @@ export default function DashboardPage() {
   }, [profile?.id, loadRoadmap, loadMatches]);
 
   const completedSteps = steps.filter((s) => s.status === "completed").length;
+
+  const monthlyRevenue = profile?.expected_monthly_revenue ?? 0;
+  const clusterId = (profile?.cluster_id ?? 'C2') as ClusterID;
+  const monthlyExpenses = profile?.monthly_expenses ?? getExpenseDefaults(clusterId).total;
+  const businessStructure = profile?.business_structure ?? 'sole_proprietorship';
+
+  const monthlyTakeHome = useMemo(() => {
+    if (!monthlyRevenue) return 0;
+    const taxes = calculateTakeHome(monthlyRevenue * 12, monthlyExpenses * 12, businessStructure);
+    return Math.max(0, taxes.estimatedTakeHome);
+  }, [monthlyRevenue, monthlyExpenses, businessStructure]);
+
+  const fmt = (n: number) =>
+    new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(n);
 
   // ── No profile yet ─────────────────────────────────────────────────────────
   if (!profileLoading && !profile?.intake_completed) {
@@ -203,9 +220,9 @@ export default function DashboardPage() {
           icon={BarChart3}
           iconBg="bg-violet-50"
           iconColor="text-violet-600"
-          label="Finances"
-          value="View"
-          sub="your financial snapshot"
+          label="Monthly Take-Home"
+          value={monthlyRevenue > 0 ? fmt(monthlyTakeHome) : "—"}
+          sub={monthlyRevenue > 0 ? "after taxes & expenses" : "Set revenue to calculate"}
           cta="View finances"
         />
       </div>

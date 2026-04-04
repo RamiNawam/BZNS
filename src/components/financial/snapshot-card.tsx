@@ -15,14 +15,16 @@ export default function SnapshotCard() {
   const { profile } = useProfileStore();
   const monthlyRevenue  = profile?.expected_monthly_revenue ?? 0;
   const clusterId = (profile?.cluster_id ?? 'C2') as ClusterID;
-  const monthlyExpenses = getExpenseDefaults(clusterId).total;
+  const monthlyExpenses = profile?.monthly_expenses ?? getExpenseDefaults(clusterId).total;
+  const businessStructure = profile?.business_structure ?? 'sole_proprietorship';
 
   const taxes = useMemo(
-    () => calculateTakeHome(monthlyRevenue * 12, monthlyExpenses * 12),
-    [monthlyRevenue, monthlyExpenses],
+    () => calculateTakeHome(monthlyRevenue * 12, monthlyExpenses * 12, businessStructure),
+    [monthlyRevenue, monthlyExpenses, businessStructure],
   );
 
-  const monthlyTakeHome = Math.max(0, taxes.estimatedTakeHome / 12 - monthlyExpenses);
+  // estimatedTakeHome is already monthly and already net of expenses
+  const monthlyTakeHome = Math.max(0, taxes.estimatedTakeHome);
   const totalMonthlyTax = taxes.totalTax / 12;
   const total = monthlyRevenue || 1;
 

@@ -1096,12 +1096,14 @@ export default function FinancialPage() {
   }, [profile, expenseProfile, questionSet]);
 
   // All calculations are deterministic — no API needed for live updates
+  const businessStructure = profile?.business_structure ?? 'sole_proprietorship';
   const taxes = useMemo(
-    () => calculateTakeHome(monthlyRevenue * 12, monthlyExpenses * 12),
-    [monthlyRevenue, monthlyExpenses],
+    () => calculateTakeHome(monthlyRevenue * 12, monthlyExpenses * 12, businessStructure),
+    [monthlyRevenue, monthlyExpenses, businessStructure],
   );
 
-  const monthlyTakeHome = Math.max(0, taxes.estimatedTakeHome - monthlyExpenses);
+  // estimatedTakeHome is already monthly and net of expenses
+  const monthlyTakeHome = Math.max(0, taxes.estimatedTakeHome);
   const quarterlyInstallment = taxes.totalTax / 4;
   const effectiveRate = monthlyRevenue > 0 ? 1 - (monthlyTakeHome / monthlyRevenue) : 0;
 

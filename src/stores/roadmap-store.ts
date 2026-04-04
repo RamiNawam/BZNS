@@ -135,11 +135,12 @@ export const useRoadmapStore = create<RoadmapStore>((set, get) => ({
 
       const data = await response.json();
 
-      // Sync with server response (preserve confidence/flags from local state)
+      // Sync with server response (preserve confidence/flags/order from local state)
+      // The server may return a new UUID if this was an inferred step that just got persisted
       set((state) => ({
         steps: state.steps.map((s) =>
-          s.id === stepId
-            ? { ...data.step, confidence: s.confidence, flags: s.flags }
+          s.id === stepId || s.step_key === data.step.step_key
+            ? { ...data.step, step_order: s.step_order, confidence: s.confidence, flags: s.flags }
             : s,
         ),
       }));

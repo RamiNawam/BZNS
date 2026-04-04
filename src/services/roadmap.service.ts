@@ -91,19 +91,31 @@ function mergeFlags(
   })
 
   // Insert inferred steps from missing_step flags
+  // Skip if a step with this step_key already exists (e.g. it was persisted on a prior click)
+  const existingKeys = new Set(enriched.map((s) => s.step_key))
   const maxOrder = Math.max(...enriched.map((s) => s.step_order), 0)
 
-  for (let i = 0; i < missingStepFlags.length; i++) {
-    const flag = missingStepFlags[i]
+  let inferredCount = 0
+  for (const flag of missingStepFlags) {
     const ss = flag.suggested_step!
 
+    if (existingKeys.has(ss.step_key)) {
+      // Already persisted to DB — attach the flag to the existing step instead
+      const existing = enriched.find((s) => s.step_key === ss.step_key)
+      if (existing) {
+        existing.confidence = 'inferred'
+        existing.flags = [...(existing.flags ?? []), flag]
+      }
+      continue
+    }
+
     const inferredStep: RoadmapStep = {
-      // Synthetic ID — these steps aren't in the DB
+      // Synthetic ID — these steps aren't in the DB yet
       id: `inferred-${ss.step_key}`,
       profile_id,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      step_order: maxOrder + 1 + i,
+      step_order: maxOrder + 1 + inferredCount,
       step_key: ss.step_key,
       title: ss.title,
       description: ss.description,
@@ -122,6 +134,7 @@ function mergeFlags(
     }
 
     enriched.push(inferredStep)
+    inferredCount++
   }
 
   return enriched
@@ -330,6 +343,83 @@ export const RoadmapService = {
     profile_id: string,
     update: UpdateStepStatusDTO
   ): Promise<RoadmapStep> {
+    // Handle inferred (non-persisted) steps — persist them to DB first
+    if (step_id.startsWith('inferred-')) {
+      const stepKey = step_id.replace('inferred-', '')
+
+      // Try to find the full step data from the enriched cache
+      const cacheKey = `roadmap:${profile_id}`
+      const cachedSteps = await CacheRepository.get<RoadmapStep[]>(cacheKey)
+      let inferredStep = cachedSteps?.find(s => s.id === step_id)
+
+      // Fallback: reconstruct from the flags cache
+      if (!inferredStep) {
+        const flags = await CacheRepository.get<GapFlag[]>(`roadmap-flags:${profile_id}`) ?? []
+        const flag = flags.find(f => f.type === 'missing_step' && f.suggested_step?.step_key === stepKey)
+        if (flag?.suggested_step) {
+          const ss = flag.suggested_step
+          const existingSteps = await RoadmapRepository.getByProfileId(profile_id)
+          const maxOrder = Math.max(...existingSteps.map(s => s.step_order), 0)
+          inferredStep = {
+            id: step_id,
+            profile_id,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            step_order: maxOrder + 1,
+            step_key: ss.step_key,
+            title: ss.title,
+            description: ss.description,
+            why_needed: ss.why_needed,
+            estimated_cost: ss.estimated_cost,
+            estimated_timeline: ss.estimated_timeline,
+            required_documents: [],
+            government_url: ss.government_url || null,
+            source: ss.source || null,
+            depends_on: ss.depends_on,
+            status: 'pending',
+            completed_at: null,
+            notes: null,
+            confidence: 'inferred',
+            flags: [flag],
+          }
+        }
+      }
+
+      if (!inferredStep) {
+        throw new Error(`Cannot find inferred step: ${step_id}`)
+      }
+
+      // Persist the inferred step to the DB
+      const [persisted] = await RoadmapRepository.batchUpsert([{
+        profile_id,
+        step_order: inferredStep.step_order,
+        step_key: inferredStep.step_key,
+        title: inferredStep.title,
+        description: inferredStep.description,
+        why_needed: inferredStep.why_needed,
+        estimated_cost: inferredStep.estimated_cost,
+        estimated_timeline: inferredStep.estimated_timeline,
+        required_documents: inferredStep.required_documents,
+        government_url: inferredStep.government_url,
+        source: inferredStep.source,
+        depends_on: inferredStep.depends_on,
+        status: 'pending',
+        completed_at: null,
+        notes: null,
+      }])
+
+      // Update the enriched cache so the ID maps correctly on next load
+      if (cachedSteps) {
+        const updatedCache = cachedSteps.map(s =>
+          s.id === step_id ? { ...s, id: persisted.id } : s
+        )
+        await CacheRepository.set(cacheKey, updatedCache)
+      }
+
+      // Now use the real DB id for the status update
+      step_id = persisted.id
+    }
+
     if (update.status === 'completed') {
       const allSteps = await RoadmapRepository.getByProfileId(profile_id)
       const targetStep = allSteps.find(s => s.id === step_id)

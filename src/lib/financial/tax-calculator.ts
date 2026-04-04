@@ -121,6 +121,7 @@ export function calculateTaxSnapshot(input: TaxCalculatorInput): TaxCalculationR
 export function calculateTakeHome(
   annualRevenue: number,
   annualExpenses: number,
+  businessStructure: string = 'sole_proprietorship',
 ): TaxCalculationResult & {
   federalTax: number;
   quebecTax: number;
@@ -134,7 +135,7 @@ export function calculateTakeHome(
   const r = calculateTaxSnapshot({
     gross_monthly_revenue: annualRevenue / 12,
     monthly_expenses: annualExpenses / 12,
-    business_structure: 'sole_proprietorship',
+    business_structure: businessStructure,
   });
   return {
     ...r,
