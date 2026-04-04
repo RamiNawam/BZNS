@@ -251,6 +251,7 @@ function PhaseSection({
               step={step}
               allSteps={allSteps}
               isLast={index === sorted.length - 1}
+              displayOrder={index + 1}
             />
           ))}
         </div>

@@ -24,6 +24,7 @@ interface RoadmapStepProps {
   step: RoadmapStepType;
   allSteps: RoadmapStepType[];
   isLast: boolean;
+  displayOrder: number;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -118,9 +119,11 @@ function FlagCard({ flag }: { flag: GapFlag }) {
 function StepNode({
   step,
   locked,
+  displayOrder,
 }: {
   step: RoadmapStepType;
   locked: boolean;
+  displayOrder: number;
 }) {
   const confidence = step.confidence ?? "verified";
 
@@ -128,7 +131,7 @@ function StepNode({
     return (
       <div className="h-9 w-9 rounded-full bg-slate-100 border-2 border-slate-200 flex items-center justify-center">
         <span className="text-xs font-bold text-slate-300 tabular-nums">
-          {step.step_order}
+          {displayOrder}
         </span>
       </div>
     );
@@ -169,7 +172,7 @@ function StepNode({
   return (
     <div className="h-9 w-9 rounded-full border-2 border-slate-200 bg-white flex items-center justify-center">
       <span className="text-xs font-bold text-slate-400 tabular-nums">
-        {step.step_order}
+        {displayOrder}
       </span>
     </div>
   );
@@ -181,6 +184,7 @@ export default function RoadmapStep({
   step,
   allSteps,
   isLast,
+  displayOrder,
 }: RoadmapStepProps) {
   const [expanded, setExpanded] = useState(false);
   const { updateStepStatus } = useRoadmapStore();
@@ -209,7 +213,7 @@ export default function RoadmapStep({
     <div className="flex gap-4">
       {/* Left rail */}
       <div className="flex flex-col items-center shrink-0 pt-1">
-        <StepNode step={step} locked={locked} />
+        <StepNode step={step} locked={locked} displayOrder={displayOrder} />
         {!isLast && (
           <div
             className={`w-0.5 flex-1 min-h-[32px] mt-1 ${
