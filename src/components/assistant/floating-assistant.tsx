@@ -15,7 +15,6 @@ const PAGE_CONTEXT_MAP: Record<string, string> = {
   '/roadmap': 'viewing their legal roadmap',
   '/funding': 'viewing available funding programs',
   '/financial': 'viewing their financial snapshot',
-  '/starter-kit': 'viewing the starter kit',
   '/intake': 'completing their business intake',
 };
 

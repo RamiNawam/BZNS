@@ -8,7 +8,6 @@ import {
   Map,
   DollarSign,
   BarChart3,
-  FileText,
   LogOut,
   Settings,
   Zap,
@@ -23,7 +22,6 @@ const navItems: { href: string; labelKey: string; icon: LucideIcon }[] = [
   { href: '/roadmap',    labelKey: 'nav.roadmap',     icon: Map             },
   { href: '/funding',    labelKey: 'nav.funding',     icon: DollarSign      },
   { href: '/financial',  labelKey: 'nav.finances',    icon: BarChart3       },
-  { href: '/starter-kit',labelKey: 'nav.starterKit',  icon: FileText        },
 ];
 
 export default function Sidebar() {

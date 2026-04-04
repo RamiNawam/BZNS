@@ -30,6 +30,13 @@ import { getDeductionSummary } from '@/lib/financial/deductions';
 import { getClusterQuestions } from '@/lib/financial/cluster-questions';
 import type { FinancialQuestion } from '@/lib/financial/cluster-questions';
 import { CLUSTERS, type ClusterID } from '@/lib/clusters';
+import {
+  FEDERAL_TAX_BRACKETS,
+  QUEBEC_TAX_BRACKETS,
+  FEDERAL_BASIC_PERSONAL_AMOUNT,
+  QUEBEC_BASIC_PERSONAL_AMOUNT,
+  type TaxBracket,
+} from '@/lib/financial/constants';
 import type { ExpenseCategory } from '@/lib/financial/expense-defaults';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -314,6 +321,102 @@ function PricingSlider({
         Charging <strong className="text-slate-600">{fmt(price + 5)}</strong> instead adds{' '}
         <strong className="text-brand-600">{fmt(5 * units * 0.65)}</strong>/month to your take-home (approx).
       </p>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TAX BRACKET BAR — visual "you are here" indicator
+// ══════════════════════════════════════════════════════════════════════════════
+
+function fmtK(n: number): string {
+  if (n >= 1000) return `$${Math.round(n / 1000)}K`;
+  return `$${n}`;
+}
+
+function TaxBracketBar({
+  brackets,
+  income,
+  personalAmount,
+  label,
+}: {
+  brackets: readonly TaxBracket[];
+  income: number;
+  personalAmount: number;
+  label: string;
+}) {
+  const lastBracketMin = brackets[brackets.length - 1].min;
+  const visualMax = Math.max(lastBracketMin * 1.15, income * 1.1, 80000);
+
+  let activeBracketIdx = 0;
+  for (let i = 0; i < brackets.length; i++) {
+    if (income > brackets[i].min) activeBracketIdx = i;
+  }
+
+  const markerPct = Math.min((income / visualMax) * 100, 98);
+
+  const colors = [
+    'bg-teal-100', 'bg-teal-200', 'bg-amber-200', 'bg-amber-300', 'bg-red-300',
+  ];
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-medium text-slate-600">{label}</span>
+        <span className="text-xs text-slate-500">
+          Taxable: <span className="font-semibold text-slate-700 tabular-nums">{fmt(income)}</span>
+        </span>
+      </div>
+
+      <div className="relative">
+        <div className="flex h-5 rounded-md overflow-hidden">
+          {brackets.map((b, i) => {
+            const start = b.min;
+            const end = b.max ?? visualMax;
+            const width = ((Math.min(end, visualMax) - start) / visualMax) * 100;
+            const isActive = i === activeBracketIdx && income > 0;
+            return (
+              <div
+                key={i}
+                className={`${colors[i] ?? 'bg-red-400'} relative flex items-center justify-center transition-all
+                  ${isActive ? 'ring-1 ring-inset ring-slate-900/20' : ''}
+                  ${i < brackets.length - 1 ? 'border-r border-white/60' : ''}`}
+                style={{ width: `${Math.max(width, 2)}%` }}
+                title={`${fmtK(start)}${b.max ? `–${fmtK(b.max)}` : '+'} → ${(b.rate * 100).toFixed(1)}%`}
+              >
+                <span className="text-[9px] font-medium text-slate-700/80 truncate px-0.5 select-none">
+                  {(b.rate * 100).toFixed(0)}%
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {income > 0 && (
+          <div
+            className="absolute top-0 h-5 w-0.5 bg-slate-900 transition-all duration-500 ease-out"
+            style={{ left: `${markerPct}%` }}
+          >
+            <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap">
+              <span className="text-[10px] font-semibold text-slate-900 bg-white/90 px-1 rounded shadow-sm">
+                You
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex text-[9px] text-slate-400 tabular-nums">
+        {brackets.map((b, i) => {
+          const end = b.max ?? visualMax;
+          const width = ((Math.min(end, visualMax) - b.min) / visualMax) * 100;
+          return (
+            <div key={i} style={{ width: `${Math.max(width, 2)}%` }} className="truncate px-0.5">
+              {fmtK(b.min)}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -1258,6 +1361,29 @@ export default function FinancialPage() {
             </tbody>
           </table>
         </Expandable>
+
+        {/* Tax Bracket Bars */}
+        {taxes.netBusinessIncome > 0 && (
+          <div className="card p-5 space-y-5">
+            <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Your Tax Brackets</h3>
+            <TaxBracketBar
+              brackets={FEDERAL_TAX_BRACKETS}
+              income={Math.max(0, taxes.netBusinessIncome - FEDERAL_BASIC_PERSONAL_AMOUNT)}
+              personalAmount={FEDERAL_BASIC_PERSONAL_AMOUNT}
+              label="Federal"
+            />
+            <TaxBracketBar
+              brackets={QUEBEC_TAX_BRACKETS}
+              income={Math.max(0, taxes.netBusinessIncome - QUEBEC_BASIC_PERSONAL_AMOUNT)}
+              personalAmount={QUEBEC_BASIC_PERSONAL_AMOUNT}
+              label="Québec"
+            />
+            <p className="text-[10px] text-slate-400">
+              Taxable income = net revenue minus personal amount ({fmtK(FEDERAL_BASIC_PERSONAL_AMOUNT)} federal, {fmtK(QUEBEC_BASIC_PERSONAL_AMOUNT)} QC)
+            </p>
+          </div>
+        )}
+
         {taxes.qpp > 0 && <QPPShock qppMonthly={taxes.qpp / 12} />}
       </section>
 

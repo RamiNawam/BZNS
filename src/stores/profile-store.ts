@@ -6,9 +6,8 @@ import type { Profile } from '@/types/profile';
 export interface IntakeFormState {
   // Classification questions (we classify, user doesn't pick)
   business_name: string
-  business_activity: string        // food | services | products | trades | children
+  business_activity: string        // food | services | professional | products | trades | children
   work_location: string            // home | commercial | client_sites | online
-  license_type: string             // professional_order | trade_cert | food_handling | none
   pricing_model: string            // per_item | per_hour | per_session | per_project | subscription
   // Legal roadmap questions
   business_idea: string
@@ -55,7 +54,6 @@ const DEFAULT_INTAKE: Partial<IntakeFormState> = {
   business_name: '',
   business_activity: '',
   work_location: '',
-  license_type: '',
   pricing_model: '',
   business_idea: '',
   location: 'montreal',

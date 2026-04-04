@@ -28,7 +28,6 @@ export const ProfileService = {
     const clusterId = classifyBusiness({
       business_activity: answers.business_activity,
       work_location: answers.work_location,
-      license_type: answers.license_type,
       pricing_model: answers.pricing_model,
     })
     const clusterMeta = CLUSTERS[clusterId]

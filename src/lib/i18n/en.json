@@ -5,7 +5,6 @@
     "roadmap": "Roadmap",
     "funding": "Funding",
     "finances": "Finances",
-    "starterKit": "Starter Kit",
     "settings": "Settings",
     "signOut": "Sign out",
     "signingOut": "Signing out..."
@@ -18,7 +17,6 @@
     "roadmap": { "title": "Legal Roadmap", "subtitle": "Step-by-step registration guide" },
     "funding": { "title": "Funding Matcher", "subtitle": "Québec programs you qualify for" },
     "financial": { "title": "Finances", "subtitle": "Your financial snapshot" },
-    "starterKit": { "title": "Starter Kit", "subtitle": "Download-ready templates" },
     "intake": { "title": "Business Profile", "subtitle": "Tell us about your idea" },
     "settings": { "title": "Settings", "subtitle": "Your profile and preferences" }
   },

@@ -5,7 +5,6 @@
     "roadmap": "Feuille de route",
     "funding": "Financement",
     "finances": "Finances",
-    "starterKit": "Trousse de démarrage",
     "settings": "Paramètres",
     "signOut": "Déconnexion",
     "signingOut": "Déconnexion..."
@@ -18,7 +17,6 @@
     "roadmap": { "title": "Feuille de route légale", "subtitle": "Guide d'immatriculation étape par étape" },
     "funding": { "title": "Financement", "subtitle": "Programmes québécois auxquels vous êtes admissible" },
     "financial": { "title": "Finances", "subtitle": "Votre portrait financier" },
-    "starterKit": { "title": "Trousse de démarrage", "subtitle": "Modèles prêts à télécharger" },
     "intake": { "title": "Profil d'entreprise", "subtitle": "Parlez-nous de votre idée" },
     "settings": { "title": "Paramètres", "subtitle": "Votre profil et vos préférences" }
   },

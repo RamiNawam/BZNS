@@ -124,11 +124,12 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
           <div className="space-y-2.5">
             <FieldLabel>What does your business mainly involve?</FieldLabel>
             {[
-              { value: 'food',     label: 'Preparing or selling food',          desc: 'Baking, cooking, catering, meal prep, jams, sauces' },
-              { value: 'services', label: 'Providing a service',                desc: 'Consulting, design, coaching, beauty, fitness, cleaning' },
-              { value: 'products', label: 'Selling physical products',           desc: 'Online store, boutique, handmade goods, reselling' },
-              { value: 'trades',   label: 'Construction or skilled trades',      desc: 'Plumbing, electrical, carpentry, painting, renovations' },
-              { value: 'children', label: 'Caring for children',                 desc: 'Home daycare, nursery, babysitting' },
+              { value: 'food',         label: 'Preparing or selling food',          desc: 'Baking, cooking, catering, meal prep, jams, sauces' },
+              { value: 'services',     label: 'Providing a service',                desc: 'Consulting, design, coaching, beauty, fitness, cleaning' },
+              { value: 'professional', label: 'Regulated profession',               desc: 'Lawyer, accountant, engineer, architect, therapist, etc.' },
+              { value: 'products',     label: 'Selling physical products',           desc: 'Online store, boutique, handmade goods, reselling' },
+              { value: 'trades',       label: 'Construction or skilled trades',      desc: 'Plumbing, electrical, carpentry, painting, renovations' },
+              { value: 'children',     label: 'Caring for children',                 desc: 'Home daycare, nursery, babysitting' },
             ].map((opt) => (
               <RadioOption
                 key={opt.value}
@@ -145,7 +146,7 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
       );
 
     // ══════════════════════════════════════════════════════════════════════════
-    // Step 1: Where you work + License (classification Q3 & Q4)
+    // Step 1: Where you work (classification Q3)
     // ══════════════════════════════════════════════════════════════════════════
     case 1:
       return (
@@ -178,26 +179,6 @@ export default function QuestionCard({ step, intakeForm, updateField }: Question
             ))}
           </div>
 
-          {/* License */}
-          <div className="space-y-2.5">
-            <FieldLabel>Does your work require a professional license or certification?</FieldLabel>
-            {[
-              { value: 'professional_order', label: 'Yes — regulated by a professional order', desc: 'Lawyer, accountant, engineer, architect, therapist, etc.' },
-              { value: 'trade_cert',         label: 'Yes — trade certification (RBQ, etc.)',    desc: 'Licensed electrician, plumber, contractor, etc.' },
-              { value: 'food_handling',      label: 'Yes — food handling permit',               desc: 'MAPAQ certification for food preparation' },
-              { value: 'none',               label: 'No license required',                      desc: 'Most freelance, retail, and personal services' },
-            ].map((opt) => (
-              <RadioOption
-                key={opt.value}
-                name="license_type"
-                value={opt.value}
-                label={opt.label}
-                desc={opt.desc}
-                checked={intakeForm.license_type === opt.value}
-                onChange={() => updateField('license_type', opt.value)}
-              />
-            ))}
-          </div>
         </div>
       );
 

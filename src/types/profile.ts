@@ -83,9 +83,8 @@ export interface Profile {
 export interface IntakeAnswers {
   // Classification questions (we classify, not the user)
   business_name: string
-  business_activity: string         // food | services | products | trades | children
+  business_activity: string         // food | services | professional | products | trades | children
   work_location: string             // home | commercial | client_sites | online
-  license_type: string              // professional_order | trade_cert | food_handling | none
   pricing_model: string             // per_item | per_hour | per_session | per_project | subscription
 
   // Legal roadmap questions
