@@ -1,6 +1,6 @@
 # MICRO-BUSINESS LAUNCHPAD — COMPLETE PROJECT PLAN v2
 # Claude Builders Hackathon @ McGill — April 1-4, 2026
-# Updated: 1st April, 2026
+# Updated: April 4, 2026
 
 ---
 
@@ -703,24 +703,33 @@ Key files and their purposes:
 - `bill96.json` — French language obligations by business size
 - `signage.json` — Signage rules (French-first)
 
-### Knowledge Base Day 1 Checklist
+### Knowledge Base Checklist — ALL DONE ✅
 
-Must have (blocks the demo):
-- [ ] `business_structures.json`
-- [ ] `financial_constants.json` ← NEW
-- [ ] `registration/req.json`
-- [ ] `registration/revenu_quebec.json`
-- [ ] `permits/mapaq.json`
-- [ ] `permits/municipal_montreal.json`
-- [ ] `permits/famille.json`
-- [ ] `tax/gst_qst.json`
-- [ ] `tax/qpp.json`
-- [ ] `tax/deductions.json`
-- [ ] `funding/futurpreneur.json`
-- [ ] `funding/pme_mtl.json`
-- [ ] `funding/sta.json`
-- [ ] `funding/bdc.json`
-- [ ] `compliance/bill96.json`
+- [x] `business_structures.json`
+- [x] `financial_constants.json`
+- [x] `registration/req.json`
+- [x] `registration/revenu_quebec.json`
+- [x] `registration/cra.json`
+- [x] `permits/mapaq.json`
+- [x] `permits/municipal_montreal.json`
+- [x] `permits/famille.json`
+- [x] `permits/racj.json`
+- [x] `permits/professional_orders.json`
+- [x] `tax/gst_qst.json`
+- [x] `tax/qpp.json`
+- [x] `tax/deductions.json`
+- [x] `tax/installments.json`
+- [x] `funding/futurpreneur.json`
+- [x] `funding/pme_mtl.json`
+- [x] `funding/sta.json`
+- [x] `funding/bdc.json`
+- [x] `funding/investissement_quebec.json`
+- [x] `funding/fli.json`
+- [x] `funding/irap.json`
+- [x] `funding/demographic_programs.json`
+- [x] `funding/canada_summer_jobs.json`
+- [x] `compliance/bill96.json`
+- [x] `compliance/signage.json`
 
 ---
 
@@ -1282,117 +1291,88 @@ Pure math calculator. Cut this first if behind schedule.
 
 ---
 
-# 11. BUILD ASSIGNMENTS — REVISED POST-TEAMMATE CONTRIBUTIONS
+# 11. BUILD STATUS — AS OF APRIL 4, 2026
 
-## Status as of April 1, 2026 (Evening)
+All three teammates (Pierre, Joseph, Rami) are working across the full stack.
 
-### What's done
+## What Is Fully Built ✅
 
-**Person B (Joseph Rassi) — COMPLETE ✅**
-- All 25 KB JSON files in `/data/` — structured, URL-verified, 2026 data
-- `src/lib/knowledge-base/loader.ts` — production-ready singleton loader
-- `src/lib/knowledge-base/selector.ts` — context-aware KB selector by business type
-- `src/lib/knowledge-base/prompts.ts` — all 4 Claude system prompts as typed builder functions
-- `scripts/check_links.py` — URL validation utility
+**Infrastructure & Config**
+- `tailwind.config.ts` — teal/amber design system with Space Grotesk + DM Sans fonts, custom shadows, animations
+- `src/app/globals.css` — full component layer (btn, card, input, badge, skeleton, shimmer)
+- `supabase/migrations/001_initial_schema.sql` + `002_financial_questionnaire.sql`
+- `src/middleware.ts` — auth session middleware protecting all `/app/*` routes
 
-**Person C (Rami Nawam) — BACKEND COMPLETE, Claude wiring pending 🔄**
-- `src/types/` (5 files) — complete, snake_case, mirrors Supabase schema
+**Knowledge Base**
+- All 25 KB JSON files in `/data/` — structured, URL-verified, 2026 data (funding, permits, registration, tax, compliance)
+- `src/lib/knowledge-base/loader.ts`, `selector.ts`, `prompts.ts` — production-ready KB pipeline
+
+**Types, Repositories, Services**
+- `src/types/` (5 files) — complete TypeScript interfaces mirroring Supabase schema
 - `src/repositories/` (6 files) — complete Supabase CRUD layer
-- `src/services/` (6 files) — architecture in place, `// TODO` comments where Claude calls go
-- `src/lib/supabase/` — browser + server clients, middleware helper
-- `src/lib/claude/client.ts`, `prompts.ts`, `schemas.ts` — SDK wrapper, generic stubs (real prompts are in `src/lib/knowledge-base/prompts.ts`)
-- `src/lib/funding/scorer.ts` — deterministic scoring logic
-- `src/lib/financial/tax-calculator.ts` + `constants.ts` — complete 2026 tax math
-- `src/app/api/` (7 routes) — all routes implemented
-- `src/middleware.ts` — auth session middleware
-- `src/app/(auth)/login/page.tsx` — full auth UI with email magic link
-- Component type migration — all components updated to use new snake_case types
-- `src/components/intake/question-card.tsx` — intake wizard questions rewritten
+- `src/services/` (6 files) — profile, roadmap, funding, financial, assistant, cache
 
-**Person A (Pierre) — scaffold complete, pages need wiring**
-- Project scaffold, all directories, `tailwind.config.ts` (⚠️ still blue — needs teal fix)
-- `src/components/` — most components complete (sidebar, layout, roadmap, financial, assistant, intake, starter-kit)
-- `src/stores/` — all 3 Zustand stores complete
-- `src/app/(app)/layout.tsx` — app shell complete
-- `src/app/page.tsx` — landing page (needs hero polish)
+**Business Logic**
+- `src/lib/classifier.ts` — deterministic C1-C12 cluster decision tree (no AI)
+- `src/lib/clusters.ts` — 12 cluster definitions with KB file mappings
+- `src/lib/financial/tax-calculator.ts` — complete 2026 QC tax math (income tax, GST/QST, QPP, QPIP, quarterly installments)
+- `src/lib/financial/constants.ts` — all 2026 tax brackets, rates, thresholds
+- `src/lib/financial/expense-defaults.ts` — cluster-specific expense templates (12 clusters)
+- `src/lib/financial/deductions.ts` — per-cluster deduction categories
+- `src/lib/financial/projections.ts` — 3-scenario, break-even, pricing calc, funding runway
+- `src/lib/financial/cluster-questions.ts` — financial questionnaire per cluster
+- `src/lib/roadmap/step-profile-sync.ts` — step completion → profile field updates + funding re-match
+- `src/lib/funding/scorer.ts` + `classify.ts` — deterministic eligibility scoring for 15+ programs
+- `src/lib/claude/client.ts`, `prompts.ts`, `schemas.ts` — Anthropic SDK wrapper + Zod schemas
+
+**Roadmap Generation (3-Layer)**
+- Layer 1: Claude generates steps from cluster-specific KB files
+- Layer 2: Claude adversarially reviews for gaps (missing_step, wrong_step, edge_case, verify_with_professional)
+- Layer 3: Merge flags, assign confidence levels (verified/inferred/flagged), insert inferred steps
+
+**API Routes**
+- All 7 routes: `/api/profile`, `/api/roadmap`, `/api/funding`, `/api/financial-snapshot`, `/api/assistant`, `/api/auth/callback`, `/api/cache`
+
+**Zustand Stores (5)**
+- profile-store, roadmap-store, funding-store, chat-store, locale-store — all with optimistic updates + rollback
+
+**Pages**
+- Landing page: hero, personas, bento features, stats, "how it works," source attribution
+- Auth: login, callback
+- App: dashboard, intake, roadmap, funding, financial, profile, settings
+
+**Components (full library)**
+- UI: button, card, input, badge, progress-bar, skeleton, language-toggle
+- Layout: sidebar, top-bar
+- Intake: intake-wizard, question-card, intake-progress
+- Roadmap: roadmap-list, roadmap-step, step-detail
+- Funding: funding-list, funding-card, funding-detail
+- Financial: snapshot-card, expense-input, take-home-breakdown, watch-out-flags
+- Assistant: chat-panel, floating-assistant, message-bubble, source-badge
 
 ---
 
-## Remaining Work by Person
+## Remaining Work — April 4 📋
 
-### Person A — Frontend + Infrastructure (YOU)
+**Environment / Supabase setup (blocks everything):**
+- [ ] Fill `.env.local` with Supabase URL, anon key, Anthropic API key
+- [ ] Run both migrations in Supabase SQL editor
+- [ ] Add `http://localhost:3000/auth/callback` + production URL to Supabase redirect URLs
 
-**Config (do first):**
-- [ ] Fix `tailwind.config.ts` — blue → teal (#0D9488 primary, #F59E0B accent)
-- [ ] Fix `src/app/globals.css` — CSS vars, body bg-slate-50
-- [ ] Set up Supabase project + fill `.env.local`
-- [ ] Run `supabase/migrations/001_initial_schema.sql`
-- [ ] Add `http://localhost:3000/auth/callback` to Supabase redirect URLs
+**Claude financial insights (quick win — ~5 lines):**
+- [ ] Uncomment Claude call in `financial.service.ts` (schema + Zod validation already in place)
 
-**Page wiring (wire stubs to existing components):**
-- [ ] `src/app/(app)/intake/page.tsx` — render `<IntakeWizard />`
-- [ ] `src/app/(app)/dashboard/page.tsx` — wire profile store on mount, real stat cards
-- [ ] `src/app/(app)/roadmap/page.tsx` — render `<RoadmapList />`
-- [ ] `src/app/(app)/funding/page.tsx` — render `<FundingList />`
-- [ ] `src/app/(app)/assistant/page.tsx` — render `<ChatPanel />`
+**i18n:**
+- [ ] Populate `src/lib/i18n/en.json` + `fr.json` with remaining static UI strings
 
-**Component completion:**
-- [ ] `src/components/ui/language-toggle.tsx` — FR/EN toggle
-- [ ] `src/components/funding/funding-detail.tsx` — eligibility detail view
+**Financial chart:**
+- [ ] Implement waterfall/bar chart visual in `take-home-breakdown.tsx`
 
-**Polish:**
-- [ ] Landing page hero — 3 persona cards, compelling copy, CTA
-- [ ] Loading skeletons on data-dependent pages
-- [ ] Empty states (no roadmap yet, no funding matches yet)
-- [ ] Error states
-- [ ] Financial Snapshot waterfall/bar chart visual
-- [ ] `src/lib/i18n/en.json` + `fr.json` — all static UI strings
-
-**Deployment + Demo:**
+**Demo day:**
 - [ ] Vercel: connect repo, set env vars, add production URL to Supabase redirect URLs
-- [ ] Seed Yara demo account (profile + roadmap + funding + snapshot + chat pre-cached)
-
----
-
-### Person C (Rami) — Current Status (Updated Apr 2, 2026)
-
-**Implemented now (backend + integration):**
-- [x] Financial questionnaire persistence migration: `supabase/migrations/002_financial_questionnaire.sql`
-- [x] Profile/type support for questionnaire answers + completion state (`src/types/profile.ts`, `src/types/financial.ts`)
-- [x] API support for questionnaire payloads in `POST/PUT /api/financial-snapshot`
-- [x] Cluster-driven financial computation path in `financial.service.ts` (C1-C9 question set -> normalized outputs -> deterministic tax math)
-- [x] Profile persistence of inferred financial fields (expected revenue, expenses, category map, unit economics when derivable)
-- [x] Frontend financial page flow updated to questionnaire-first, with organized Layout A sections
-- [x] Business type label fix for fallback cluster (`C9: General Micro-Business`)
-
-**Still remaining (Rami):**
-- [ ] Final Claude prompt wiring cleanup across services (`profile.service.ts`, `roadmap.service.ts`, `assistant.service.ts`, `cache.service.ts`)
-- [ ] End-to-end validation on all 3 personas (Yara, Marcus, Fatima) with saved questionnaire answers
-- [ ] Apply migration `002_financial_questionnaire.sql` in shared/prod Supabase project
-
----
-
-## File Ownership Reference
-
-| Path | Owner |
-|------|-------|
-| `tailwind.config.ts`, `globals.css` | Person A |
-| `src/app/(app)/` — all page files | Person A |
-| `src/app/page.tsx` — landing page | Person A |
-| `src/components/` — all UI components | Person A |
-| `src/stores/` — Zustand stores | Person A |
-| Vercel deployment | Person A |
-| `data/` | Person B ✅ |
-| `src/lib/knowledge-base/` | Person B ✅ |
-| `scripts/` | Person B ✅ |
-| `src/app/api/` | Person C ✅ |
-| `src/repositories/` | Person C ✅ |
-| `src/services/` | Person C 🔄 |
-| `src/lib/supabase/` | Person C ✅ |
-| `src/lib/claude/` | Person C ✅ |
-| `src/lib/funding/`, `src/lib/financial/` | Person C ✅ |
-| `src/types/` | Person C ✅ |
-| `src/middleware.ts` | Person C ✅ |
+- [ ] Seed Yara demo account in Supabase (profile + roadmap + funding + snapshot + chat pre-cached)
+- [ ] End-to-end validation on all 3 personas (Yara, Marcus, Fatima)
+- [ ] Verify cached responses work as Claude API fallback
 
 ---
 
