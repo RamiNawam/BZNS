@@ -8,7 +8,6 @@ import {
   ArrowRight,
   ChevronRight,
   Sparkles,
-  Zap,
 } from "lucide-react";
 
 // ─── Data ───────────────────────────────────────────────
@@ -293,12 +292,7 @@ export default function HomePage() {
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-lg bg-brand-600 flex items-center justify-center">
-              <Zap size={14} className="text-white" />
-            </div>
-            <span className="font-heading font-bold text-slate-900 text-lg">
-              BZNS
-            </span>
+            <img src="/BZNS.png" alt="BZNS" className="h-10 object-contain" />
           </div>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
             <a
@@ -568,12 +562,7 @@ export default function HomePage() {
       <footer className="border-t border-slate-200 bg-white py-8">
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="h-5 w-5 rounded-md bg-brand-600 flex items-center justify-center">
-              <Zap size={10} className="text-white" />
-            </div>
-            <span className="font-heading font-semibold text-slate-700 text-sm">
-              BZNS
-            </span>
+            <img src="/BZNS.png" alt="BZNS" className="h-8 object-contain" />
           </div>
           <p className="text-xs text-slate-400 text-center">
             Not legal or financial advice. Always verify with official
